@@ -1,0 +1,69 @@
+%PDF-1.4
+%‚„œ”
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [5 0 R 7 0 R] /Count 2 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+4 0 obj
+<< /Title (Open Finance Framework v2 - Operational Rules \(synthetic fixture\)) /Producer (bg-spec fixture writer) >>
+endobj
+5 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R >> >> /Contents 6 0 R >>
+endobj
+6 0 obj
+<< /Length 316 >>
+stream
+BT
+/F1 10 Tf
+13 TL
+50 800 Td
+(Open Finance Framework Version 2) Tj T*
+() Tj T*
+(Operational Rules \(synthetic fixture\)) Tj T*
+() Tj T*
+(SYNTHETIC TEST FIXTURE. This document is original test data created for the bg-spec MCP) Tj T*
+(server. It is not a Berlin Group publication and has no normative value.) Tj T*
+ET
+endstream
+endobj
+7 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R >> >> /Contents 8 0 R >>
+endobj
+8 0 obj
+<< /Length 406 >>
+stream
+BT
+/F1 10 Tf
+13 TL
+50 800 Td
+(3 Transaction History Access) Tj T*
+() Tj T*
+(The ASPSP SHALL make at least 90 days of transaction history available through the) Tj T*
+(transaction list endpoint.) Tj T*
+() Tj T*
+(Without active PSU involvement the TPP MUST NOT read the transaction list of an account more) Tj T*
+(than four times per calendar day. The limit is counted per account and per consent.) Tj T*
+ET
+endstream
+endobj
+xref
+0 9
+0000000000 65535 f 
+0000000015 00000 n 
+0000000064 00000 n 
+0000000127 00000 n 
+0000000224 00000 n 
+0000000357 00000 n 
+0000000483 00000 n 
+0000000849 00000 n 
+0000000975 00000 n 
+trailer
+<< /Size 9 /Root 1 0 R /Info 4 0 R >>
+startxref
+1431
+%%EOF

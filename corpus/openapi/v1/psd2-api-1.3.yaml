@@ -1,0 +1,166 @@
+# SYNTHETIC TEST FIXTURE - original test data, not a Berlin Group publication.
+openapi: 3.0.1
+info:
+  title: NextGenPSD2 XS2A Interface (synthetic fixture)
+  version: "1.3"
+  description: Synthetic account information subset used to exercise the bg-spec MCP server.
+servers:
+  - url: https://api.example-aspsp.test
+tags:
+  - name: Account Information Service (AIS)
+paths:
+  /v1/accounts:
+    get:
+      operationId: getAccountList
+      summary: Read account list
+      tags: [Account Information Service (AIS)]
+      parameters:
+        - $ref: '#/components/parameters/X-Request-ID'
+        - $ref: '#/components/parameters/Consent-ID'
+        - name: withBalance
+          in: query
+          schema: {type: boolean}
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/AccountList'}
+        '400': {$ref: '#/components/responses/400_AIS'}
+  /v1/accounts/{account-id}/transactions:
+    parameters:
+      - $ref: '#/components/parameters/AccountID'
+    get:
+      operationId: getTransactionList
+      summary: Read transaction list of an account
+      description: Reads account data from a given account addressed by account-id.
+      tags: [Account Information Service (AIS)]
+      parameters:
+        - $ref: '#/components/parameters/X-Request-ID'
+        - $ref: '#/components/parameters/Consent-ID'
+        - name: dateFrom
+          in: query
+          description: Conditional; mandatory unless deltaList is used.
+          schema: {type: string, format: date}
+        - name: dateTo
+          in: query
+          schema: {type: string, format: date}
+        - name: bookingStatus
+          in: query
+          required: true
+          schema: {$ref: '#/components/schemas/BookingStatus'}
+        - name: withBalance
+          in: query
+          schema: {type: boolean}
+      responses:
+        '200':
+          description: OK
+          headers:
+            X-Request-ID: {schema: {type: string, format: uuid}}
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/TransactionsResponse200Json'}
+        '400': {$ref: '#/components/responses/400_AIS'}
+        '401': {description: Unauthorized}
+        '403': {description: Forbidden}
+        '404': {description: Not found}
+  /v1/accounts/{account-id}/transactions/{transactionId}:
+    parameters:
+      - $ref: '#/components/parameters/AccountID'
+      - name: transactionId
+        in: path
+        required: true
+        schema: {type: string}
+    get:
+      operationId: getTransactionDetails
+      summary: Read transaction details
+      tags: [Account Information Service (AIS)]
+      parameters:
+        - $ref: '#/components/parameters/X-Request-ID'
+        - $ref: '#/components/parameters/Consent-ID'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/Transactions'}
+        '404': {description: Not found}
+components:
+  parameters:
+    AccountID:
+      name: account-id
+      in: path
+      required: true
+      description: Resource identification of the addressed account.
+      schema: {type: string}
+    X-Request-ID:
+      name: X-Request-ID
+      in: header
+      required: true
+      schema: {type: string, format: uuid}
+    Consent-ID:
+      name: Consent-ID
+      in: header
+      required: true
+      schema: {type: string}
+  responses:
+    400_AIS:
+      description: Bad request
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/Error400'}
+  schemas:
+    BookingStatus:
+      type: string
+      description: Booking status filter of a transaction list request.
+      enum: [booked, pending, both]
+    Amount:
+      type: object
+      required: [currency, amount]
+      properties:
+        currency: {type: string, pattern: '[A-Z]{3}'}
+        amount: {type: string, pattern: '-?[0-9]{1,14}(\.[0-9]{1,3})?'}
+    Transactions:
+      type: object
+      description: Transaction details.
+      required: [transactionAmount]
+      properties:
+        transactionId: {type: string}
+        entryReference: {type: string, maxLength: 35}
+        bookingDate: {type: string, format: date}
+        valueDate: {type: string, format: date}
+        transactionAmount: {$ref: '#/components/schemas/Amount'}
+        creditorName: {type: string, maxLength: 70}
+        remittanceInformationUnstructured: {type: string, maxLength: 140}
+    AccountReport:
+      type: object
+      required: [booked]
+      properties:
+        booked:
+          type: array
+          items: {$ref: '#/components/schemas/Transactions'}
+        pending:
+          type: array
+          items: {$ref: '#/components/schemas/Transactions'}
+    TransactionsResponse200Json:
+      type: object
+      properties:
+        account: {type: object, properties: {iban: {type: string}}}
+        transactions: {$ref: '#/components/schemas/AccountReport'}
+    AccountList:
+      type: object
+      required: [accounts]
+      properties:
+        accounts:
+          type: array
+          items: {type: object, properties: {resourceId: {type: string}, iban: {type: string}}}
+    Error400:
+      type: object
+      properties:
+        tppMessages:
+          type: array
+          items:
+            type: object
+            properties:
+              category: {type: string, enum: [ERROR, WARNING]}
+              code: {type: string, enum: [FORMAT_ERROR, PERIOD_INVALID]}

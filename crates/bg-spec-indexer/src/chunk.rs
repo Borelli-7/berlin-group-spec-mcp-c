@@ -38,6 +38,10 @@ pub struct RawChunk {
 /// Returns the normalized section label (`4.2.1 Read Transaction List`).
 pub fn detect_heading(line: &str) -> Option<String> {
     let line = line.trim();
+    if let Some(md) = line.strip_prefix('#') {
+        let title = md.trim_start_matches('#').trim();
+        return (!title.is_empty() && md.starts_with([' ', '#'])).then(|| title.to_owned());
+    }
     if line.len() < 3 || line.len() > 120 || line.ends_with(['.', ',', ';', ':']) {
         return None;
     }
@@ -249,6 +253,8 @@ mod tests {
         assert!(detect_heading("200 transactions were returned").is_none());
         assert!(detect_heading("2024 Berlin Group").is_none());
         assert!(detect_heading("Plain text line").is_none());
+        assert_eq!(detect_heading("## E-07 Access frequency").as_deref(), Some("E-07 Access frequency"));
+        assert!(detect_heading("#hashtag").is_none());
     }
 
     #[test]

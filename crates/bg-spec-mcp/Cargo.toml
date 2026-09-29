@@ -15,7 +15,6 @@ path = "src/lib.rs"
 [dependencies]
 bg-spec-core.workspace = true
 bg-spec-store.workspace = true
-bg-spec-indexer.workspace = true
 rmcp.workspace = true
 tokio.workspace = true
 serde.workspace = true
@@ -27,6 +26,7 @@ clap.workspace = true
 anyhow.workspace = true
 
 [dev-dependencies]
+bg-spec-indexer.workspace = true
 tempfile.workspace = true
 insta.workspace = true
 sha2.workspace = true

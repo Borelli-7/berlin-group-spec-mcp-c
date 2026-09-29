@@ -1,0 +1,121 @@
+# Curated requirement mappings: the authoritative bridge
+#   Requirement -> Source (+locator) -> Endpoint -> Schema -> Acceptance criteria
+#
+# Only requirements listed here are returned as `authoritative_requirement`.
+# Everything found by search is `discovered_evidence`.
+#
+# NOTE: the example corpus deliberately contains curation problems so that the conflict
+# detection can be demonstrated (see REQUIREMENT_TRACEABILITY.md):
+#   * OFV2-TRANSACTIONS-002 <-> OFV2-TRANSACTIONS-003: declared conflict
+#   * OFV2-TRANSACTIONS-003: precedence tie (operational rules vs errata) + stale sha256 pin
+#   * OFV2-BALANCES-001: dangling references (page out of range, unknown schema)
+schema_version: 1
+requirements:
+  - id: OFV2-TRANSACTIONS-001
+    version: openfinance-v2
+    title: Read transaction list with mandatory bookingStatus and dateFrom
+    description: >-
+      The ASPSP exposes GET /accounts/{accountId}/transactions. bookingStatus and dateFrom
+      are mandatory query parameters; responses are paginated.
+    sources:
+      - source_id: bg-openfinance-v2-implementation-guidelines
+        locator: section:4.2
+        note: Read Transaction List
+      - source_id: bg-openfinance-v2-implementation-guidelines
+        locator: page:3
+      - source_id: bg-openfinance-v2-openapi
+        locator: op:GET /accounts/{accountId}/transactions
+    endpoints:
+      - GET /accounts/{accountId}/transactions
+    schemas:
+      - TransactionsResponse200Json
+      - BookingStatus
+    acceptance_criteria:
+      - "A request without bookingStatus is rejected with HTTP 400."
+      - "The values booked, pending and both of bookingStatus are supported."
+      - "A request without dateFrom (and without deltaList) is rejected with HTTP 400 FORMAT_ERROR."
+      - "When more entries exist than fit into one page, the response contains _links.next."
+      - "The optional pageSize query parameter limits the number of returned entries."
+    tags: [ais, transactions]
+
+  - id: OFV2-TRANSACTIONS-002
+    version: openfinance-v2
+    title: Transaction list access frequency limited per account and consent
+    sources:
+      - source_id: bg-openfinance-v2-operational-rules
+        locator: page:2
+      - source_id: bg-openfinance-v2-implementation-guidelines
+        locator: page:3
+    endpoints:
+      - GET /accounts/{accountId}/transactions
+    acceptance_criteria:
+      - "The fifth transaction list read of an account within one calendar day without PSU involvement is rejected with HTTP 429 ACCESS_EXCEEDED."
+    conflicts_with:
+      - requirement_id: OFV2-TRANSACTIONS-003
+        note: Operational rules count per account and consent; errata E-07 counts per consent only.
+    tags: [ais, transactions, frequency]
+
+  - id: OFV2-TRANSACTIONS-003
+    version: openfinance-v2
+    title: Transaction list access frequency counted per consent (errata E-07)
+    sources:
+      - source_id: bg-openfinance-v2-errata
+        locator: section:E-07
+        sha256: "000000000000"
+        note: Pinned to the errata revision reviewed at curation time.
+      - source_id: bg-openfinance-v2-operational-rules
+        locator: page:2
+    endpoints:
+      - GET /accounts/{accountId}/transactions
+    acceptance_criteria:
+      - "The access counter for transaction list reads is maintained per consent."
+    tags: [ais, transactions, frequency, errata]
+
+  - id: OFV2-TRANSACTION-DETAILS-001
+    version: openfinance-v2
+    title: Read transaction details
+    sources:
+      - source_id: bg-openfinance-v2-implementation-guidelines
+        locator: section:4.3
+      - source_id: bg-openfinance-v2-openapi
+        locator: op:GET /accounts/{accountId}/transactions/{transactionId}
+    endpoints:
+      - GET /accounts/{accountId}/transactions/{transactionId}
+    schemas:
+      - Transactions
+    acceptance_criteria:
+      - "An unknown transactionId is answered with HTTP 404."
+    tags: [ais, transactions]
+
+  - id: OFV2-BALANCES-001
+    version: openfinance-v2
+    title: Read balances returns closingBooked or interimAvailable
+    sources:
+      - source_id: bg-openfinance-v2-implementation-guidelines
+        locator: page:42
+      - source_id: bg-openfinance-v2-openapi
+        locator: schema:BalanceList
+    endpoints:
+      - GET /accounts/{accountId}/balances
+    schemas:
+      - BalanceList
+    acceptance_criteria:
+      - "At least one balance of type closingBooked or interimAvailable is returned."
+    tags: [ais, balances]
+
+  - id: NGPSD2-TRANSACTIONS-001
+    version: nextgenpsd2-v1.3
+    title: Read transaction list (NextGenPSD2 v1.3 baseline)
+    sources:
+      - source_id: bg-nextgenpsd2-v1.3-implementation-guidelines
+        locator: section:6.3
+      - source_id: bg-nextgenpsd2-v1.3-openapi
+        locator: op:GET /v1/accounts/{account-id}/transactions
+    endpoints:
+      - GET /v1/accounts/{account-id}/transactions
+    schemas:
+      - TransactionsResponse200Json
+    acceptance_criteria:
+      - "bookingStatus is mandatory and supports booked, pending and both."
+      - "dateFrom is mandatory unless deltaList is used."
+    tags: [ais, transactions, baseline]

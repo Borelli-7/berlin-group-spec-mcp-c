@@ -1,0 +1,206 @@
+# SYNTHETIC TEST FIXTURE - original test data, not a Berlin Group publication.
+openapi: 3.0.3
+info:
+  title: Open Finance Framework API v2 (synthetic fixture)
+  version: "2.0"
+  description: Synthetic account information subset used to exercise the bg-spec MCP server.
+servers:
+  - url: https://api.example-aspsp.test/openfinance/v2
+tags:
+  - name: Account Information Service (AIS)
+security:
+  - BearerAuthOAuth: []
+paths:
+  /accounts:
+    get:
+      operationId: getAccountList
+      summary: Read account list
+      tags: [Account Information Service (AIS)]
+      parameters:
+        - $ref: '#/components/parameters/X-Request-ID'
+        - name: withBalance
+          in: query
+          schema: {type: boolean}
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/AccountList'}
+        '400': {$ref: '#/components/responses/400_AIS'}
+  /accounts/{accountId}/transactions:
+    parameters:
+      - $ref: '#/components/parameters/AccountId'
+    get:
+      operationId: getTransactionList
+      summary: Read transaction list of an account
+      description: Reads the transaction list of the account addressed by accountId, with pagination.
+      tags: [Account Information Service (AIS)]
+      parameters:
+        - $ref: '#/components/parameters/X-Request-ID'
+        - name: dateFrom
+          in: query
+          required: true
+          description: Mandatory unless deltaList is used.
+          schema: {type: string, format: date}
+        - name: dateTo
+          in: query
+          schema: {type: string, format: date}
+        - name: bookingStatus
+          in: query
+          required: true
+          schema: {$ref: '#/components/schemas/BookingStatus'}
+        - name: withBalance
+          in: query
+          schema: {type: boolean}
+        - name: pageSize
+          in: query
+          description: Maximum number of entries per page.
+          schema: {type: integer, format: int32, minimum: 1, maximum: 500}
+      responses:
+        '200':
+          description: OK
+          headers:
+            X-Request-ID: {schema: {type: string, format: uuid}}
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/TransactionsResponse200Json'}
+        '400': {$ref: '#/components/responses/400_AIS'}
+        '401': {description: Unauthorized}
+        '403': {description: Forbidden}
+        '404': {description: Not found}
+        '429': {description: Too many requests (ACCESS_EXCEEDED)}
+  /accounts/{accountId}/transactions/{transactionId}:
+    parameters:
+      - $ref: '#/components/parameters/AccountId'
+      - name: transactionId
+        in: path
+        required: true
+        schema: {type: string}
+    get:
+      operationId: getTransactionDetails
+      summary: Read transaction details
+      tags: [Account Information Service (AIS)]
+      parameters:
+        - $ref: '#/components/parameters/X-Request-ID'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/Transactions'}
+        '404': {description: Not found}
+  /accounts/{accountId}/balances:
+    parameters:
+      - $ref: '#/components/parameters/AccountId'
+    get:
+      operationId: getBalances
+      summary: Read balances
+      tags: [Account Information Service (AIS)]
+      parameters:
+        - $ref: '#/components/parameters/X-Request-ID'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/ReadAccountBalanceResponse200'}
+components:
+  securitySchemes:
+    BearerAuthOAuth:
+      type: http
+      scheme: bearer
+  parameters:
+    AccountId:
+      name: accountId
+      in: path
+      required: true
+      description: Resource identification of the addressed account.
+      schema: {type: string}
+    X-Request-ID:
+      name: X-Request-ID
+      in: header
+      required: true
+      schema: {type: string, format: uuid}
+  responses:
+    400_AIS:
+      description: Bad request
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/Error400'}
+  schemas:
+    BookingStatus:
+      type: string
+      description: Booking status filter of a transaction list request.
+      enum: [booked, pending, both, information, all]
+    Amount:
+      type: object
+      required: [currency, amount]
+      properties:
+        currency: {type: string, pattern: '[A-Z]{3}'}
+        amount: {type: string, pattern: '-?[0-9]{1,14}(\.[0-9]{1,3})?'}
+    PartyIdentification:
+      type: object
+      properties:
+        name: {type: string, maxLength: 140}
+        iban: {type: string}
+    Transactions:
+      type: object
+      description: Transaction details.
+      required: [transactionAmount, bookingDate]
+      properties:
+        transactionId: {type: string}
+        entryReference: {type: string, maxLength: 35}
+        bookingDate: {type: string, format: date-time}
+        valueDate: {type: string, format: date, nullable: true}
+        transactionAmount: {$ref: '#/components/schemas/Amount'}
+        creditor: {$ref: '#/components/schemas/PartyIdentification'}
+        merchantCategoryCode: {type: string, pattern: '[0-9]{4}'}
+        remittanceInformationUnstructured: {type: string, maxLength: 140}
+    AccountReport:
+      type: object
+      required: [booked]
+      properties:
+        booked:
+          type: array
+          items: {$ref: '#/components/schemas/Transactions'}
+        pending:
+          type: array
+          items: {$ref: '#/components/schemas/Transactions'}
+        _links:
+          type: object
+          properties:
+            next: {type: string, format: uri}
+    TransactionsResponse200Json:
+      type: object
+      properties:
+        account: {type: object, properties: {iban: {type: string}}}
+        transactions: {$ref: '#/components/schemas/AccountReport'}
+    ReadAccountBalanceResponse200:
+      type: object
+      required: [balances]
+      properties:
+        balances:
+          type: array
+          items:
+            type: object
+            properties:
+              balanceType: {type: string, enum: [closingBooked, interimAvailable, expected]}
+              balanceAmount: {$ref: '#/components/schemas/Amount'}
+    AccountList:
+      type: object
+      required: [accounts]
+      properties:
+        accounts:
+          type: array
+          items: {type: object, properties: {resourceId: {type: string}, iban: {type: string}}}
+    Error400:
+      type: object
+      properties:
+        tppMessages:
+          type: array
+          items:
+            type: object
+            properties:
+              category: {type: string, enum: [ERROR, WARNING]}
+              code: {type: string, enum: [FORMAT_ERROR, PERIOD_INVALID, ACCESS_EXCEEDED]}

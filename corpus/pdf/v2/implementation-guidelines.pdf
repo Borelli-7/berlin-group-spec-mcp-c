@@ -1,0 +1,167 @@
+%PDF-1.4
+%‚„œ”
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [5 0 R 7 0 R 9 0 R 11 0 R 13 0 R 15 0 R] /Count 6 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+4 0 obj
+<< /Title (Open Finance Framework v2 - Implementation Guidelines \(synthetic fixture\)) /Producer (bg-spec fixture writer) >>
+endobj
+5 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R >> >> /Contents 6 0 R >>
+endobj
+6 0 obj
+<< /Length 346 >>
+stream
+BT
+/F1 10 Tf
+13 TL
+50 800 Td
+(Open Finance Framework Version 2) Tj T*
+() Tj T*
+(Implementation Guidelines - Account Information \(synthetic fixture\)) Tj T*
+() Tj T*
+(SYNTHETIC TEST FIXTURE. This document is original test data created for the bg-spec MCP) Tj T*
+(server. It is not a Berlin Group publication and has no normative value.) Tj T*
+ET
+endstream
+endobj
+7 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R >> >> /Contents 8 0 R >>
+endobj
+8 0 obj
+<< /Length 518 >>
+stream
+BT
+/F1 10 Tf
+13 TL
+50 800 Td
+(1 Introduction) Tj T*
+() Tj T*
+(This document describes the account information interface of the synthetic Open Finance) Tj T*
+(Framework version 2. Version 2 extends version 1.3 and keeps the version 1.3 interface) Tj T*
+(available for existing TPPs.) Tj T*
+() Tj T*
+(2 Conventions) Tj T*
+() Tj T*
+(The key words MUST, MUST NOT, SHALL, SHALL NOT, SHOULD and MAY are to be interpreted as) Tj T*
+(normative requirement levels. Statements without these key words are informative.) Tj T*
+ET
+endstream
+endobj
+9 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R >> >> /Contents 10 0 R >>
+endobj
+10 0 obj
+<< /Length 1224 >>
+stream
+BT
+/F1 10 Tf
+13 TL
+50 800 Td
+(4.2 Read Transaction List) Tj T*
+() Tj T*
+(Call GET /accounts/{accountId}/transactions reads the transaction list of an addressed) Tj T*
+(account.) Tj T*
+() Tj T*
+(The query parameter bookingStatus is mandatory. The ASPSP SHALL support the values booked,) Tj T*
+(pending and both. The ASPSP MAY support the values information and all. If the value) Tj T*
+(information is used, the ASPSP SHALL return standing order information instead of) Tj T*
+(transactions.) Tj T*
+() Tj T*
+(The query parameter dateFrom is mandatory unless deltaList is used. The ASPSP SHALL reject a) Tj T*
+(request without dateFrom with HTTP status 400 and error code FORMAT_ERROR.) Tj T*
+() Tj T*
+(The ASPSP SHALL support the pagination of transaction lists. The TPP MAY limit the page size) Tj T*
+(with the query parameter pageSize. The ASPSP SHALL return a link next when more entries) Tj T*
+(exist.) Tj T*
+() Tj T*
+(The ASPSP SHALL return HTTP status 429 with error code ACCESS_EXCEEDED when the access) Tj T*
+(frequency limit of the consent is exceeded.) Tj T*
+() Tj T*
+(Each returned transaction MUST contain transactionAmount and bookingDate. The bookingDate is) Tj T*
+(returned as date-time in version 2.) Tj T*
+ET
+endstream
+endobj
+11 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R >> >> /Contents 12 0 R >>
+endobj
+12 0 obj
+<< /Length 0 >>
+stream
+endstream
+endobj
+13 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R >> >> /Contents 14 0 R >>
+endobj
+14 0 obj
+<< /Length 484 >>
+stream
+BT
+/F1 10 Tf
+13 TL
+50 800 Td
+(4.3 Read Transaction Details) Tj T*
+() Tj T*
+(Call GET /accounts/{accountId}/transactions/{transactionId} reads the details of one) Tj T*
+(transaction. The ASPSP SHALL return HTTP status 404 if the transactionId is unknown.) Tj T*
+() Tj T*
+(4.4 Read Balance) Tj T*
+() Tj T*
+(Call GET /accounts/{accountId}/balances reads the balances of an account. The ASPSP SHALL) Tj T*
+(return at least one balance of type closingBooked or interimAvailable.) Tj T*
+ET
+endstream
+endobj
+15 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R >> >> /Contents 16 0 R >>
+endobj
+16 0 obj
+<< /Length 450 >>
+stream
+BT
+/F1 10 Tf
+13 TL
+50 800 Td
+(5 Error Codes) Tj T*
+() Tj T*
+(FORMAT_ERROR \(400\): the request does not match the syntax of the interface.) Tj T*
+() Tj T*
+(PERIOD_INVALID \(400\): the requested period is outside the supported range.) Tj T*
+() Tj T*
+(CONSENT_INVALID \(401\): the consent was created but is not valid for the addressed service.) Tj T*
+() Tj T*
+(ACCESS_EXCEEDED \(429\): the access frequency limit of the consent is exceeded.) Tj T*
+ET
+endstream
+endobj
+xref
+0 17
+0000000000 65535 f 
+0000000015 00000 n 
+0000000064 00000 n 
+0000000154 00000 n 
+0000000251 00000 n 
+0000000392 00000 n 
+0000000518 00000 n 
+0000000914 00000 n 
+0000001040 00000 n 
+0000001608 00000 n 
+0000001735 00000 n 
+0000003011 00000 n 
+0000003139 00000 n 
+0000003188 00000 n 
+0000003316 00000 n 
+0000003851 00000 n 
+0000003979 00000 n 
+trailer
+<< /Size 17 /Root 1 0 R /Info 4 0 R >>
+startxref
+4480
+%%EOF

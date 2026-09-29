@@ -1,0 +1,72 @@
+%PDF-1.4
+%‚„œ”
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [5 0 R 7 0 R] /Count 2 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+4 0 obj
+<< /Title (NextGenPSD2 v1.3 - Implementation Guidelines \(synthetic fixture\)) /Producer (bg-spec fixture writer) >>
+endobj
+5 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R >> >> /Contents 6 0 R >>
+endobj
+6 0 obj
+<< /Length 325 >>
+stream
+BT
+/F1 10 Tf
+13 TL
+50 800 Td
+(NextGenPSD2 Framework Version 1.3) Tj T*
+() Tj T*
+(Implementation Guidelines \(synthetic fixture\)) Tj T*
+() Tj T*
+(SYNTHETIC TEST FIXTURE. This document is original test data created for the bg-spec MCP) Tj T*
+(server. It is not a Berlin Group publication and has no normative value.) Tj T*
+ET
+endstream
+endobj
+7 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R >> >> /Contents 8 0 R >>
+endobj
+8 0 obj
+<< /Length 495 >>
+stream
+BT
+/F1 10 Tf
+13 TL
+50 800 Td
+(6.3 Read Transaction List) Tj T*
+() Tj T*
+(Call GET /v1/accounts/{account-id}/transactions reads the transaction list of an account.) Tj T*
+() Tj T*
+(The query parameter bookingStatus is mandatory. The ASPSP SHALL support the values booked,) Tj T*
+(pending and both.) Tj T*
+() Tj T*
+(The query parameter dateFrom is conditional. It is mandatory unless deltaList is used.) Tj T*
+() Tj T*
+(The ASPSP SHALL return HTTP status 400, 401, 403 or 404 on errors.) Tj T*
+ET
+endstream
+endobj
+xref
+0 9
+0000000000 65535 f 
+0000000015 00000 n 
+0000000064 00000 n 
+0000000127 00000 n 
+0000000224 00000 n 
+0000000356 00000 n 
+0000000482 00000 n 
+0000000857 00000 n 
+0000000983 00000 n 
+trailer
+<< /Size 9 /Root 1 0 R /Info 4 0 R >>
+startxref
+1528
+%%EOF

@@ -1,6 +1,7 @@
 //! PDF extraction behind a replaceable interface.
 
 pub mod fixture;
+pub mod fixture_corpus;
 mod oxide;
 
 pub use oxide::PdfOxideExtractor;
