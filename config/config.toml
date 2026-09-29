@@ -1,0 +1,28 @@
+# Berlin Group specification MCP configuration.
+# Relative paths are resolved against the directory containing this file.
+corpus_root = "../corpus"
+data_dir = "../data"
+manifest = "manifest.yaml"
+requirements = "requirements/requirements.yaml"
+
+[versions]
+baseline = "nextgenpsd2-v1.3"
+target = "openfinance-v2"
+
+[versions.path_prefixes]
+# NextGenPSD2 1.3 paths are published as /v1/...; stripped for cross-version matching.
+"nextgenpsd2-v1.3" = "/v1"
+
+[chunking]
+max_chars = 6000
+overlap_chars = 500
+
+[pdf]
+min_chars_per_page = 16
+
+[search]
+default_limit = 10
+max_limit = 50
+
+[log]
+level = "info"

@@ -1,0 +1,26 @@
+[package]
+name = "bg-spec-indexer"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+bg-spec-core.workspace = true
+bg-spec-store.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+serde-saphyr.workspace = true
+openapiv3.workspace = true
+pdf_oxide.workspace = true
+sha2.workspace = true
+hex.workspace = true
+walkdir.workspace = true
+thiserror.workspace = true
+tokio.workspace = true
+tracing.workspace = true
+toml.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true
+insta.workspace = true

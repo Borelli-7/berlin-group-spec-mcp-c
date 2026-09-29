@@ -1,0 +1,21 @@
+[package]
+name = "bg-spec-cli"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[[bin]]
+name = "bg-spec"
+path = "src/main.rs"
+
+[dependencies]
+bg-spec-core.workspace = true
+bg-spec-store.workspace = true
+bg-spec-indexer.workspace = true
+tokio.workspace = true
+serde_json.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+clap.workspace = true
+anyhow.workspace = true

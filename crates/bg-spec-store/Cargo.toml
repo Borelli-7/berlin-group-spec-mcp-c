@@ -1,0 +1,20 @@
+[package]
+name = "bg-spec-store"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+bg-spec-core.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+sqlx.workspace = true
+tantivy.workspace = true
+thiserror.workspace = true
+async-trait.workspace = true
+tokio.workspace = true
+tracing.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true
