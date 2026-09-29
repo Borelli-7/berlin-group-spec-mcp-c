@@ -2,6 +2,8 @@
 //! full-text index. Both implement the read ports of `bg-spec-core`; write APIs are used
 //! by the indexer only.
 
+#![forbid(unsafe_code)]
+
 pub mod search;
 pub mod sqlite;
 

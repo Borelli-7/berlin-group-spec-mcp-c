@@ -1,0 +1,46 @@
+{
+  "source": {
+    "source_id": "bg-openfinance-v2-implementation-guidelines",
+    "document_id": "bg-openfinance-v2-implementation-guidelines@8eec1c4376ce",
+    "version": "openfinance-v2",
+    "kind": "pdf",
+    "title": "Open Finance v2 Implementation Guidelines (synthetic fixture)",
+    "authority": "normative",
+    "precedence": 100,
+    "path": "pdf/v2/implementation-guidelines.pdf",
+    "sha256": "8eec1c4376ce0a3155981597e953208585e80d986308bd69593d4a4b86949d5b",
+    "status": "partial",
+    "page_count": 6,
+    "ocr_required_pages": [
+      4
+    ],
+    "diagnostics": 1,
+    "indexed_at_unix": "<timestamp>"
+  },
+  "locator": "page:3",
+  "classification": "source_content",
+  "content": {
+    "type": "pages",
+    "pages": [
+      {
+        "page": 3,
+        "status": "extracted",
+        "text": "4.2 Read Transaction List\n\nCall GET /accounts/{accountId}/transactions reads the transaction list of an addressed\naccount.\n\nThe query parameter bookingStatus is mandatory. The ASPSP SHALL support the values booked,\npending and both. The ASPSP MAY support the values information and all. If the value\ninformation is used, the ASPSP SHALL return standing order information instead of\ntransactions.\n\nThe query parameter dateFrom is mandatory unless deltaList is used. The ASPSP SHALL reject a\nrequest without dateFrom with HTTP status 400 and error code FORMAT_ERROR.\n\nThe ASPSP SHALL support the pagination of transaction lists. The TPP MAY limit the page size\nwith the query parameter pageSize. The ASPSP SHALL return a link next when more entries\nexist.\n\nThe ASPSP SHALL return HTTP status 429 with error code ACCESS_EXCEEDED when the access\nfrequency limit of the consent is exceeded.\n\nEach returned transaction MUST contain transactionAmount and bookingDate. The bookingDate is\nreturned as date-time in version 2.",
+        "sha256": "ffb004d5d4d60493cbcc67cbdf923ef7f782113b7492240ba869ba9de5de294a"
+      }
+    ]
+  },
+  "provenance": [
+    {
+      "source_id": "bg-openfinance-v2-implementation-guidelines",
+      "document_id": "bg-openfinance-v2-implementation-guidelines@8eec1c4376ce",
+      "version": "openfinance-v2",
+      "kind": "pdf",
+      "authority": "normative",
+      "precedence": 100,
+      "locator": "page:3",
+      "sha256": "ffb004d5d4d60493cbcc67cbdf923ef7f782113b7492240ba869ba9de5de294a",
+      "document_sha256": "8eec1c4376ce0a3155981597e953208585e80d986308bd69593d4a4b86949d5b"
+    }
+  ]
+}

@@ -1,0 +1,74 @@
+{
+  "version": "openfinance-v2",
+  "name": "Transactions",
+  "schema": {
+    "version": "openfinance-v2",
+    "name": "Transactions",
+    "schema": {
+      "type": "object",
+      "description": "Transaction details.",
+      "required": [
+        "transactionAmount",
+        "bookingDate"
+      ],
+      "properties": {
+        "transactionId": {
+          "type": "string"
+        },
+        "entryReference": {
+          "type": "string",
+          "maxLength": 35
+        },
+        "bookingDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "valueDate": {
+          "type": "string",
+          "format": "date",
+          "nullable": true
+        },
+        "transactionAmount": {
+          "$ref": "#/components/schemas/Amount"
+        },
+        "creditor": {
+          "$ref": "#/components/schemas/PartyIdentification"
+        },
+        "merchantCategoryCode": {
+          "type": "string",
+          "pattern": "[0-9]{4}"
+        },
+        "remittanceInformationUnstructured": {
+          "type": "string",
+          "maxLength": 140
+        }
+      }
+    },
+    "referenced_schemas": [
+      "Amount",
+      "PartyIdentification"
+    ],
+    "json_pointer": "/components/schemas/Transactions",
+    "provenance": {
+      "source_id": "bg-openfinance-v2-openapi",
+      "document_id": "bg-openfinance-v2-openapi@edd99f6e0265",
+      "version": "openfinance-v2",
+      "kind": "openapi",
+      "authority": "technical",
+      "precedence": 90,
+      "locator": "schema:Transactions",
+      "sha256": "3e0fd453f446a53f019806fb665d35ddc229a944547c37b2e0b37e8657967330",
+      "document_sha256": "edd99f6e026537a45d3e95f33a35918e0f338914c70879234c5dc3c1e799fdfb"
+    }
+  },
+  "referenced_schemas": [
+    "Amount",
+    "PartyIdentification"
+  ],
+  "transitive_referenced_schemas": [
+    "Amount",
+    "PartyIdentification"
+  ],
+  "unresolved_references": [],
+  "alternatives": []
+}

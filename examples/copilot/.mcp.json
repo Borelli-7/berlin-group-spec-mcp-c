@@ -1,0 +1,27 @@
+{
+  "mcpServers": {
+    "berlin-group-spec": {
+      "type": "local",
+      "command": "/absolute/path/berlin-group-spec-mcp/target/release/bg-spec-mcp",
+      "args": [
+        "--config",
+        "/absolute/path/berlin-group-spec-mcp/config/config.toml"
+      ],
+      "env": {
+        "BG_SPEC_LOG": "warn"
+      },
+      "tools": [
+        "search_specification",
+        "find_requirement",
+        "read_source",
+        "read_openapi_endpoint",
+        "read_openapi_schema",
+        "get_endpoint_requirements",
+        "trace_requirement",
+        "compare_v1_v2",
+        "list_sources",
+        "health"
+      ]
+    }
+  }
+}

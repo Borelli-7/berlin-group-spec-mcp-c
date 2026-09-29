@@ -4,6 +4,8 @@
 //! `bg_spec_core` service and returns structured JSON. No tool writes, executes or reads
 //! caller-supplied filesystem paths.
 
+#![forbid(unsafe_code)]
+
 mod error;
 mod inputs;
 mod server;

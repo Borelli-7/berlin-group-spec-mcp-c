@@ -1,5 +1,7 @@
 //! `bg-spec`: indexing, diagnostics and maintenance CLI for the Berlin Group spec MCP.
 
+#![forbid(unsafe_code)]
+
 mod doctor;
 
 use anyhow::{Context, Result};

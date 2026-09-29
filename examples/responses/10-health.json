@@ -1,0 +1,30 @@
+{
+  "status": "degraded",
+  "read_only": true,
+  "server_version": "0.1.0",
+  "baseline_version": "nextgenpsd2-v1.3",
+  "target_version": "openfinance-v2",
+  "catalog": {
+    "documents": 6,
+    "pages": 11,
+    "ocr_required_pages": 1,
+    "chunks": 14,
+    "operations": 7,
+    "schemas": 16,
+    "requirements": 6
+  },
+  "index": {
+    "schema_version": 1,
+    "last_indexed_at_unix": "<timestamp>",
+    "index_generation": 3,
+    "requirements_file_sha256": "91f9b55e4d5f1b425fe608d1e6442edfdf06e9f2749b02ebe53d781b477da13c"
+  },
+  "search_documents": 37,
+  "versions": [
+    "nextgenpsd2-v1.3",
+    "openfinance-v2"
+  ],
+  "problems": [
+    "1 page(s) require OCR (no extractable text)"
+  ]
+}

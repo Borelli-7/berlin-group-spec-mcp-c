@@ -3,6 +3,8 @@
 //! Startup only opens the existing SQLite catalog (read-only) and Tantivy index; it never parses
 //! documents or rebuilds indexes. All logs go to stderr so stdout carries only MCP frames.
 
+#![forbid(unsafe_code)]
+
 use anyhow::{Context, Result};
 use bg_spec_core::{
     config::Config,

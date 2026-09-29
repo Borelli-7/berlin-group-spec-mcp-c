@@ -1,0 +1,1 @@
+{"tool":"get_endpoint_requirements","arguments":{"version":"openfinance-v2","path":"/accounts/{accountId}/transactions","method":"GET"}}

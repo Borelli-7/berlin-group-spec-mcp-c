@@ -1,0 +1,194 @@
+{
+  "version": "openfinance-v2",
+  "requested_method": "GET",
+  "requested_path": "/accounts/{accountId}/transactions",
+  "matched_by": "exact",
+  "operation": {
+    "version": "openfinance-v2",
+    "path": "/accounts/{accountId}/transactions",
+    "method": "GET",
+    "operation_id": "getTransactionList",
+    "summary": "Read transaction list of an account",
+    "description": "Reads the transaction list of the account addressed by accountId, with pagination.",
+    "tags": [
+      "Account Information Service (AIS)"
+    ],
+    "deprecated": false,
+    "parameters": [
+      {
+        "name": "accountId",
+        "location": "path",
+        "required": true,
+        "deprecated": false,
+        "description": "Resource identification of the addressed account.",
+        "schema": {
+          "schema": {
+            "type": "string"
+          }
+        },
+        "component": "#/components/parameters/AccountId"
+      },
+      {
+        "name": "X-Request-ID",
+        "location": "header",
+        "required": true,
+        "deprecated": false,
+        "schema": {
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "component": "#/components/parameters/X-Request-ID"
+      },
+      {
+        "name": "dateFrom",
+        "location": "query",
+        "required": true,
+        "deprecated": false,
+        "description": "Mandatory unless deltaList is used.",
+        "schema": {
+          "schema": {
+            "type": "string",
+            "format": "date"
+          }
+        }
+      },
+      {
+        "name": "dateTo",
+        "location": "query",
+        "required": false,
+        "deprecated": false,
+        "schema": {
+          "schema": {
+            "type": "string",
+            "format": "date"
+          }
+        }
+      },
+      {
+        "name": "bookingStatus",
+        "location": "query",
+        "required": true,
+        "deprecated": false,
+        "schema": {
+          "schema_ref": "BookingStatus",
+          "schema": {
+            "$ref": "#/components/schemas/BookingStatus"
+          }
+        }
+      },
+      {
+        "name": "withBalance",
+        "location": "query",
+        "required": false,
+        "deprecated": false,
+        "schema": {
+          "schema": {
+            "type": "boolean"
+          }
+        }
+      },
+      {
+        "name": "pageSize",
+        "location": "query",
+        "required": false,
+        "deprecated": false,
+        "description": "Maximum number of entries per page.",
+        "schema": {
+          "schema": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 1,
+            "maximum": 500
+          }
+        }
+      }
+    ],
+    "responses": [
+      {
+        "status": "200",
+        "description": "OK",
+        "headers": [
+          "X-Request-ID"
+        ],
+        "content": [
+          {
+            "media_type": "application/json",
+            "schema": {
+              "schema_ref": "TransactionsResponse200Json",
+              "schema": {
+                "$ref": "#/components/schemas/TransactionsResponse200Json"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "status": "400",
+        "description": "Bad request",
+        "headers": [],
+        "content": [
+          {
+            "media_type": "application/json",
+            "schema": {
+              "schema_ref": "Error400",
+              "schema": {
+                "$ref": "#/components/schemas/Error400"
+              }
+            }
+          }
+        ],
+        "component": "#/components/responses/400_AIS"
+      },
+      {
+        "status": "401",
+        "description": "Unauthorized",
+        "headers": [],
+        "content": []
+      },
+      {
+        "status": "403",
+        "description": "Forbidden",
+        "headers": [],
+        "content": []
+      },
+      {
+        "status": "404",
+        "description": "Not found",
+        "headers": [],
+        "content": []
+      },
+      {
+        "status": "429",
+        "description": "Too many requests (ACCESS_EXCEEDED)",
+        "headers": [],
+        "content": []
+      }
+    ],
+    "security": [
+      {
+        "BearerAuthOAuth": []
+      }
+    ],
+    "security_origin": "global",
+    "referenced_schemas": [
+      "BookingStatus",
+      "Error400",
+      "TransactionsResponse200Json"
+    ],
+    "json_pointer": "/paths/~1accounts~1{accountId}~1transactions/get",
+    "provenance": {
+      "source_id": "bg-openfinance-v2-openapi",
+      "document_id": "bg-openfinance-v2-openapi@edd99f6e0265",
+      "version": "openfinance-v2",
+      "kind": "openapi",
+      "authority": "technical",
+      "precedence": 90,
+      "locator": "op:GET /accounts/{accountId}/transactions",
+      "sha256": "2935fd27adbb313d52dc8f4b04cee4dc74f1693bf8671549bc9c917adf8f45f5",
+      "document_sha256": "edd99f6e026537a45d3e95f33a35918e0f338914c70879234c5dc3c1e799fdfb"
+    }
+  },
+  "alternatives": []
+}

@@ -1,0 +1,103 @@
+{
+  "total": 6,
+  "sources": [
+    {
+      "source_id": "bg-nextgenpsd2-v1.3-implementation-guidelines",
+      "document_id": "bg-nextgenpsd2-v1.3-implementation-guidelines@6b1ad0402855",
+      "version": "nextgenpsd2-v1.3",
+      "kind": "pdf",
+      "title": "NextGenPSD2 v1.3 Implementation Guidelines (synthetic fixture)",
+      "authority": "normative",
+      "precedence": 100,
+      "path": "pdf/v1/implementation-guidelines-v1.3.pdf",
+      "sha256": "6b1ad04028559e8382f14dee595a5183038ba8757cf7afe4fb0f84dfead8bdf6",
+      "status": "indexed",
+      "page_count": 2,
+      "ocr_required_pages": [],
+      "diagnostics": 0,
+      "indexed_at_unix": "<timestamp>"
+    },
+    {
+      "source_id": "bg-nextgenpsd2-v1.3-openapi",
+      "document_id": "bg-nextgenpsd2-v1.3-openapi@45501c5076b9",
+      "version": "nextgenpsd2-v1.3",
+      "kind": "openapi",
+      "title": "NextGenPSD2 v1.3 OpenAPI (synthetic fixture)",
+      "authority": "technical",
+      "precedence": 90,
+      "path": "openapi/v1/psd2-api-1.3.yaml",
+      "sha256": "45501c5076b98ccd3f755581d51a3a32e9c82710d2ef18b9f574dc93fee014b2",
+      "status": "indexed",
+      "page_count": null,
+      "ocr_required_pages": [],
+      "diagnostics": 0,
+      "indexed_at_unix": "<timestamp>"
+    },
+    {
+      "source_id": "bg-openfinance-v2-implementation-guidelines",
+      "document_id": "bg-openfinance-v2-implementation-guidelines@8eec1c4376ce",
+      "version": "openfinance-v2",
+      "kind": "pdf",
+      "title": "Open Finance v2 Implementation Guidelines (synthetic fixture)",
+      "authority": "normative",
+      "precedence": 100,
+      "path": "pdf/v2/implementation-guidelines.pdf",
+      "sha256": "8eec1c4376ce0a3155981597e953208585e80d986308bd69593d4a4b86949d5b",
+      "status": "partial",
+      "page_count": 6,
+      "ocr_required_pages": [
+        4
+      ],
+      "diagnostics": 1,
+      "indexed_at_unix": "<timestamp>"
+    },
+    {
+      "source_id": "bg-openfinance-v2-openapi",
+      "document_id": "bg-openfinance-v2-openapi@edd99f6e0265",
+      "version": "openfinance-v2",
+      "kind": "openapi",
+      "title": "Open Finance v2 OpenAPI (synthetic fixture)",
+      "authority": "technical",
+      "precedence": 90,
+      "path": "openapi/v2/openfinance-api-v2.yaml",
+      "sha256": "edd99f6e026537a45d3e95f33a35918e0f338914c70879234c5dc3c1e799fdfb",
+      "status": "indexed",
+      "page_count": null,
+      "ocr_required_pages": [],
+      "diagnostics": 0,
+      "indexed_at_unix": "<timestamp>"
+    },
+    {
+      "source_id": "bg-openfinance-v2-errata",
+      "document_id": "bg-openfinance-v2-errata@809757ca2bde",
+      "version": "openfinance-v2",
+      "kind": "text",
+      "title": "Open Finance v2 Errata and Clarifications (synthetic fixture)",
+      "authority": "informative",
+      "precedence": 80,
+      "path": "text/v2/errata.md",
+      "sha256": "809757ca2bdef7b43e9f039df0c5277a4c347c1a95489097efa54695c7c1e91d",
+      "status": "indexed",
+      "page_count": 1,
+      "ocr_required_pages": [],
+      "diagnostics": 0,
+      "indexed_at_unix": "<timestamp>"
+    },
+    {
+      "source_id": "bg-openfinance-v2-operational-rules",
+      "document_id": "bg-openfinance-v2-operational-rules@80430186dc34",
+      "version": "openfinance-v2",
+      "kind": "pdf",
+      "title": "Open Finance v2 Operational Rules (synthetic fixture)",
+      "authority": "normative",
+      "precedence": 80,
+      "path": "pdf/v2/operational-rules.pdf",
+      "sha256": "80430186dc34e00a77e634344b432b302e43b08bb45b9d7b52ba5d91d00adfe9",
+      "status": "indexed",
+      "page_count": 2,
+      "ocr_required_pages": [],
+      "diagnostics": 0,
+      "indexed_at_unix": "<timestamp>"
+    }
+  ]
+}

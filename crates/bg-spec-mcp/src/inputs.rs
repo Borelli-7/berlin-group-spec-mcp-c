@@ -12,7 +12,7 @@ pub struct SearchSpecificationInput {
     /// Specification version filter, e.g. `openfinance-v2` or `nextgenpsd2-v1.3`.
     #[serde(default)]
     pub version: Option<String>,
-    /// Kind filter: `pdf`, `openapi`, `text` or `requirements`.
+    /// Kind filter: `pdf`, `openapi` or `text`.
     #[serde(default)]
     pub kind: Option<String>,
     /// Restrict to one source id (see `list_sources`).
@@ -112,7 +112,7 @@ pub struct ListSourcesInput {
     /// Optional version filter.
     #[serde(default)]
     pub version: Option<String>,
-    /// Optional kind filter.
+    /// Optional kind filter: `pdf`, `openapi` or `text`.
     #[serde(default)]
     pub kind: Option<String>,
 }

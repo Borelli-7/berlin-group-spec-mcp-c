@@ -1,0 +1,28 @@
+{
+  "query": "dateFrom mandatory",
+  "filters": {
+    "version": "openfinance-v2",
+    "kind": "pdf",
+    "source_id": null
+  },
+  "notice": "Search results are discovered evidence retrieved by full-text relevance. They are NOT authoritative requirements. Only curated requirement mappings (classification 'authoritative_requirement') are requirements; verify evidence with read_source before relying on it.",
+  "total": 1,
+  "results": [
+    {
+      "record_id": "bg-openfinance-v2-implementation-guidelines:p3:c0",
+      "record_type": "chunk",
+      "source_id": "bg-openfinance-v2-implementation-guidelines",
+      "document_id": "bg-openfinance-v2-implementation-guidelines@8eec1c4376ce",
+      "version": "openfinance-v2",
+      "kind": "pdf",
+      "authority": "normative",
+      "title": "Open Finance v2 Implementation Guidelines (synthetic fixture) — 4.2 Read Transaction List",
+      "locator": "chunk:bg-openfinance-v2-implementation-guidelines:p3:c0",
+      "page": 3,
+      "evidence": "query parameter dateFrom is mandatory unless deltaList is used. The ASPSP SHALL reject a\nrequest without dateFrom with HTTP status 400 and error code FORMAT_ERROR.\n\nThe ASPSP SHALL support the pagination of transaction lists. The TPP MAY limit the page size\nwith the query parameter pageSize. The ASPSP SHALL return a link next when more entries\nexist.\n\nThe ASPSP SHALL return HTTP status 429 with",
+      "relevance": 4.689000129699707,
+      "sha256": "ffb004d5d4d60493cbcc67cbdf923ef7f782113b7492240ba869ba9de5de294a",
+      "classification": "discovered_evidence"
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+{
+  "source": {
+    "source_id": "bg-openfinance-v2-errata",
+    "document_id": "bg-openfinance-v2-errata@809757ca2bde",
+    "version": "openfinance-v2",
+    "kind": "text",
+    "title": "Open Finance v2 Errata and Clarifications (synthetic fixture)",
+    "authority": "informative",
+    "precedence": 80,
+    "path": "text/v2/errata.md",
+    "sha256": "809757ca2bdef7b43e9f039df0c5277a4c347c1a95489097efa54695c7c1e91d",
+    "status": "indexed",
+    "page_count": 1,
+    "ocr_required_pages": [],
+    "diagnostics": 0,
+    "indexed_at_unix": "<timestamp>"
+  },
+  "locator": "section:E-07",
+  "classification": "source_content",
+  "content": {
+    "type": "chunks",
+    "chunks": [
+      {
+        "chunk_id": "bg-openfinance-v2-errata:p1:c1",
+        "page": 1,
+        "section": "E-07 Transaction list access frequency",
+        "ordinal": 1,
+        "text": "E-07 Transaction list access frequency\n\nClarification: the limit of four transaction list reads per calendar day without PSU\ninvolvement is counted per consent only, not per account.",
+        "provenance": {
+          "source_id": "bg-openfinance-v2-errata",
+          "document_id": "bg-openfinance-v2-errata@809757ca2bde",
+          "version": "openfinance-v2",
+          "kind": "text",
+          "authority": "informative",
+          "precedence": 80,
+          "locator": "chunk:bg-openfinance-v2-errata:p1:c1",
+          "sha256": "dfa8ea7a43492195dc217d436f78b8ee9b2410bb56c56ec34d556d1ecc2d1959",
+          "document_sha256": "809757ca2bdef7b43e9f039df0c5277a4c347c1a95489097efa54695c7c1e91d"
+        }
+      }
+    ]
+  },
+  "provenance": [
+    {
+      "source_id": "bg-openfinance-v2-errata",
+      "document_id": "bg-openfinance-v2-errata@809757ca2bde",
+      "version": "openfinance-v2",
+      "kind": "text",
+      "authority": "informative",
+      "precedence": 80,
+      "locator": "chunk:bg-openfinance-v2-errata:p1:c1",
+      "sha256": "dfa8ea7a43492195dc217d436f78b8ee9b2410bb56c56ec34d556d1ecc2d1959",
+      "document_sha256": "809757ca2bdef7b43e9f039df0c5277a4c347c1a95489097efa54695c7c1e91d"
+    }
+  ]
+}

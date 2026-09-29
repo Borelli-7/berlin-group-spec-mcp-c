@@ -1,0 +1,430 @@
+{
+  "requirement_id": "OFV2-TRANSACTIONS-003",
+  "classification": "authoritative_requirement",
+  "requirement": {
+    "id": "OFV2-TRANSACTIONS-003",
+    "version": "openfinance-v2",
+    "title": "Transaction list access frequency counted per consent (errata E-07)",
+    "sources": [
+      {
+        "source_id": "bg-openfinance-v2-errata",
+        "locator": "section:E-07",
+        "sha256": "000000000000",
+        "note": "Pinned to the errata revision reviewed at curation time."
+      },
+      {
+        "source_id": "bg-openfinance-v2-operational-rules",
+        "locator": "page:2"
+      }
+    ],
+    "endpoints": [
+      "GET /accounts/{accountId}/transactions"
+    ],
+    "schemas": [],
+    "acceptance_criteria": [
+      "The access counter for transaction list reads is maintained per consent."
+    ],
+    "conflicts_with": [],
+    "tags": [
+      "ais",
+      "transactions",
+      "frequency",
+      "errata"
+    ]
+  },
+  "mapping": {
+    "file": "requirements/requirements.yaml",
+    "file_sha256": "91f9b55e4d5f1b425fe608d1e6442edfdf06e9f2749b02ebe53d781b477da13c",
+    "locator": "requirement:OFV2-TRANSACTIONS-003",
+    "sha256": "0fb15b83a96250f902cce39a345ffabb7cca9f268ef41ce52f2158968db26118"
+  },
+  "sources": [
+    {
+      "source_id": "bg-openfinance-v2-errata",
+      "locator": "section:E-07",
+      "note": "Pinned to the errata revision reviewed at curation time.",
+      "status": "stale",
+      "document": {
+        "title": "Open Finance v2 Errata and Clarifications (synthetic fixture)",
+        "kind": "text",
+        "version": "openfinance-v2",
+        "authority": "informative",
+        "precedence": 80,
+        "sha256": "809757ca2bdef7b43e9f039df0c5277a4c347c1a95489097efa54695c7c1e91d",
+        "status": "indexed"
+      },
+      "excerpt": "E-07 Transaction list access frequency\n\nClarification: the limit of four transaction list reads per calendar day without PSU\ninvolvement is counted per consent only, not per account.",
+      "provenance": [
+        {
+          "source_id": "bg-openfinance-v2-errata",
+          "document_id": "bg-openfinance-v2-errata@809757ca2bde",
+          "version": "openfinance-v2",
+          "kind": "text",
+          "authority": "informative",
+          "precedence": 80,
+          "locator": "chunk:bg-openfinance-v2-errata:p1:c1",
+          "sha256": "dfa8ea7a43492195dc217d436f78b8ee9b2410bb56c56ec34d556d1ecc2d1959",
+          "document_sha256": "809757ca2bdef7b43e9f039df0c5277a4c347c1a95489097efa54695c7c1e91d"
+        }
+      ]
+    },
+    {
+      "source_id": "bg-openfinance-v2-operational-rules",
+      "locator": "page:2",
+      "status": "resolved",
+      "document": {
+        "title": "Open Finance v2 Operational Rules (synthetic fixture)",
+        "kind": "pdf",
+        "version": "openfinance-v2",
+        "authority": "normative",
+        "precedence": 80,
+        "sha256": "80430186dc34e00a77e634344b432b302e43b08bb45b9d7b52ba5d91d00adfe9",
+        "status": "indexed"
+      },
+      "excerpt": "3 Transaction History Access\n\nThe ASPSP SHALL make at least 90 days of transaction history available through the\ntransaction list endpoint.\n\nWithout active PSU involvement the TPP MUST NOT read the transaction list of an account more\nthan four times per calendar day. The limit is counted per account and per consent.",
+      "provenance": [
+        {
+          "source_id": "bg-openfinance-v2-operational-rules",
+          "document_id": "bg-openfinance-v2-operational-rules@80430186dc34",
+          "version": "openfinance-v2",
+          "kind": "pdf",
+          "authority": "normative",
+          "precedence": 80,
+          "locator": "page:2",
+          "sha256": "07fcee82a83b379bc569924f5a6cc45ee1bfe4abb2036222fb4c6fcd24093ec8",
+          "document_sha256": "80430186dc34e00a77e634344b432b302e43b08bb45b9d7b52ba5d91d00adfe9"
+        }
+      ]
+    }
+  ],
+  "endpoints": [
+    {
+      "endpoint": "GET /accounts/{accountId}/transactions",
+      "via": "endpoints",
+      "found": true,
+      "operation": {
+        "method": "GET",
+        "path": "/accounts/{accountId}/transactions",
+        "operation_id": "getTransactionList",
+        "summary": "Read transaction list of an account",
+        "response_statuses": [
+          "200",
+          "400",
+          "401",
+          "403",
+          "404",
+          "429"
+        ],
+        "referenced_schemas": [
+          "BookingStatus",
+          "Error400",
+          "TransactionsResponse200Json"
+        ]
+      },
+      "provenance": {
+        "source_id": "bg-openfinance-v2-openapi",
+        "document_id": "bg-openfinance-v2-openapi@edd99f6e0265",
+        "version": "openfinance-v2",
+        "kind": "openapi",
+        "authority": "technical",
+        "precedence": 90,
+        "locator": "op:GET /accounts/{accountId}/transactions",
+        "sha256": "2935fd27adbb313d52dc8f4b04cee4dc74f1693bf8671549bc9c917adf8f45f5",
+        "document_sha256": "edd99f6e026537a45d3e95f33a35918e0f338914c70879234c5dc3c1e799fdfb"
+      }
+    }
+  ],
+  "schemas": [
+    {
+      "name": "BookingStatus",
+      "via": "operation:GET /accounts/{accountId}/transactions",
+      "found": true,
+      "referenced_schemas": [],
+      "provenance": {
+        "source_id": "bg-openfinance-v2-openapi",
+        "document_id": "bg-openfinance-v2-openapi@edd99f6e0265",
+        "version": "openfinance-v2",
+        "kind": "openapi",
+        "authority": "technical",
+        "precedence": 90,
+        "locator": "schema:BookingStatus",
+        "sha256": "135c445e43a83060bb57dd851a9d23c96b1ee6e9d6218e57f315d32475a8f6ef",
+        "document_sha256": "edd99f6e026537a45d3e95f33a35918e0f338914c70879234c5dc3c1e799fdfb"
+      }
+    },
+    {
+      "name": "Error400",
+      "via": "operation:GET /accounts/{accountId}/transactions",
+      "found": true,
+      "referenced_schemas": [],
+      "provenance": {
+        "source_id": "bg-openfinance-v2-openapi",
+        "document_id": "bg-openfinance-v2-openapi@edd99f6e0265",
+        "version": "openfinance-v2",
+        "kind": "openapi",
+        "authority": "technical",
+        "precedence": 90,
+        "locator": "schema:Error400",
+        "sha256": "1a39bd25253f9f4b7d097adc731e34f40347ebbbc385b68f4c5a642e8ab09221",
+        "document_sha256": "edd99f6e026537a45d3e95f33a35918e0f338914c70879234c5dc3c1e799fdfb"
+      }
+    },
+    {
+      "name": "TransactionsResponse200Json",
+      "via": "operation:GET /accounts/{accountId}/transactions",
+      "found": true,
+      "referenced_schemas": [
+        "AccountReport"
+      ],
+      "provenance": {
+        "source_id": "bg-openfinance-v2-openapi",
+        "document_id": "bg-openfinance-v2-openapi@edd99f6e0265",
+        "version": "openfinance-v2",
+        "kind": "openapi",
+        "authority": "technical",
+        "precedence": 90,
+        "locator": "schema:TransactionsResponse200Json",
+        "sha256": "570a3ed1d4cd773e1c62f4f9559ee1b5360d5e2291f52c033a5c653ec65fafbf",
+        "document_sha256": "edd99f6e026537a45d3e95f33a35918e0f338914c70879234c5dc3c1e799fdfb"
+      }
+    },
+    {
+      "name": "AccountReport",
+      "via": "transitive:TransactionsResponse200Json",
+      "found": true,
+      "referenced_schemas": [
+        "Transactions"
+      ],
+      "provenance": {
+        "source_id": "bg-openfinance-v2-openapi",
+        "document_id": "bg-openfinance-v2-openapi@edd99f6e0265",
+        "version": "openfinance-v2",
+        "kind": "openapi",
+        "authority": "technical",
+        "precedence": 90,
+        "locator": "schema:AccountReport",
+        "sha256": "b8721b53771ae3838aa068e85fef440eac58cdaf08d877403218c6c4a4e92931",
+        "document_sha256": "edd99f6e026537a45d3e95f33a35918e0f338914c70879234c5dc3c1e799fdfb"
+      }
+    },
+    {
+      "name": "Amount",
+      "via": "transitive:TransactionsResponse200Json",
+      "found": true,
+      "referenced_schemas": [],
+      "provenance": {
+        "source_id": "bg-openfinance-v2-openapi",
+        "document_id": "bg-openfinance-v2-openapi@edd99f6e0265",
+        "version": "openfinance-v2",
+        "kind": "openapi",
+        "authority": "technical",
+        "precedence": 90,
+        "locator": "schema:Amount",
+        "sha256": "516ad2819374af39b1f04bd69f80cbb0d0c8db76d6b74bff9f7b301b90413643",
+        "document_sha256": "edd99f6e026537a45d3e95f33a35918e0f338914c70879234c5dc3c1e799fdfb"
+      }
+    },
+    {
+      "name": "PartyIdentification",
+      "via": "transitive:TransactionsResponse200Json",
+      "found": true,
+      "referenced_schemas": [],
+      "provenance": {
+        "source_id": "bg-openfinance-v2-openapi",
+        "document_id": "bg-openfinance-v2-openapi@edd99f6e0265",
+        "version": "openfinance-v2",
+        "kind": "openapi",
+        "authority": "technical",
+        "precedence": 90,
+        "locator": "schema:PartyIdentification",
+        "sha256": "4faa87ec1820bf0dd561b2b2feee8900864eca6afa8c1d14a7850de07d89df99",
+        "document_sha256": "edd99f6e026537a45d3e95f33a35918e0f338914c70879234c5dc3c1e799fdfb"
+      }
+    },
+    {
+      "name": "Transactions",
+      "via": "transitive:TransactionsResponse200Json",
+      "found": true,
+      "referenced_schemas": [
+        "Amount",
+        "PartyIdentification"
+      ],
+      "provenance": {
+        "source_id": "bg-openfinance-v2-openapi",
+        "document_id": "bg-openfinance-v2-openapi@edd99f6e0265",
+        "version": "openfinance-v2",
+        "kind": "openapi",
+        "authority": "technical",
+        "precedence": 90,
+        "locator": "schema:Transactions",
+        "sha256": "3e0fd453f446a53f019806fb665d35ddc229a944547c37b2e0b37e8657967330",
+        "document_sha256": "edd99f6e026537a45d3e95f33a35918e0f338914c70879234c5dc3c1e799fdfb"
+      }
+    }
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "OFV2-TRANSACTIONS-003/AC1",
+      "requirement_id": "OFV2-TRANSACTIONS-003",
+      "text": "The access counter for transaction list reads is maintained per consent.",
+      "mapping": {
+        "file": "requirements/requirements.yaml",
+        "file_sha256": "91f9b55e4d5f1b425fe608d1e6442edfdf06e9f2749b02ebe53d781b477da13c",
+        "locator": "requirement:OFV2-TRANSACTIONS-003",
+        "sha256": "0fb15b83a96250f902cce39a345ffabb7cca9f268ef41ce52f2158968db26118"
+      }
+    }
+  ],
+  "related_evidence": [
+    {
+      "record_id": "bg-openfinance-v2-errata:p1:c1",
+      "record_type": "chunk",
+      "source_id": "bg-openfinance-v2-errata",
+      "document_id": "bg-openfinance-v2-errata@809757ca2bde",
+      "version": "openfinance-v2",
+      "kind": "text",
+      "authority": "informative",
+      "title": "Open Finance v2 Errata and Clarifications (synthetic fixture) — E-07 Transaction list access frequency",
+      "locator": "chunk:bg-openfinance-v2-errata:p1:c1",
+      "page": 1,
+      "evidence": "E-07 Transaction list access frequency\n\nClarification: the limit of four transaction list reads per calendar day without PSU\ninvolvement is counted per consent only, not per account",
+      "relevance": 34.266998291015625,
+      "sha256": "dfa8ea7a43492195dc217d436f78b8ee9b2410bb56c56ec34d556d1ecc2d1959",
+      "classification": "discovered_evidence"
+    },
+    {
+      "record_id": "bg-openfinance-v2-operational-rules:p2:c0",
+      "record_type": "chunk",
+      "source_id": "bg-openfinance-v2-operational-rules",
+      "document_id": "bg-openfinance-v2-operational-rules@80430186dc34",
+      "version": "openfinance-v2",
+      "kind": "pdf",
+      "authority": "normative",
+      "title": "Open Finance v2 Operational Rules (synthetic fixture) — 3 Transaction History Access",
+      "locator": "chunk:bg-openfinance-v2-operational-rules:p2:c0",
+      "page": 2,
+      "evidence": "3 Transaction History Access\n\nThe ASPSP SHALL make at least 90 days of transaction history available through the\ntransaction list endpoint.\n\nWithout active PSU involvement the TPP MUST NOT read the transaction list of an account more\nthan four times per calendar day. The limit is counted per account and per consent",
+      "relevance": 19.113000869750977,
+      "sha256": "07fcee82a83b379bc569924f5a6cc45ee1bfe4abb2036222fb4c6fcd24093ec8",
+      "classification": "discovered_evidence"
+    },
+    {
+      "record_id": "bg-openfinance-v2-implementation-guidelines:p3:c0",
+      "record_type": "chunk",
+      "source_id": "bg-openfinance-v2-implementation-guidelines",
+      "document_id": "bg-openfinance-v2-implementation-guidelines@8eec1c4376ce",
+      "version": "openfinance-v2",
+      "kind": "pdf",
+      "authority": "normative",
+      "title": "Open Finance v2 Implementation Guidelines (synthetic fixture) — 4.2 Read Transaction List",
+      "locator": "chunk:bg-openfinance-v2-implementation-guidelines:p3:c0",
+      "page": 3,
+      "evidence": "error code ACCESS_EXCEEDED when the access\nfrequency limit of the consent is exceeded.\n\nEach returned transaction MUST contain transactionAmount and bookingDate. The bookingDate is\nreturned as date-time in version 2",
+      "relevance": 11.015000343322754,
+      "sha256": "ffb004d5d4d60493cbcc67cbdf923ef7f782113b7492240ba869ba9de5de294a",
+      "classification": "discovered_evidence"
+    },
+    {
+      "record_id": "bg-openfinance-v2-errata:p1:c0",
+      "record_type": "chunk",
+      "source_id": "bg-openfinance-v2-errata",
+      "document_id": "bg-openfinance-v2-errata@809757ca2bde",
+      "version": "openfinance-v2",
+      "kind": "text",
+      "authority": "informative",
+      "title": "Open Finance v2 Errata and Clarifications (synthetic fixture) — Open Finance Framework v2 - Errata and Clarifications (synthetic fixture)",
+      "locator": "chunk:bg-openfinance-v2-errata:p1:c0",
+      "page": 1,
+      "evidence": "Open Finance Framework v2 - Errata and Clarifications (synthetic fixture)\n\nSYNTHETIC TEST FIXTURE. Original test data created for the bg-spec MCP server; not a\nBerlin Group publication and without normative value",
+      "relevance": 10.72700023651123,
+      "sha256": "8ab84f6d66458e7cd13f98ab3e834538f767a10a7478904b79ea879f8fc6fd98",
+      "classification": "discovered_evidence"
+    },
+    {
+      "record_id": "bg-openfinance-v2-implementation-guidelines:p6:c0",
+      "record_type": "chunk",
+      "source_id": "bg-openfinance-v2-implementation-guidelines",
+      "document_id": "bg-openfinance-v2-implementation-guidelines@8eec1c4376ce",
+      "version": "openfinance-v2",
+      "kind": "pdf",
+      "authority": "normative",
+      "title": "Open Finance v2 Implementation Guidelines (synthetic fixture) — 5 Error Codes",
+      "locator": "chunk:bg-openfinance-v2-implementation-guidelines:p6:c0",
+      "page": 6,
+      "evidence": "5 Error Codes\n\nFORMAT_ERROR (400): the request does not match the syntax of the interface.\n\nPERIOD_INVALID (400): the requested period is outside the supported range.\n\nCONSENT_INVALID (401): the consent was created but is not valid for the addressed service.\n\nACCESS_EXCEEDED (429): the access frequency limit of the consent is exceeded",
+      "relevance": 8.027999877929688,
+      "sha256": "d4881f769cf543273b50d3b16bcb3fb1b3a1fecb5c4f18a616d45d081a4e4566",
+      "classification": "discovered_evidence"
+    }
+  ],
+  "conflicts": [
+    {
+      "kind": "declared",
+      "description": "OFV2-TRANSACTIONS-002 declares a conflict with OFV2-TRANSACTIONS-003: Operational rules count per account and consent; errata E-07 counts per consent only.",
+      "requirement_ids": [
+        "OFV2-TRANSACTIONS-002",
+        "OFV2-TRANSACTIONS-003"
+      ],
+      "citations": [
+        {
+          "source_id": "bg-openfinance-v2-errata",
+          "locator": "section:E-07"
+        },
+        {
+          "source_id": "bg-openfinance-v2-implementation-guidelines",
+          "locator": "page:3"
+        },
+        {
+          "source_id": "bg-openfinance-v2-operational-rules",
+          "locator": "page:2"
+        }
+      ],
+      "provenance": []
+    },
+    {
+      "kind": "precedence_tie",
+      "description": "OFV2-TRANSACTIONS-003: sources bg-openfinance-v2-errata, bg-openfinance-v2-operational-rules of version openfinance-v2 share precedence 80 but differ in authority (normative vs informative)",
+      "requirement_ids": [
+        "OFV2-TRANSACTIONS-003"
+      ],
+      "citations": [
+        {
+          "source_id": "bg-openfinance-v2-errata",
+          "locator": "section:E-07"
+        },
+        {
+          "source_id": "bg-openfinance-v2-operational-rules",
+          "locator": "page:2"
+        }
+      ],
+      "provenance": []
+    },
+    {
+      "kind": "stale_source",
+      "description": "OFV2-TRANSACTIONS-003 pins bg-openfinance-v2-errata to sha256 000000000000 but the indexed document is 809757ca2bdef7b43e9f039df0c5277a4c347c1a95489097efa54695c7c1e91d",
+      "requirement_ids": [
+        "OFV2-TRANSACTIONS-003"
+      ],
+      "citations": [
+        {
+          "source_id": "bg-openfinance-v2-errata",
+          "locator": "section:E-07"
+        }
+      ],
+      "provenance": [
+        {
+          "source_id": "bg-openfinance-v2-errata",
+          "document_id": "bg-openfinance-v2-errata@809757ca2bde",
+          "version": "openfinance-v2",
+          "kind": "text",
+          "authority": "informative",
+          "precedence": 80,
+          "locator": "document",
+          "sha256": "809757ca2bdef7b43e9f039df0c5277a4c347c1a95489097efa54695c7c1e91d",
+          "document_sha256": "809757ca2bdef7b43e9f039df0c5277a4c347c1a95489097efa54695c7c1e91d"
+        }
+      ]
+    }
+  ],
+  "notice": "The requirement and acceptance criteria come from the curated mapping. 'related_evidence' is discovered evidence only."
+}

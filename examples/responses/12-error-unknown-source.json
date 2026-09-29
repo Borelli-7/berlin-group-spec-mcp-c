@@ -1,0 +1,11 @@
+{
+  "isError": true,
+  "content": [
+    {
+      "error": {
+        "code": "not_found",
+        "message": "not found: unknown source_id '../../etc/passwd'"
+      }
+    }
+  ]
+}

@@ -1,0 +1,478 @@
+{
+  "requirement_id": "OFV2-TRANSACTIONS-001",
+  "classification": "authoritative_requirement",
+  "requirement": {
+    "id": "OFV2-TRANSACTIONS-001",
+    "version": "openfinance-v2",
+    "title": "Read transaction list with mandatory bookingStatus and dateFrom",
+    "description": "The ASPSP exposes GET /accounts/{accountId}/transactions. bookingStatus and dateFrom are mandatory query parameters; responses are paginated.",
+    "sources": [
+      {
+        "source_id": "bg-openfinance-v2-implementation-guidelines",
+        "locator": "section:4.2",
+        "note": "Read Transaction List"
+      },
+      {
+        "source_id": "bg-openfinance-v2-implementation-guidelines",
+        "locator": "page:3"
+      },
+      {
+        "source_id": "bg-openfinance-v2-openapi",
+        "locator": "op:GET /accounts/{accountId}/transactions"
+      }
+    ],
+    "endpoints": [
+      "GET /accounts/{accountId}/transactions"
+    ],
+    "schemas": [
+      "TransactionsResponse200Json",
+      "BookingStatus"
+    ],
+    "acceptance_criteria": [
+      "A request without bookingStatus is rejected with HTTP 400.",
+      "The values booked, pending and both of bookingStatus are supported.",
+      "A request without dateFrom (and without deltaList) is rejected with HTTP 400 FORMAT_ERROR.",
+      "When more entries exist than fit into one page, the response contains _links.next.",
+      "The optional pageSize query parameter limits the number of returned entries."
+    ],
+    "conflicts_with": [],
+    "tags": [
+      "ais",
+      "transactions"
+    ]
+  },
+  "mapping": {
+    "file": "requirements/requirements.yaml",
+    "file_sha256": "91f9b55e4d5f1b425fe608d1e6442edfdf06e9f2749b02ebe53d781b477da13c",
+    "locator": "requirement:OFV2-TRANSACTIONS-001",
+    "sha256": "6d38e62564e29dd26b5c469f8ad55e2ca6cdadc375895976383d490227e7799c"
+  },
+  "sources": [
+    {
+      "source_id": "bg-openfinance-v2-implementation-guidelines",
+      "locator": "section:4.2",
+      "note": "Read Transaction List",
+      "status": "resolved",
+      "document": {
+        "title": "Open Finance v2 Implementation Guidelines (synthetic fixture)",
+        "kind": "pdf",
+        "version": "openfinance-v2",
+        "authority": "normative",
+        "precedence": 100,
+        "sha256": "8eec1c4376ce0a3155981597e953208585e80d986308bd69593d4a4b86949d5b",
+        "status": "partial"
+      },
+      "excerpt": "4.2 Read Transaction List\n\nCall GET /accounts/{accountId}/transactions reads the transaction list of an addressed\naccount.\n\nThe query parameter bookingStatus is mandatory. The ASPSP SHALL support the values booked,\npending and both. The ASPSP MAY support the values information and all. If the value\ninformation is used, the ASPSP SHALL return standing order information instead of\ntransactions.\n\nThe query parameter dateFrom is mandatory unless deltaList is used. The ASPSP SHALL reject a\nrequest without dateFrom with HTTP status 400 and error code FORMAT_ERROR.\n\nThe ASPSP SHALL support the pagination of transaction lists. The TPP MAY limit the page size\nwith the query parameter pageSize. The ASPSP SHALL return a link next when more entries\nexist.\n\nThe ASPSP SHALL return HTTP status 429 with error code ACCESS_EXCEEDED when the access\nfrequency limit of the consent is exceeded.\n\nEach returned transaction MUST contain transactionAmount and bookingDate. The bookingDate is\nreturned as date-time in version 2.",
+      "provenance": [
+        {
+          "source_id": "bg-openfinance-v2-implementation-guidelines",
+          "document_id": "bg-openfinance-v2-implementation-guidelines@8eec1c4376ce",
+          "version": "openfinance-v2",
+          "kind": "pdf",
+          "authority": "normative",
+          "precedence": 100,
+          "locator": "chunk:bg-openfinance-v2-implementation-guidelines:p3:c0",
+          "sha256": "ffb004d5d4d60493cbcc67cbdf923ef7f782113b7492240ba869ba9de5de294a",
+          "document_sha256": "8eec1c4376ce0a3155981597e953208585e80d986308bd69593d4a4b86949d5b"
+        }
+      ]
+    },
+    {
+      "source_id": "bg-openfinance-v2-implementation-guidelines",
+      "locator": "page:3",
+      "status": "resolved",
+      "document": {
+        "title": "Open Finance v2 Implementation Guidelines (synthetic fixture)",
+        "kind": "pdf",
+        "version": "openfinance-v2",
+        "authority": "normative",
+        "precedence": 100,
+        "sha256": "8eec1c4376ce0a3155981597e953208585e80d986308bd69593d4a4b86949d5b",
+        "status": "partial"
+      },
+      "excerpt": "4.2 Read Transaction List\n\nCall GET /accounts/{accountId}/transactions reads the transaction list of an addressed\naccount.\n\nThe query parameter bookingStatus is mandatory. The ASPSP SHALL support the values booked,\npending and both. The ASPSP MAY support the values information and all. If the value\ninformation is used, the ASPSP SHALL return standing order information instead of\ntransactions.\n\nThe query parameter dateFrom is mandatory unless deltaList is used. The ASPSP SHALL reject a\nrequest without dateFrom with HTTP status 400 and error code FORMAT_ERROR.\n\nThe ASPSP SHALL support the pagination of transaction lists. The TPP MAY limit the page size\nwith the query parameter pageSize. The ASPSP SHALL return a link next when more entries\nexist.\n\nThe ASPSP SHALL return HTTP status 429 with error code ACCESS_EXCEEDED when the access\nfrequency limit of the consent is exceeded.\n\nEach returned transaction MUST contain transactionAmount and bookingDate. The bookingDate is\nreturned as date-time in version 2.",
+      "provenance": [
+        {
+          "source_id": "bg-openfinance-v2-implementation-guidelines",
+          "document_id": "bg-openfinance-v2-implementation-guidelines@8eec1c4376ce",
+          "version": "openfinance-v2",
+          "kind": "pdf",
+          "authority": "normative",
+          "precedence": 100,
+          "locator": "page:3",
+          "sha256": "ffb004d5d4d60493cbcc67cbdf923ef7f782113b7492240ba869ba9de5de294a",
+          "document_sha256": "8eec1c4376ce0a3155981597e953208585e80d986308bd69593d4a4b86949d5b"
+        }
+      ]
+    },
+    {
+      "source_id": "bg-openfinance-v2-openapi",
+      "locator": "op:GET /accounts/{accountId}/transactions",
+      "status": "resolved",
+      "document": {
+        "title": "Open Finance v2 OpenAPI (synthetic fixture)",
+        "kind": "openapi",
+        "version": "openfinance-v2",
+        "authority": "technical",
+        "precedence": 90,
+        "sha256": "edd99f6e026537a45d3e95f33a35918e0f338914c70879234c5dc3c1e799fdfb",
+        "status": "indexed"
+      },
+      "excerpt": "GET /accounts/{accountId}/transactions Read transaction list of an account",
+      "provenance": [
+        {
+          "source_id": "bg-openfinance-v2-openapi",
+          "document_id": "bg-openfinance-v2-openapi@edd99f6e0265",
+          "version": "openfinance-v2",
+          "kind": "openapi",
+          "authority": "technical",
+          "precedence": 90,
+          "locator": "op:GET /accounts/{accountId}/transactions",
+          "sha256": "2935fd27adbb313d52dc8f4b04cee4dc74f1693bf8671549bc9c917adf8f45f5",
+          "document_sha256": "edd99f6e026537a45d3e95f33a35918e0f338914c70879234c5dc3c1e799fdfb"
+        }
+      ]
+    }
+  ],
+  "endpoints": [
+    {
+      "endpoint": "GET /accounts/{accountId}/transactions",
+      "via": "endpoints",
+      "found": true,
+      "operation": {
+        "method": "GET",
+        "path": "/accounts/{accountId}/transactions",
+        "operation_id": "getTransactionList",
+        "summary": "Read transaction list of an account",
+        "response_statuses": [
+          "200",
+          "400",
+          "401",
+          "403",
+          "404",
+          "429"
+        ],
+        "referenced_schemas": [
+          "BookingStatus",
+          "Error400",
+          "TransactionsResponse200Json"
+        ]
+      },
+      "provenance": {
+        "source_id": "bg-openfinance-v2-openapi",
+        "document_id": "bg-openfinance-v2-openapi@edd99f6e0265",
+        "version": "openfinance-v2",
+        "kind": "openapi",
+        "authority": "technical",
+        "precedence": 90,
+        "locator": "op:GET /accounts/{accountId}/transactions",
+        "sha256": "2935fd27adbb313d52dc8f4b04cee4dc74f1693bf8671549bc9c917adf8f45f5",
+        "document_sha256": "edd99f6e026537a45d3e95f33a35918e0f338914c70879234c5dc3c1e799fdfb"
+      }
+    },
+    {
+      "endpoint": "GET /accounts/{accountId}/transactions",
+      "via": "source:bg-openfinance-v2-openapi op:GET /accounts/{accountId}/transactions",
+      "found": true,
+      "operation": {
+        "method": "GET",
+        "path": "/accounts/{accountId}/transactions",
+        "operation_id": "getTransactionList",
+        "summary": "Read transaction list of an account",
+        "response_statuses": [
+          "200",
+          "400",
+          "401",
+          "403",
+          "404",
+          "429"
+        ],
+        "referenced_schemas": [
+          "BookingStatus",
+          "Error400",
+          "TransactionsResponse200Json"
+        ]
+      },
+      "provenance": {
+        "source_id": "bg-openfinance-v2-openapi",
+        "document_id": "bg-openfinance-v2-openapi@edd99f6e0265",
+        "version": "openfinance-v2",
+        "kind": "openapi",
+        "authority": "technical",
+        "precedence": 90,
+        "locator": "op:GET /accounts/{accountId}/transactions",
+        "sha256": "2935fd27adbb313d52dc8f4b04cee4dc74f1693bf8671549bc9c917adf8f45f5",
+        "document_sha256": "edd99f6e026537a45d3e95f33a35918e0f338914c70879234c5dc3c1e799fdfb"
+      }
+    }
+  ],
+  "schemas": [
+    {
+      "name": "TransactionsResponse200Json",
+      "via": "explicit",
+      "found": true,
+      "referenced_schemas": [
+        "AccountReport"
+      ],
+      "provenance": {
+        "source_id": "bg-openfinance-v2-openapi",
+        "document_id": "bg-openfinance-v2-openapi@edd99f6e0265",
+        "version": "openfinance-v2",
+        "kind": "openapi",
+        "authority": "technical",
+        "precedence": 90,
+        "locator": "schema:TransactionsResponse200Json",
+        "sha256": "570a3ed1d4cd773e1c62f4f9559ee1b5360d5e2291f52c033a5c653ec65fafbf",
+        "document_sha256": "edd99f6e026537a45d3e95f33a35918e0f338914c70879234c5dc3c1e799fdfb"
+      }
+    },
+    {
+      "name": "AccountReport",
+      "via": "transitive:TransactionsResponse200Json",
+      "found": true,
+      "referenced_schemas": [
+        "Transactions"
+      ],
+      "provenance": {
+        "source_id": "bg-openfinance-v2-openapi",
+        "document_id": "bg-openfinance-v2-openapi@edd99f6e0265",
+        "version": "openfinance-v2",
+        "kind": "openapi",
+        "authority": "technical",
+        "precedence": 90,
+        "locator": "schema:AccountReport",
+        "sha256": "b8721b53771ae3838aa068e85fef440eac58cdaf08d877403218c6c4a4e92931",
+        "document_sha256": "edd99f6e026537a45d3e95f33a35918e0f338914c70879234c5dc3c1e799fdfb"
+      }
+    },
+    {
+      "name": "Amount",
+      "via": "transitive:TransactionsResponse200Json",
+      "found": true,
+      "referenced_schemas": [],
+      "provenance": {
+        "source_id": "bg-openfinance-v2-openapi",
+        "document_id": "bg-openfinance-v2-openapi@edd99f6e0265",
+        "version": "openfinance-v2",
+        "kind": "openapi",
+        "authority": "technical",
+        "precedence": 90,
+        "locator": "schema:Amount",
+        "sha256": "516ad2819374af39b1f04bd69f80cbb0d0c8db76d6b74bff9f7b301b90413643",
+        "document_sha256": "edd99f6e026537a45d3e95f33a35918e0f338914c70879234c5dc3c1e799fdfb"
+      }
+    },
+    {
+      "name": "PartyIdentification",
+      "via": "transitive:TransactionsResponse200Json",
+      "found": true,
+      "referenced_schemas": [],
+      "provenance": {
+        "source_id": "bg-openfinance-v2-openapi",
+        "document_id": "bg-openfinance-v2-openapi@edd99f6e0265",
+        "version": "openfinance-v2",
+        "kind": "openapi",
+        "authority": "technical",
+        "precedence": 90,
+        "locator": "schema:PartyIdentification",
+        "sha256": "4faa87ec1820bf0dd561b2b2feee8900864eca6afa8c1d14a7850de07d89df99",
+        "document_sha256": "edd99f6e026537a45d3e95f33a35918e0f338914c70879234c5dc3c1e799fdfb"
+      }
+    },
+    {
+      "name": "Transactions",
+      "via": "transitive:TransactionsResponse200Json",
+      "found": true,
+      "referenced_schemas": [
+        "Amount",
+        "PartyIdentification"
+      ],
+      "provenance": {
+        "source_id": "bg-openfinance-v2-openapi",
+        "document_id": "bg-openfinance-v2-openapi@edd99f6e0265",
+        "version": "openfinance-v2",
+        "kind": "openapi",
+        "authority": "technical",
+        "precedence": 90,
+        "locator": "schema:Transactions",
+        "sha256": "3e0fd453f446a53f019806fb665d35ddc229a944547c37b2e0b37e8657967330",
+        "document_sha256": "edd99f6e026537a45d3e95f33a35918e0f338914c70879234c5dc3c1e799fdfb"
+      }
+    },
+    {
+      "name": "BookingStatus",
+      "via": "explicit",
+      "found": true,
+      "referenced_schemas": [],
+      "provenance": {
+        "source_id": "bg-openfinance-v2-openapi",
+        "document_id": "bg-openfinance-v2-openapi@edd99f6e0265",
+        "version": "openfinance-v2",
+        "kind": "openapi",
+        "authority": "technical",
+        "precedence": 90,
+        "locator": "schema:BookingStatus",
+        "sha256": "135c445e43a83060bb57dd851a9d23c96b1ee6e9d6218e57f315d32475a8f6ef",
+        "document_sha256": "edd99f6e026537a45d3e95f33a35918e0f338914c70879234c5dc3c1e799fdfb"
+      }
+    },
+    {
+      "name": "Error400",
+      "via": "operation:GET /accounts/{accountId}/transactions",
+      "found": true,
+      "referenced_schemas": [],
+      "provenance": {
+        "source_id": "bg-openfinance-v2-openapi",
+        "document_id": "bg-openfinance-v2-openapi@edd99f6e0265",
+        "version": "openfinance-v2",
+        "kind": "openapi",
+        "authority": "technical",
+        "precedence": 90,
+        "locator": "schema:Error400",
+        "sha256": "1a39bd25253f9f4b7d097adc731e34f40347ebbbc385b68f4c5a642e8ab09221",
+        "document_sha256": "edd99f6e026537a45d3e95f33a35918e0f338914c70879234c5dc3c1e799fdfb"
+      }
+    }
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "OFV2-TRANSACTIONS-001/AC1",
+      "requirement_id": "OFV2-TRANSACTIONS-001",
+      "text": "A request without bookingStatus is rejected with HTTP 400.",
+      "mapping": {
+        "file": "requirements/requirements.yaml",
+        "file_sha256": "91f9b55e4d5f1b425fe608d1e6442edfdf06e9f2749b02ebe53d781b477da13c",
+        "locator": "requirement:OFV2-TRANSACTIONS-001",
+        "sha256": "6d38e62564e29dd26b5c469f8ad55e2ca6cdadc375895976383d490227e7799c"
+      }
+    },
+    {
+      "id": "OFV2-TRANSACTIONS-001/AC2",
+      "requirement_id": "OFV2-TRANSACTIONS-001",
+      "text": "The values booked, pending and both of bookingStatus are supported.",
+      "mapping": {
+        "file": "requirements/requirements.yaml",
+        "file_sha256": "91f9b55e4d5f1b425fe608d1e6442edfdf06e9f2749b02ebe53d781b477da13c",
+        "locator": "requirement:OFV2-TRANSACTIONS-001",
+        "sha256": "6d38e62564e29dd26b5c469f8ad55e2ca6cdadc375895976383d490227e7799c"
+      }
+    },
+    {
+      "id": "OFV2-TRANSACTIONS-001/AC3",
+      "requirement_id": "OFV2-TRANSACTIONS-001",
+      "text": "A request without dateFrom (and without deltaList) is rejected with HTTP 400 FORMAT_ERROR.",
+      "mapping": {
+        "file": "requirements/requirements.yaml",
+        "file_sha256": "91f9b55e4d5f1b425fe608d1e6442edfdf06e9f2749b02ebe53d781b477da13c",
+        "locator": "requirement:OFV2-TRANSACTIONS-001",
+        "sha256": "6d38e62564e29dd26b5c469f8ad55e2ca6cdadc375895976383d490227e7799c"
+      }
+    },
+    {
+      "id": "OFV2-TRANSACTIONS-001/AC4",
+      "requirement_id": "OFV2-TRANSACTIONS-001",
+      "text": "When more entries exist than fit into one page, the response contains _links.next.",
+      "mapping": {
+        "file": "requirements/requirements.yaml",
+        "file_sha256": "91f9b55e4d5f1b425fe608d1e6442edfdf06e9f2749b02ebe53d781b477da13c",
+        "locator": "requirement:OFV2-TRANSACTIONS-001",
+        "sha256": "6d38e62564e29dd26b5c469f8ad55e2ca6cdadc375895976383d490227e7799c"
+      }
+    },
+    {
+      "id": "OFV2-TRANSACTIONS-001/AC5",
+      "requirement_id": "OFV2-TRANSACTIONS-001",
+      "text": "The optional pageSize query parameter limits the number of returned entries.",
+      "mapping": {
+        "file": "requirements/requirements.yaml",
+        "file_sha256": "91f9b55e4d5f1b425fe608d1e6442edfdf06e9f2749b02ebe53d781b477da13c",
+        "locator": "requirement:OFV2-TRANSACTIONS-001",
+        "sha256": "6d38e62564e29dd26b5c469f8ad55e2ca6cdadc375895976383d490227e7799c"
+      }
+    }
+  ],
+  "related_evidence": [
+    {
+      "record_id": "bg-openfinance-v2-implementation-guidelines:p3:c0",
+      "record_type": "chunk",
+      "source_id": "bg-openfinance-v2-implementation-guidelines",
+      "document_id": "bg-openfinance-v2-implementation-guidelines@8eec1c4376ce",
+      "version": "openfinance-v2",
+      "kind": "pdf",
+      "authority": "normative",
+      "title": "Open Finance v2 Implementation Guidelines (synthetic fixture) — 4.2 Read Transaction List",
+      "locator": "chunk:bg-openfinance-v2-implementation-guidelines:p3:c0",
+      "page": 3,
+      "evidence": "query parameter dateFrom is mandatory unless deltaList is used. The ASPSP SHALL reject a\nrequest without dateFrom with HTTP status 400 and error code FORMAT_ERROR.\n\nThe ASPSP SHALL support the pagination of transaction lists. The TPP MAY limit the page size\nwith the query parameter pageSize. The ASPSP SHALL return a link next when more entries\nexist.\n\nThe ASPSP SHALL return HTTP status 429 with",
+      "relevance": 30.312000274658203,
+      "sha256": "ffb004d5d4d60493cbcc67cbdf923ef7f782113b7492240ba869ba9de5de294a",
+      "classification": "discovered_evidence"
+    },
+    {
+      "record_id": "bg-openfinance-v2-errata:p1:c2",
+      "record_type": "chunk",
+      "source_id": "bg-openfinance-v2-errata",
+      "document_id": "bg-openfinance-v2-errata@809757ca2bde",
+      "version": "openfinance-v2",
+      "kind": "text",
+      "authority": "informative",
+      "title": "Open Finance v2 Errata and Clarifications (synthetic fixture) — E-09 bookingStatus value all",
+      "locator": "chunk:bg-openfinance-v2-errata:p1:c2",
+      "page": 1,
+      "evidence": "E-09 bookingStatus value all\n\nThe bookingStatus value all returns booked, pending and information entries in one\nresponse. ASPSPs that do not support information SHALL reject the value all with\nHTTP status 400 and error code FORMAT_ERROR",
+      "relevance": 19.94300079345703,
+      "sha256": "242958460734148d175faf9c02d2406c738aa114cc4102e7e51ddfebaeb8aa23",
+      "classification": "discovered_evidence"
+    },
+    {
+      "record_id": "bg-openfinance-v2-errata:p1:c1",
+      "record_type": "chunk",
+      "source_id": "bg-openfinance-v2-errata",
+      "document_id": "bg-openfinance-v2-errata@809757ca2bde",
+      "version": "openfinance-v2",
+      "kind": "text",
+      "authority": "informative",
+      "title": "Open Finance v2 Errata and Clarifications (synthetic fixture) — E-07 Transaction list access frequency",
+      "locator": "chunk:bg-openfinance-v2-errata:p1:c1",
+      "page": 1,
+      "evidence": "E-07 Transaction list access frequency\n\nClarification: the limit of four transaction list reads per calendar day without PSU\ninvolvement is counted per consent only, not per account",
+      "relevance": 18.25,
+      "sha256": "dfa8ea7a43492195dc217d436f78b8ee9b2410bb56c56ec34d556d1ecc2d1959",
+      "classification": "discovered_evidence"
+    },
+    {
+      "record_id": "bg-openfinance-v2-implementation-guidelines:p5:c0",
+      "record_type": "chunk",
+      "source_id": "bg-openfinance-v2-implementation-guidelines",
+      "document_id": "bg-openfinance-v2-implementation-guidelines@8eec1c4376ce",
+      "version": "openfinance-v2",
+      "kind": "pdf",
+      "authority": "normative",
+      "title": "Open Finance v2 Implementation Guidelines (synthetic fixture) — 4.3 Read Transaction Details",
+      "locator": "chunk:bg-openfinance-v2-implementation-guidelines:p5:c0",
+      "page": 5,
+      "evidence": "4.3 Read Transaction Details\n\nCall GET /accounts/{accountId}/transactions/{transactionId} reads the details of one\ntransaction. The ASPSP SHALL return HTTP status 404 if the transactionId is unknown",
+      "relevance": 17.94499969482422,
+      "sha256": "d2aaf0f1aa71da8795ab975e8126c21a8466627d20fd5c56b48f79153d321ae9",
+      "classification": "discovered_evidence"
+    },
+    {
+      "record_id": "bg-openfinance-v2-operational-rules:p2:c0",
+      "record_type": "chunk",
+      "source_id": "bg-openfinance-v2-operational-rules",
+      "document_id": "bg-openfinance-v2-operational-rules@80430186dc34",
+      "version": "openfinance-v2",
+      "kind": "pdf",
+      "authority": "normative",
+      "title": "Open Finance v2 Operational Rules (synthetic fixture) — 3 Transaction History Access",
+      "locator": "chunk:bg-openfinance-v2-operational-rules:p2:c0",
+      "page": 2,
+      "evidence": "3 Transaction History Access\n\nThe ASPSP SHALL make at least 90 days of transaction history available through the\ntransaction list endpoint.\n\nWithout active PSU involvement the TPP MUST NOT read the transaction list of an account more\nthan four times per calendar day. The limit is counted per account and per consent",
+      "relevance": 14.739999771118164,
+      "sha256": "07fcee82a83b379bc569924f5a6cc45ee1bfe4abb2036222fb4c6fcd24093ec8",
+      "classification": "discovered_evidence"
+    }
+  ],
+  "conflicts": [],
+  "notice": "The requirement and acceptance criteria come from the curated mapping. 'related_evidence' is discovered evidence only."
+}
