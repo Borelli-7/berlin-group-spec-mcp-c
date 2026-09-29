@@ -209,17 +209,7 @@ pub struct SpecificationService {
 }
 
 pub(crate) fn provenance(doc: &Document, locator: String, sha256: String) -> Provenance {
-    Provenance {
-        source_id: doc.source_id.clone(),
-        document_id: doc.document_id.clone(),
-        version: doc.version.clone(),
-        kind: doc.kind,
-        authority: doc.authority,
-        precedence: doc.precedence,
-        locator,
-        sha256,
-        document_sha256: doc.sha256.clone().unwrap_or_default(),
-    }
+    Provenance::for_document(doc, locator, sha256)
 }
 
 impl SpecificationService {

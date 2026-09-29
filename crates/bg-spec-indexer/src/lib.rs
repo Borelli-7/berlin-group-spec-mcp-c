@@ -1,14 +1,10 @@
-pub fn add(left: u64, right: u64) -> u64 {
-    left + right
-}
+//! Ingestion pipeline: discovery, hashing, PDF extraction, OpenAPI normalization,
+//! chunking and indexing into the SQLite catalog and Tantivy index.
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+pub mod chunk;
+pub mod discover;
+pub mod openapi;
+pub mod pdf;
+pub mod pipeline;
 
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
-}
+pub use pipeline::{DocumentReport, IndexAction, IndexOptions, IndexReport, Indexer};

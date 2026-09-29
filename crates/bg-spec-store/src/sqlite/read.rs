@@ -31,6 +31,11 @@ impl SqliteCatalog {
         Ok(n.max(0) as u64)
     }
 
+    /// Raw `index_meta` value.
+    pub async fn meta_value(&self, key: &str) -> Result<Option<String>> {
+        self.meta(key).await
+    }
+
     async fn meta(&self, key: &str) -> Result<Option<String>> {
         sqlx::query_scalar("SELECT value FROM index_meta WHERE key = ?1")
             .bind(key)

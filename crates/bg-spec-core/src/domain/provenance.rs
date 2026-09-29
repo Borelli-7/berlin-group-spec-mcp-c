@@ -1,4 +1,4 @@
-use super::{DocumentAuthority, DocumentKind, SpecificationVersion};
+use super::{Document, DocumentAuthority, DocumentKind, SpecificationVersion};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
@@ -19,4 +19,21 @@ pub struct Provenance {
     pub sha256: String,
     /// SHA-256 of the whole source document file.
     pub document_sha256: String,
+}
+
+impl Provenance {
+    /// Provenance of a record (`locator`, content `sha256`) inside an indexed document.
+    pub fn for_document(doc: &Document, locator: String, sha256: String) -> Self {
+        Self {
+            source_id: doc.source_id.clone(),
+            document_id: doc.document_id.clone(),
+            version: doc.version.clone(),
+            kind: doc.kind,
+            authority: doc.authority,
+            precedence: doc.precedence,
+            locator,
+            sha256,
+            document_sha256: doc.sha256.clone().unwrap_or_default(),
+        }
+    }
 }
