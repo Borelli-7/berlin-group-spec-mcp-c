@@ -1,1 +1,1 @@
-{"tool":"read_openapi_schema","arguments":{"version":"openfinance-v2","name":"Transactions"}}
+{"tool":"read_openapi_schema","arguments":{"version":"openfinance-v2","name":"accountReport"}}

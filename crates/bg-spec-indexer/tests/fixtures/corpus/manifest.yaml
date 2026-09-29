@@ -1,0 +1,55 @@
+# Corpus manifest: the ONLY place where authority and precedence are declared.
+# Authority is never inferred from file names. Paths are relative to this directory.
+#
+# All documents referenced below are SYNTHETIC TEST FIXTURES. Replace them with the
+# official Berlin Group files you are licensed to use (see README.md, "Corpus").
+schema_version: 1
+sources:
+  - id: bg-nextgenpsd2-v1.3-openapi
+    kind: openapi
+    version: nextgenpsd2-v1.3
+    authority: technical
+    precedence: 90
+    path: openapi/v1/psd2-api-1.3.yaml
+    title: NextGenPSD2 v1.3 OpenAPI (synthetic fixture)
+
+  - id: bg-nextgenpsd2-v1.3-implementation-guidelines
+    kind: pdf
+    version: nextgenpsd2-v1.3
+    authority: normative
+    precedence: 100
+    path: pdf/v1/implementation-guidelines-v1.3.pdf
+    title: NextGenPSD2 v1.3 Implementation Guidelines (synthetic fixture)
+
+  - id: bg-openfinance-v2-openapi
+    kind: openapi
+    version: openfinance-v2
+    authority: technical
+    precedence: 90
+    path: openapi/v2/openfinance-api-v2.yaml
+    title: Open Finance v2 OpenAPI (synthetic fixture)
+
+  - id: bg-openfinance-v2-implementation-guidelines
+    kind: pdf
+    version: openfinance-v2
+    authority: normative
+    precedence: 100
+    path: pdf/v2/implementation-guidelines.pdf
+    title: Open Finance v2 Implementation Guidelines (synthetic fixture)
+    tags: [implementation-guidelines]
+
+  - id: bg-openfinance-v2-operational-rules
+    kind: pdf
+    version: openfinance-v2
+    authority: normative
+    precedence: 80
+    path: pdf/v2/operational-rules.pdf
+    title: Open Finance v2 Operational Rules (synthetic fixture)
+
+  - id: bg-openfinance-v2-errata
+    kind: text
+    version: openfinance-v2
+    authority: informative
+    precedence: 80
+    path: text/v2/errata.md
+    title: Open Finance v2 Errata and Clarifications (synthetic fixture)

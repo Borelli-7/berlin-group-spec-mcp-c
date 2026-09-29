@@ -1,46 +1,44 @@
 {
   "source": {
-    "source_id": "bg-openfinance-v2-implementation-guidelines",
-    "document_id": "bg-openfinance-v2-implementation-guidelines@8eec1c4376ce",
+    "source_id": "bg-openfinance-v2-xs2a-implementation-guidelines",
+    "document_id": "bg-openfinance-v2-xs2a-implementation-guidelines@ec74c8bcb7f7",
     "version": "openfinance-v2",
     "kind": "pdf",
-    "title": "Open Finance v2 Implementation Guidelines (synthetic fixture)",
+    "title": "openFinance XS2A API as PSD2 Interface - Implementation Guidelines 2.4 (2025-10-31)",
     "authority": "normative",
     "precedence": 100,
-    "path": "pdf/v2/implementation-guidelines.pdf",
-    "sha256": "8eec1c4376ce0a3155981597e953208585e80d986308bd69593d4a4b86949d5b",
-    "status": "partial",
-    "page_count": 6,
-    "ocr_required_pages": [
-      4
-    ],
-    "diagnostics": 1,
+    "path": "pdf/v2/XS2A API as PSD2 Interface implementation guide line-2.4.pdf",
+    "sha256": "ec74c8bcb7f785463fb3e383b4849531bb2048e0e2e2494ad6b1f43753a4fdea",
+    "status": "indexed",
+    "page_count": 127,
+    "ocr_required_pages": [],
+    "diagnostics": 0,
     "indexed_at_unix": "<timestamp>"
   },
-  "locator": "page:3",
+  "locator": "page:97",
   "classification": "source_content",
   "content": {
     "type": "pages",
     "pages": [
       {
-        "page": 3,
+        "page": 97,
         "status": "extracted",
-        "text": "4.2 Read Transaction List\n\nCall GET /accounts/{accountId}/transactions reads the transaction list of an addressed\naccount.\n\nThe query parameter bookingStatus is mandatory. The ASPSP SHALL support the values booked,\npending and both. The ASPSP MAY support the values information and all. If the value\ninformation is used, the ASPSP SHALL return standing order information instead of\ntransactions.\n\nThe query parameter dateFrom is mandatory unless deltaList is used. The ASPSP SHALL reject a\nrequest without dateFrom with HTTP status 400 and error code FORMAT_ERROR.\n\nThe ASPSP SHALL support the pagination of transaction lists. The TPP MAY limit the page size\nwith the query parameter pageSize. The ASPSP SHALL return a link next when more entries\nexist.\n\nThe ASPSP SHALL return HTTP status 429 with error code ACCESS_EXCEEDED when the access\nfrequency limit of the consent is exceeded.\n\nEach returned transaction MUST contain transactionAmount and bookingDate. The bookingDate is\nreturned as date-time in version 2.",
-        "sha256": "ffb004d5d4d60493cbcc67cbdf923ef7f782113b7492240ba869ba9de5de294a"
+        "text": "openFinance PSD2 XSZA API\n\n\nAttribute\n\nbookingStatus\n\n\ndeltaList\n\n\nPublished by the Berlin Group under Creative Commons Attribution-NoDerivatives 4.0 International Public License\n  (ref. License Notice for full license conditions)\n\n\n– Implementation Guidelines\n\n\nType\n\nMax35Text\n\n\nBoolean\n\n\n\n\n\nCondition\n\nMandatory\n\n\nOptional if\nsupported by\nAPI provider\n\n\nAccount Information Service\n\n\nDescription\n\nPermitted codes are \"booked\", \"pending\",\n\"both\", \"information\" and \"all\".\n\n\"booked\" shall be supported by the\nASPSP.\n\nTo support the \"pending\" feature is\nconditional for the ASPSP. It is mandated if\nthe ASPSP online channels provide\npending transactions to the PSU. Error\ncode if not supported.\n\nTo support the \"both\" feature is optional for\nthe ASPSP, Error code if not supported. If\nsupported, \"both\" means to request lists of\ntransactions of bookingStatus either\n\"pending\" or \"booked\".\n\nTo support the \"information\" feature is\noptional for the ASPSP. Currently the\nbooking status “information” only covers\nstanding orders. Error code if not\nsupported.\n\nTo support the \"all\" feature is optional for\nthe ASPSP, Error code if not supported. If\nsupported, \"all\" means to request lists of\ntransaction of any bookingStatus\n(\"pending\", \"booked\" or \"information\").\n\nThis data attribute is indicating that the\nAISP is in favour to get all transactions after\nthe last report access for this PSU on the\naddressed account. This is another\nimplementation of a delta access-report.\n\nThis delta indicator might be rejected by the\nASPSP if this function is not supported.\n\nIf this data element is contained, the entries\n\"dateFrom\" and \"dateTo\" might be ignored\nby the ASPSP if a delta report is supported.\n\n\nPage 92",
+        "sha256": "1a1268007dc927e5887748958c2db21595b5f104548d3d594a2f4c7fefb585e0"
       }
     ]
   },
   "provenance": [
     {
-      "source_id": "bg-openfinance-v2-implementation-guidelines",
-      "document_id": "bg-openfinance-v2-implementation-guidelines@8eec1c4376ce",
+      "source_id": "bg-openfinance-v2-xs2a-implementation-guidelines",
+      "document_id": "bg-openfinance-v2-xs2a-implementation-guidelines@ec74c8bcb7f7",
       "version": "openfinance-v2",
       "kind": "pdf",
       "authority": "normative",
       "precedence": 100,
-      "locator": "page:3",
-      "sha256": "ffb004d5d4d60493cbcc67cbdf923ef7f782113b7492240ba869ba9de5de294a",
-      "document_sha256": "8eec1c4376ce0a3155981597e953208585e80d986308bd69593d4a4b86949d5b"
+      "locator": "page:97",
+      "sha256": "1a1268007dc927e5887748958c2db21595b5f104548d3d594a2f4c7fefb585e0",
+      "document_sha256": "ec74c8bcb7f785463fb3e383b4849531bb2048e0e2e2494ad6b1f43753a4fdea"
     }
   ]
 }

@@ -81,14 +81,16 @@ get_endpoint_requirements → read_openapi_endpoint → trace_requirement → re
 
 ## Corpus
 
-The bundled `corpus/` is a **synthetic fixture corpus** (original text written for testing; not the
-Berlin Group documents, which are copyrighted). It models NextGenPSD2 v1.3 and Open Finance v2
-transaction endpoints with deliberate differences, a scanned (image-only) PDF page and deliberate
-curation conflicts.
+`corpus/` contains the **official Berlin Group publications** (NextGenPSD2 1.3.16 and openFinance API
+Framework v2.x PDFs and OpenAPI files, 28 sources), published by the Berlin Group mostly under the
+Creative Commons Attribution-NoDerivatives 4.0 license; they are redistributed unmodified. Authority and
+precedence are **declared** in `corpus/manifest.yaml`, never inferred from file names.
+`corpus/requirements/requirements.yaml` holds 14 curated requirements, and `corpus/text/v2/errata.md`
+records project clarifications on discrepancies between the official files (not a Berlin Group publication).
 
-To use the official specification, place the files you are licensed to use under `corpus/` and
-describe them in `corpus/manifest.yaml` (authority and precedence are **declared**, never inferred from
-file names). See [INDEXING.md](INDEXING.md) and [REQUIREMENT_TRACEABILITY.md](REQUIREMENT_TRACEABILITY.md).
+Tests use a separate **synthetic fixture corpus** in `crates/bg-spec-indexer/tests/fixtures/corpus/`
+(original test text with deliberate differences, an image-only PDF page and curation conflicts).
+See [INDEXING.md](INDEXING.md) and [REQUIREMENT_TRACEABILITY.md](REQUIREMENT_TRACEABILITY.md).
 
 ## Workspace
 
@@ -99,7 +101,8 @@ crates/
   bg-spec-indexer  discovery, SHA-256, PDF extraction (pdf_oxide), OpenAPI normalization, chunking
   bg-spec-mcp      rmcp stdio server (thin adapters)            → binary bg-spec-mcp
   bg-spec-cli      index / doctor / stats / sources             → binary bg-spec
-corpus/            manifest.yaml, openapi/, pdf/, text/, requirements/
+corpus/            official corpus: manifest.yaml, openapi/, pdf/, text/, requirements/
+crates/bg-spec-indexer/tests/fixtures/corpus/   synthetic test corpus
 config/config.toml
 data/              catalog.db, tantivy/   (generated; git-ignored)
 examples/          Copilot configs, example calls and responses

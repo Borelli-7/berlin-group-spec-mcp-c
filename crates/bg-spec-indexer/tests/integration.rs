@@ -374,6 +374,28 @@ async fn endpoint_and_schema_lookup() {
         .unwrap();
     assert_eq!(v1.operation.path, "/v1/accounts/{account-id}/transactions");
 
+    // A v1-prefixed path resolves in v2 (and vice versa) through the other version's prefix.
+    let v2_from_v1_path = svc
+        .specification
+        .read_endpoint(None, "/v1/accounts/{account-id}/transactions", "GET")
+        .await
+        .unwrap();
+    assert_eq!(v2_from_v1_path.operation.path, ENDPOINT);
+    assert_eq!(
+        v2_from_v1_path.matched_by,
+        bg_spec_core::services::MatchedBy::Canonical
+    );
+    let v1_from_v2_path = svc
+        .specification
+        .read_endpoint(
+            Some("nextgenpsd2-v1.3"),
+            "/v2/accounts/{accountId}/transactions",
+            "GET",
+        )
+        .await
+        .unwrap();
+    assert_eq!(v1_from_v2_path.operation.path, v1.operation.path);
+
     let schema = svc
         .specification
         .read_schema(None, "Transactions")

@@ -1,74 +1,95 @@
 {
   "version": "openfinance-v2",
-  "name": "Transactions",
+  "name": "accountReport",
   "schema": {
     "version": "openfinance-v2",
-    "name": "Transactions",
+    "name": "accountReport",
     "schema": {
+      "description": "See document \\\"openFinance API Framework Data Dictionary\\\", section \\\"Account Report\\\" for more details.\n",
       "type": "object",
-      "description": "Transaction details.",
       "required": [
-        "transactionAmount",
-        "bookingDate"
+        "_links"
       ],
       "properties": {
-        "transactionId": {
-          "type": "string"
+        "booked": {
+          "description": "Shall be contained if bookingStatus parameter is set to \\\"booked\\\", \\\"both\\\" or \\\"all\\\".\n",
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/transactions"
+          }
         },
-        "entryReference": {
-          "type": "string",
-          "maxLength": 35
+        "pending": {
+          "description": "Not contained if the bookingStatus parameter is set to \\\"booked\\\" or \\\"information\\\".\n",
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/transactions"
+          }
         },
-        "bookingDate": {
-          "type": "string",
-          "format": "date-time"
+        "information": {
+          "description": "Only contained if the bookingStatus is set to \\\"information\\\" or \\\"all\\\" and if supported by ASPSP.\n",
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/transactions"
+          }
         },
-        "valueDate": {
-          "type": "string",
-          "format": "date",
-          "nullable": true
-        },
-        "transactionAmount": {
-          "$ref": "#/components/schemas/Amount"
-        },
-        "creditor": {
-          "$ref": "#/components/schemas/PartyIdentification"
-        },
-        "merchantCategoryCode": {
-          "type": "string",
-          "pattern": "[0-9]{4}"
-        },
-        "remittanceInformationUnstructured": {
-          "type": "string",
-          "maxLength": 140
+        "_links": {
+          "description": "The following links might be used within this context:\n* account (mandatoryin the context of cash accounts)\n* savingsAccount (mandatory in the context of savings accounts)\n* loanAccount (mandatory in the context of loan accounts)\n* first (optional)\n* next (optional)\n* previous (optional)\n* last (optional)\n",
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/links"
+            }
+          ]
         }
       }
     },
     "referenced_schemas": [
-      "Amount",
-      "PartyIdentification"
+      "links",
+      "transactions"
     ],
-    "json_pointer": "/components/schemas/Transactions",
+    "json_pointer": "/components/schemas/accountReport",
     "provenance": {
-      "source_id": "bg-openfinance-v2-openapi",
-      "document_id": "bg-openfinance-v2-openapi@edd99f6e0265",
+      "source_id": "bg-openfinance-v2-openapi-ais",
+      "document_id": "bg-openfinance-v2-openapi-ais@d818f580bc87",
       "version": "openfinance-v2",
       "kind": "openapi",
       "authority": "technical",
       "precedence": 90,
-      "locator": "schema:Transactions",
-      "sha256": "3e0fd453f446a53f019806fb665d35ddc229a944547c37b2e0b37e8657967330",
-      "document_sha256": "edd99f6e026537a45d3e95f33a35918e0f338914c70879234c5dc3c1e799fdfb"
+      "locator": "schema:accountReport",
+      "sha256": "8f238996479de8de60b9808e6c9d1c2493e6bff1833927c280ba0d542b7d97d2",
+      "document_sha256": "d818f580bc8779f28fb28c6a43ba0853650587be536f55ca60ed455005ff847d"
     }
   },
   "referenced_schemas": [
-    "Amount",
-    "PartyIdentification"
+    "links",
+    "transactions"
   ],
   "transitive_referenced_schemas": [
-    "Amount",
-    "PartyIdentification"
+    "AccountIdentificationCode",
+    "BBAN",
+    "BICFI",
+    "BalanceType",
+    "BankTransactionCode",
+    "CardDataEntryMode",
+    "CardTransactionType",
+    "CashAccountType",
+    "ClearingSystemIdentificationCode",
+    "CountryCode",
+    {
+      "_truncated_items": 65
+    }
   ],
   "unresolved_references": [],
-  "alternatives": []
+  "alternatives": [
+    {
+      "source_id": "bg-openfinance-v2-openapi-data-dictionary",
+      "document_id": "bg-openfinance-v2-openapi-data-dictionary@8b0f84e167c2",
+      "version": "openfinance-v2",
+      "kind": "openapi",
+      "authority": "technical",
+      "precedence": 90,
+      "locator": "schema:accountReport",
+      "sha256": "8f238996479de8de60b9808e6c9d1c2493e6bff1833927c280ba0d542b7d97d2",
+      "document_sha256": "8b0f84e167c2d8e5da3977b013bb50ac6f4fb2767aadb51ff6a71d973fe648b0"
+    }
+  ]
 }

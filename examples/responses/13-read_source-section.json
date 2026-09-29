@@ -1,56 +1,56 @@
 {
   "source": {
-    "source_id": "bg-openfinance-v2-errata",
-    "document_id": "bg-openfinance-v2-errata@809757ca2bde",
+    "source_id": "project-openfinance-v2-errata",
+    "document_id": "project-openfinance-v2-errata@0526127db9e6",
     "version": "openfinance-v2",
     "kind": "text",
-    "title": "Open Finance v2 Errata and Clarifications (synthetic fixture)",
-    "authority": "informative",
-    "precedence": 80,
+    "title": "Project errata and clarifications on the openFinance v2 corpus",
+    "authority": "project",
+    "precedence": 10,
     "path": "text/v2/errata.md",
-    "sha256": "809757ca2bdef7b43e9f039df0c5277a4c347c1a95489097efa54695c7c1e91d",
+    "sha256": "0526127db9e64ec84102c2472ddb7f6b8170e284ec73ac508a7ef28ac161d431",
     "status": "indexed",
     "page_count": 1,
     "ocr_required_pages": [],
     "diagnostics": 0,
     "indexed_at_unix": "<timestamp>"
   },
-  "locator": "section:E-07",
+  "locator": "section:E-01",
   "classification": "source_content",
   "content": {
     "type": "chunks",
     "chunks": [
       {
-        "chunk_id": "bg-openfinance-v2-errata:p1:c1",
+        "chunk_id": "project-openfinance-v2-errata:p1:c1",
         "page": 1,
-        "section": "E-07 Transaction list access frequency",
+        "section": "E-01 ASPSP-SCA-Approach value SIGNATURE missing from the OpenAPI enum",
         "ordinal": 1,
-        "text": "E-07 Transaction list access frequency\n\nClarification: the limit of four transaction list reads per calendar day without PSU\ninvolvement is counted per consent only, not per account.",
+        "text": "E-01 ASPSP-SCA-Approach value SIGNATURE missing from the OpenAPI enum\n\nProtocol Functions and Security Measures 2.3, section 8.4.2 (page 95), lists the values\nEMBEDDED, DECOUPLED, REDIRECT, ASPSP-CHANNEL and SIGNATURE for the ASPSP-SCA-Approach\nresponse header. Consent API 2.2 uses \"ASPSP-SCA-Approach: SIGNATURE\" in an example (page 32).\nThe header definitions in the Signing Basket 2.3, Consent 2.1 and PIS 2.3 OpenAPI files list\nSIGNATURE in the description, but their enum only contains EMBEDDED, DECOUPLED, REDIRECT and\nASPSP-CHANNEL.\n\nClarification: the PDF value list prevails. SIGNATURE is a valid ASPSP-SCA-Approach value;\nclients generated from the OpenAPI enum must tolerate it.",
         "provenance": {
-          "source_id": "bg-openfinance-v2-errata",
-          "document_id": "bg-openfinance-v2-errata@809757ca2bde",
+          "source_id": "project-openfinance-v2-errata",
+          "document_id": "project-openfinance-v2-errata@0526127db9e6",
           "version": "openfinance-v2",
           "kind": "text",
-          "authority": "informative",
-          "precedence": 80,
-          "locator": "chunk:bg-openfinance-v2-errata:p1:c1",
-          "sha256": "dfa8ea7a43492195dc217d436f78b8ee9b2410bb56c56ec34d556d1ecc2d1959",
-          "document_sha256": "809757ca2bdef7b43e9f039df0c5277a4c347c1a95489097efa54695c7c1e91d"
+          "authority": "project",
+          "precedence": 10,
+          "locator": "chunk:project-openfinance-v2-errata:p1:c1",
+          "sha256": "f61fbf5b2dc6599f89948614cf01a732dbd705e76cfaf0454af9775125bc5697",
+          "document_sha256": "0526127db9e64ec84102c2472ddb7f6b8170e284ec73ac508a7ef28ac161d431"
         }
       }
     ]
   },
   "provenance": [
     {
-      "source_id": "bg-openfinance-v2-errata",
-      "document_id": "bg-openfinance-v2-errata@809757ca2bde",
+      "source_id": "project-openfinance-v2-errata",
+      "document_id": "project-openfinance-v2-errata@0526127db9e6",
       "version": "openfinance-v2",
       "kind": "text",
-      "authority": "informative",
-      "precedence": 80,
-      "locator": "chunk:bg-openfinance-v2-errata:p1:c1",
-      "sha256": "dfa8ea7a43492195dc217d436f78b8ee9b2410bb56c56ec34d556d1ecc2d1959",
-      "document_sha256": "809757ca2bdef7b43e9f039df0c5277a4c347c1a95489097efa54695c7c1e91d"
+      "authority": "project",
+      "precedence": 10,
+      "locator": "chunk:project-openfinance-v2-errata:p1:c1",
+      "sha256": "f61fbf5b2dc6599f89948614cf01a732dbd705e76cfaf0454af9775125bc5697",
+      "document_sha256": "0526127db9e64ec84102c2472ddb7f6b8170e284ec73ac508a7ef28ac161d431"
     }
   ]
 }

@@ -952,12 +952,15 @@ impl RequirementService {
         self.spec.ensure_known_version(&version).await?;
         let method = normalize_method(method)?;
         let path = validate_path(path)?;
-        let key = self.spec.path_key_for(&version, &path);
         let mut conflicts = Vec::new();
         let mut citations: Vec<SourceCitation> = Vec::new();
 
         // 1. OpenAPI operation.
         let lookup = self.spec.lookup_operation(&version, &method, &path).await?;
+        let key = match &lookup {
+            Some(l) => self.spec.path_key_for(&version, &l.primary.path),
+            None => self.spec.path_key_for(&version, &path),
+        };
         if let Some(l) = &lookup {
             let others: Vec<Provenance> = l.others.iter().map(|o| o.provenance.clone()).collect();
             conflicts.extend(Self::duplicate_conflict(

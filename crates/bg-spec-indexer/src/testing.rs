@@ -5,16 +5,26 @@
 use bg_spec_core::{Result, config::Config, error::CoreError};
 use std::path::{Path, PathBuf};
 
-/// Path of the example corpus shipped with the workspace.
+/// Path of the synthetic fixture corpus used by tests (independent of the real `corpus/`).
 pub fn example_corpus_dir() -> PathBuf {
+    Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/corpus")
+}
+
+/// Path of the workspace corpus with the official Berlin Group files.
+pub fn workspace_corpus_dir() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR")).join("../../corpus")
 }
 
 /// Copies the example corpus into `dest/corpus` and returns a config whose data directory is
 /// `dest/data`.
 pub fn stage_example_corpus(dest: &Path) -> Result<Config> {
+    stage_corpus(&example_corpus_dir(), dest)
+}
+
+/// Copies `src` into `dest/corpus` and returns a config whose data directory is `dest/data`.
+pub fn stage_corpus(src: &Path, dest: &Path) -> Result<Config> {
     let corpus = dest.join("corpus");
-    copy_dir(&example_corpus_dir(), &corpus)?;
+    copy_dir(src, &corpus)?;
     config_for(dest, &corpus)
 }
 
@@ -30,6 +40,7 @@ target = "openfinance-v2"
 
 [versions.path_prefixes]
 "nextgenpsd2-v1.3" = "/v1"
+"openfinance-v2" = "/v2"
 "#,
         corpus = corpus.display().to_string(),
         data = dest.join("data").display().to_string(),

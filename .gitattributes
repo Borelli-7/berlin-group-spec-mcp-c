@@ -1,0 +1,3 @@
+# Official corpus files are hashed (sha256 pins); store them byte-for-byte.
+corpus/openapi/** -text
+corpus/pdf/** -text

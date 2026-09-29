@@ -1,16 +1,16 @@
 {
   "method": "GET",
-  "path": "/accounts/{accountId}/transactions",
+  "path": "/v1/accounts/{account-id}/transactions",
   "from": {
     "version": "nextgenpsd2-v1.3",
     "found": true,
-    "matched_by": "canonical",
+    "matched_by": "exact",
     "unresolved_schemas": []
   },
   "to": {
     "version": "openfinance-v2",
     "found": true,
-    "matched_by": "exact",
+    "matched_by": "canonical",
     "unresolved_schemas": []
   },
   "notice": "Structural differences only. No backward-compatibility verdict is made; interpretation is the responsibility of the consuming agent.",
@@ -20,7 +20,7 @@
     "method": "GET",
     "operation_id": "getTransactionList",
     "summary": "Read transaction list of an account",
-    "description": "Reads account data from a given account addressed by account-id.",
+    "description": "Read transaction reports or transaction lists of a given account addressed by \"account-id\", depending on the steering parameter \n\"bookingStatus\" together with balances.\n\nFor a given account, additional parameters are e.g. the attributes \"dateFrom\" and \"dateTo\". \nThe ASPSP might add balance information, if transaction lists without balances are not supported.\n",
     "tags": [
       "Account Information Service (AIS)"
     ],
@@ -31,19 +31,108 @@
         "location": "path",
         "required": true,
         "deprecated": false,
-        "description": "Resource identification of the addressed account.",
+        "description": "This identification is denoting the addressed (card) account. \nThe account-id is retrieved by using a \"Read Account List\" or \"Read Card Account list\" call. \nThe account-id is the \"resourceId\" attribute of the account structure. \nIts value is constant at least throughout the lifecycle of a given consent.\n",
+        "schema": {
+          "schema_ref": "accountId",
+          "schema": {
+            "$ref": "#/components/schemas/accountId"
+          }
+        },
+        "component": "#/components/parameters/accountId"
+      },
+      {
+        "name": "dateFrom",
+        "location": "query",
+        "required": false,
+        "deprecated": false,
+        "description": "Conditional: Starting date (inclusive the date dateFrom) of the transaction list, mandated if no delta access is required\nand if bookingStatus does not equal \"information\".\n\nFor booked transactions, the relevant date is the booking date. \n\nFor pending transactions, the relevant date is the entry date, which may not be transparent \nneither in this API nor other channels of the ASPSP.\n",
+        "schema": {
+          "schema": {
+            "type": "string",
+            "format": "date"
+          }
+        },
+        "component": "#/components/parameters/dateFrom"
+      },
+      {
+        "name": "dateTo",
+        "location": "query",
+        "required": false,
+        "deprecated": false,
+        "description": "End date (inclusive the data dateTo) of the transaction list, default is \"now\" if not given. \n\nMight be ignored if a delta function is used.\n\nFor booked transactions, the relevant date is the booking date. \n\nFor pending transactions, the relevant date is the entry date, which may not be transparent \nneither in this API nor other channels of the ASPSP.\n",
+        "schema": {
+          "schema": {
+            "type": "string",
+            "format": "date"
+          }
+        },
+        "component": "#/components/parameters/dateTo"
+      },
+      {
+        "name": "entryReferenceFrom",
+        "location": "query",
+        "required": false,
+        "deprecated": false,
+        "description": "This data attribute is indicating that the AISP is in favour to get all transactions after \nthe transaction with identification entryReferenceFrom alternatively to the above defined period. \nThis is a implementation of a delta access. \nIf this data element is contained, the entries \"dateFrom\" and \"dateTo\" might be ignored by the ASPSP \nif a delta report is supported.\n\nOptional if supported by API provider.\n",
         "schema": {
           "schema": {
             "type": "string"
           }
         },
-        "component": "#/components/parameters/AccountID"
+        "component": "#/components/parameters/entryReferenceFrom"
+      },
+      {
+        "name": "bookingStatus",
+        "location": "query",
+        "required": true,
+        "deprecated": false,
+        "description": "Permitted codes are \n  * \"booked\",\n  * \"pending\",  \n  * \"both\",\n  * \"information\" and\n  * \"all\"\n\"booked\" shall be supported by the ASPSP.\nTo support the \"pending\" and \"both\" feature is optional for the ASPSP, \nError code if not supported in the online banking frontend.\nIf supported, \"both\" means to request transaction reports of transaction of bookingStatus either \"pending\" or \"booked\".\nTo support the \"information\" feature is optional for the ASPSP. Currently the booking status “information” only covers standing orders. Error code if not supported.\nTo support the \"all\" feature is optional for the ASPSP, Error code if not supported. If supported, \"all\" means to request transaction reports of transaction of any bookingStatus (\"pending\", \"booked\" or \"information\").\n",
+        "schema": {
+          "schema": {
+            "type": "string",
+            "enum": [
+              "information",
+              "booked",
+              "pending",
+              "both",
+              "all"
+            ]
+          }
+        },
+        "component": "#/components/parameters/bookingStatusGeneric"
+      },
+      {
+        "name": "deltaList",
+        "location": "query",
+        "required": false,
+        "deprecated": false,
+        "description": "This data attribute is indicating that the AISP is in favour to get all transactions after the last report access for this PSU on the addressed account. This is another implementation of a delta access-report.\nThis delta indicator might be rejected by the ASPSP if this function is not supported.\nOptional if supported by API provider",
+        "schema": {
+          "schema": {
+            "type": "boolean"
+          }
+        },
+        "component": "#/components/parameters/deltaList"
+      },
+      {
+        "name": "withBalance",
+        "location": "query",
+        "required": false,
+        "deprecated": false,
+        "description": "If contained, this function reads the list of accessible payment accounts including the booking balance, \nif granted by the PSU in the related consent and available by the ASPSP. \nThis parameter might be ignored by the ASPSP. \n",
+        "schema": {
+          "schema": {
+            "type": "boolean"
+          }
+        },
+        "component": "#/components/parameters/withBalanceQuery"
       },
       {
         "name": "X-Request-ID",
         "location": "header",
         "required": true,
         "deprecated": false,
+        "description": "ID of the request, unique to the call, as determined by the initiating party.",
         "schema": {
           "schema": {
             "type": "string",
@@ -53,64 +142,33 @@
         "component": "#/components/parameters/X-Request-ID"
       },
       {
-        "name": "Consent-ID",
+        "name": "Digest",
         "location": "header",
-        "required": true,
+        "required": false,
         "deprecated": false,
+        "description": "Is contained if and only if the \"Signature\" element is contained in the header of the request.",
         "schema": {
           "schema": {
             "type": "string"
           }
         },
-        "component": "#/components/parameters/Consent-ID"
+        "component": "#/components/parameters/Digest"
       },
       {
-        "name": "dateFrom",
-        "location": "query",
+        "name": "Signature",
+        "location": "header",
         "required": false,
         "deprecated": false,
-        "description": "Conditional; mandatory unless deltaList is used.",
+        "description": "A signature of the request by the TPP on application level. This might be mandated by ASPSP.\n",
         "schema": {
           "schema": {
-            "type": "string",
-            "format": "date"
+            "type": "string"
           }
-        }
+        },
+        "component": "#/components/parameters/Signature"
       },
       {
-        "name": "dateTo",
-        "location": "query",
-        "required": false,
-        "deprecated": false,
-        "schema": {
-          "schema": {
-            "type": "string",
-            "format": "date"
-          }
-        }
-      },
-      {
-        "name": "bookingStatus",
-        "location": "query",
-        "required": true,
-        "deprecated": false,
-        "schema": {
-          "schema_ref": "BookingStatus",
-          "schema": {
-            "$ref": "#/components/schemas/BookingStatus"
-          }
-        }
-      },
-      {
-        "name": "withBalance",
-        "location": "query",
-        "required": false,
-        "deprecated": false,
-        "schema": {
-          "schema": {
-            "type": "boolean"
-          }
-        }
+        "_truncated_items": 12
       }
     ],
     "responses": [
@@ -124,170 +182,468 @@
           {
             "media_type": "application/json",
             "schema": {
-              "schema_ref": "TransactionsResponse200Json",
+              "schema_ref": "transactionsResponse-200_json",
               "schema": {
-                "$ref": "#/components/schemas/TransactionsResponse200Json"
+                "$ref": "#/components/schemas/transactionsResponse-200_json"
               }
             }
-          }
-        ]
-      },
-      {
-        "status": "400",
-        "description": "Bad request",
-        "headers": [],
-        "content": [
+          },
           {
-            "media_type": "application/json",
+            "media_type": "application/xml",
             "schema": {
-              "schema_ref": "Error400",
               "schema": {
-                "$ref": "#/components/schemas/Error400"
+                "description": "Body of the XML response for a successful read transaction list request.\nThe body has the structure of a either a camt.052 or camt.053 message.\nThe camt.052 may include pending payments which are not yet finally booked. The ASPSP will decide on the format due to the chosen parameters, specifically on the chosen dates relative to the time of the request. In addition the ASPSP might offer camt.054x structure e.g. in a corporate setting.",
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/camt.052"
+                  },
+                  {
+                    "$ref": "#/components/schemas/camt.053"
+                  },
+                  {
+                    "$ref": "#/components/schemas/camt.054"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "media_type": "text/plain",
+            "schema": {
+              "schema": {
+                "description": "Body of the Text response for a successful read transaction list request.\nThe body has the structure of a MT94x message.\nThe response body consists of an MT940 or MT942 format in a text structure. The MT942 may include pending payments which are not yet finally booked. The ASPSP will decide on the format due to the chosen parameters, specifically on the chosen dates relative to the time of the request.",
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/mt940"
+                  },
+                  {
+                    "$ref": "#/components/schemas/mt942"
+                  }
+                ]
               }
             }
           }
         ],
-        "component": "#/components/responses/400_AIS"
+        "component": "#/components/responses/OK_200_AccountsTransactions"
+      },
+      {
+        "status": "400",
+        "description": "Bad Request",
+        "headers": [
+          "Location",
+          "X-Request-ID"
+        ],
+        "content": [
+          {
+            "media_type": "application/json",
+            "schema": {
+              "schema_ref": "Error400_NG_AIS",
+              "schema": {
+                "$ref": "#/components/schemas/Error400_NG_AIS"
+              }
+            }
+          },
+          {
+            "media_type": "application/problem+json",
+            "schema": {
+              "schema_ref": "Error400_AIS",
+              "schema": {
+                "$ref": "#/components/schemas/Error400_AIS"
+              }
+            }
+          }
+        ],
+        "component": "#/components/responses/BAD_REQUEST_400_AIS"
       },
       {
         "status": "401",
         "description": "Unauthorized",
-        "headers": [],
-        "content": []
+        "headers": [
+          "Location",
+          "X-Request-ID"
+        ],
+        "content": [
+          {
+            "media_type": "application/json",
+            "schema": {
+              "schema_ref": "Error401_NG_AIS",
+              "schema": {
+                "$ref": "#/components/schemas/Error401_NG_AIS"
+              }
+            }
+          },
+          {
+            "media_type": "application/problem+json",
+            "schema": {
+              "schema_ref": "Error401_AIS",
+              "schema": {
+                "$ref": "#/components/schemas/Error401_AIS"
+              }
+            }
+          }
+        ],
+        "component": "#/components/responses/UNAUTHORIZED_401_AIS"
       },
       {
         "status": "403",
         "description": "Forbidden",
-        "headers": [],
-        "content": []
+        "headers": [
+          "Location",
+          "X-Request-ID"
+        ],
+        "content": [
+          {
+            "media_type": "application/json",
+            "schema": {
+              "schema_ref": "Error403_NG_AIS",
+              "schema": {
+                "$ref": "#/components/schemas/Error403_NG_AIS"
+              }
+            }
+          },
+          {
+            "media_type": "application/problem+json",
+            "schema": {
+              "schema_ref": "Error403_AIS",
+              "schema": {
+                "$ref": "#/components/schemas/Error403_AIS"
+              }
+            }
+          }
+        ],
+        "component": "#/components/responses/FORBIDDEN_403_AIS"
       },
       {
         "status": "404",
         "description": "Not found",
-        "headers": [],
-        "content": []
+        "headers": [
+          "Location",
+          "X-Request-ID"
+        ],
+        "content": [
+          {
+            "media_type": "application/json",
+            "schema": {
+              "schema_ref": "Error404_NG_AIS",
+              "schema": {
+                "$ref": "#/components/schemas/Error404_NG_AIS"
+              }
+            }
+          },
+          {
+            "media_type": "application/problem+json",
+            "schema": {
+              "schema_ref": "Error404_AIS",
+              "schema": {
+                "$ref": "#/components/schemas/Error404_AIS"
+              }
+            }
+          }
+        ],
+        "component": "#/components/responses/NOT_FOUND_404_AIS"
+      },
+      {
+        "status": "405",
+        "description": "Method Not Allowed",
+        "headers": [
+          "Location",
+          "X-Request-ID"
+        ],
+        "content": [
+          {
+            "media_type": "application/json",
+            "schema": {
+              "schema_ref": "Error405_NG_AIS",
+              "schema": {
+                "$ref": "#/components/schemas/Error405_NG_AIS"
+              }
+            }
+          },
+          {
+            "media_type": "application/problem+json",
+            "schema": {
+              "schema_ref": "Error405_AIS",
+              "schema": {
+                "$ref": "#/components/schemas/Error405_AIS"
+              }
+            }
+          }
+        ],
+        "component": "#/components/responses/METHOD_NOT_ALLOWED_405_AIS"
+      },
+      {
+        "status": "406",
+        "description": "Not Acceptable",
+        "headers": [
+          "Location",
+          "X-Request-ID"
+        ],
+        "content": [
+          {
+            "media_type": "application/json",
+            "schema": {
+              "schema_ref": "Error406_NG_AIS",
+              "schema": {
+                "$ref": "#/components/schemas/Error406_NG_AIS"
+              }
+            }
+          },
+          {
+            "media_type": "application/problem+json",
+            "schema": {
+              "schema_ref": "Error406_AIS",
+              "schema": {
+                "$ref": "#/components/schemas/Error406_AIS"
+              }
+            }
+          }
+        ],
+        "component": "#/components/responses/NOT_ACCEPTABLE_406_AIS"
+      },
+      {
+        "status": "408",
+        "description": "Request Timeout",
+        "headers": [
+          "Location",
+          "X-Request-ID"
+        ],
+        "content": [],
+        "component": "#/components/responses/REQUEST_TIMEOUT_408_AIS"
+      },
+      {
+        "status": "409",
+        "description": "Conflict",
+        "headers": [
+          "Location",
+          "X-Request-ID"
+        ],
+        "content": [
+          {
+            "media_type": "application/json",
+            "schema": {
+              "schema_ref": "Error409_NG_AIS",
+              "schema": {
+                "$ref": "#/components/schemas/Error409_NG_AIS"
+              }
+            }
+          },
+          {
+            "media_type": "application/problem+json",
+            "schema": {
+              "schema_ref": "Error409_AIS",
+              "schema": {
+                "$ref": "#/components/schemas/Error409_AIS"
+              }
+            }
+          }
+        ],
+        "component": "#/components/responses/CONFLICT_409_AIS"
+      },
+      {
+        "status": "415",
+        "description": "Unsupported Media Type",
+        "headers": [
+          "Location",
+          "X-Request-ID"
+        ],
+        "content": [],
+        "component": "#/components/responses/UNSUPPORTED_MEDIA_TYPE_415_AIS"
+      },
+      {
+        "_truncated_items": 3
       }
     ],
-    "security": [],
-    "security_origin": "none",
+    "security": [
+      {},
+      {
+        "BearerAuthOAuth": []
+      }
+    ],
+    "security_origin": "operation",
     "referenced_schemas": [
-      "BookingStatus",
-      "Error400",
-      "TransactionsResponse200Json"
+      "Error400_AIS",
+      "Error400_NG_AIS",
+      "Error401_AIS",
+      "Error401_NG_AIS",
+      "Error403_AIS",
+      "Error403_NG_AIS",
+      "Error404_AIS",
+      "Error404_NG_AIS",
+      "Error405_AIS",
+      "Error405_NG_AIS",
+      {
+        "_truncated_items": 14
+      }
     ],
     "json_pointer": "/paths/~1v1~1accounts~1{account-id}~1transactions/get",
     "provenance": {
       "source_id": "bg-nextgenpsd2-v1.3-openapi",
-      "document_id": "bg-nextgenpsd2-v1.3-openapi@45501c5076b9",
+      "document_id": "bg-nextgenpsd2-v1.3-openapi@ab6893b24fe0",
       "version": "nextgenpsd2-v1.3",
       "kind": "openapi",
       "authority": "technical",
       "precedence": 90,
       "locator": "op:GET /v1/accounts/{account-id}/transactions",
-      "sha256": "4442846ccabe17fa690f0765a827ed5d849672c36671585687253555df68985d",
-      "document_sha256": "45501c5076b98ccd3f755581d51a3a32e9c82710d2ef18b9f574dc93fee014b2"
+      "sha256": "e017ec23adebf33be407f1b8f5ab59b798033a8a360939c87eece3eeaddf785a",
+      "document_sha256": "ab6893b24fe06e773b53af42d10fad465cbe11935d67e2c2d69a6c3efd688b4b"
     }
   },
   "v2_operation": {
     "version": "openfinance-v2",
-    "path": "/accounts/{accountId}/transactions",
+    "path": "/v2/accounts/{account-id}/transactions",
     "method": "GET",
-    "operation_id": "getTransactionList",
-    "summary": "Read transaction list of an account",
-    "description": "Reads the transaction list of the account addressed by accountId, with pagination.",
+    "operation_id": "getAccountTransactionList",
+    "summary": "Read Transaction List",
+    "description": "Reads account transaction data from a given account addressed by \\\"account-id\\\". \nThis can be either booked or pending transactions or a list of standing orders as further transactional information.\nSee \\\"XS2A API as PSD2 Interface Implementation Guidelines \\\", section \\\"Read Transaction List\\\".\n",
     "tags": [
       "Account Information Service (AIS)"
     ],
     "deprecated": false,
     "parameters": [
       {
-        "name": "accountId",
+        "name": "account-id",
         "location": "path",
         "required": true,
         "deprecated": false,
-        "description": "Resource identification of the addressed account.",
+        "description": "This identification is denoting the addressed (card) account. \nThe account-id is retrieved by using a \\\"Read Account List\\\" or \\\"Read Card Account list\\\" call. \nThe account-id is the \\\"resourceId\\\" attribute of the account structure. \nIts value is constant at least throughout the lifecycle of a given consent.\n",
         "schema": {
+          "schema_ref": "Max70Text",
           "schema": {
-            "type": "string"
+            "$ref": "#/components/schemas/Max70Text"
           }
         },
-        "component": "#/components/parameters/AccountId"
-      },
-      {
-        "name": "X-Request-ID",
-        "location": "header",
-        "required": true,
-        "deprecated": false,
-        "schema": {
-          "schema": {
-            "type": "string",
-            "format": "uuid"
-          }
-        },
-        "component": "#/components/parameters/X-Request-ID"
+        "component": "#/components/parameters/PATH_accountId"
       },
       {
         "name": "dateFrom",
         "location": "query",
-        "required": true,
+        "required": false,
         "deprecated": false,
-        "description": "Mandatory unless deltaList is used.",
+        "description": "Conditional: Starting date (inclusive the date dateFrom) of the transaction list, mandated if no delta access is required\nand if bookingStatus does not equal \\\"information\\\".\nFor booked transactions, the relevant date is the booking date. \nFor pending transactions, the relevant date is the entry date, which may not be transparent \nneither in this API nor other channels of the ASPSP.\n",
         "schema": {
+          "schema_ref": "ISODate",
           "schema": {
-            "type": "string",
-            "format": "date"
+            "$ref": "#/components/schemas/ISODate"
           }
-        }
+        },
+        "component": "#/components/parameters/QUERY_dateFrom"
       },
       {
         "name": "dateTo",
         "location": "query",
         "required": false,
         "deprecated": false,
+        "description": "End date (inclusive the data dateTo) of the transaction list, default is \\\"now\\\" if not given. \nMight be ignored if a delta function is used.\nFor booked transactions, the relevant date is the booking date. \nFor pending transactions, the relevant date is the entry date, which may not be transparent \nneither in this API nor other channels of the ASPSP.\n",
         "schema": {
+          "schema_ref": "ISODate",
           "schema": {
-            "type": "string",
-            "format": "date"
+            "$ref": "#/components/schemas/ISODate"
           }
-        }
+        },
+        "component": "#/components/parameters/QUERY_dateTo"
+      },
+      {
+        "name": "entryReferenceFrom",
+        "location": "query",
+        "required": false,
+        "deprecated": false,
+        "description": "This data attribute is indicating that the AISP is in favour to get all transactions after \nthe transaction with identification entryReferenceFrom alternatively to the above defined period. \nThis is a implementation of a delta access. \nIf this data element is contained, the entries \\\"dateFrom\\\" and \\\"dateTo\\\" might be ignored by the ASPSP \nif a delta report is supported.\nOptional if supported by API provider.\n",
+        "schema": {
+          "schema_ref": "Max35Text",
+          "schema": {
+            "$ref": "#/components/schemas/Max35Text"
+          }
+        },
+        "component": "#/components/parameters/QUERY_entryReferenceFrom"
       },
       {
         "name": "bookingStatus",
         "location": "query",
         "required": true,
         "deprecated": false,
+        "description": "Permitted codes are \n  * \\\"booked\\\",\n  * \\\"pending\\\",  \n  * \\\"both\\\",\n  * \\\"information\\\" and\n  * \\\"all\\\"\n\\\"booked\\\" shall be supported by the ASPSP.\nTo support the \\\"pending\\\" and \\\"both\\\" feature is optional for the ASPSP, \nError code if not supported in the online banking frontend.\nIf supported, \\\"both\\\" means to request transaction reports of transaction of bookingStatus either \\\"pending\\\" or \\\"booked\\\".\nTo support the \\\"information\\\" feature is optional for the ASPSP. Currently the booking status \\\"information\\\" only covers standing orders. Error code if not supported.\nTo support the \\\"all\\\" feature is optional for the ASPSP, Error code if not supported. If supported, \\\"all\\\" means to request transaction reports of transaction of any bookingStatus (\\\"pending\\\", \\\"booked\\\" or \\\"information\\\").\n",
         "schema": {
-          "schema_ref": "BookingStatus",
           "schema": {
-            "$ref": "#/components/schemas/BookingStatus"
+            "type": "string",
+            "enum": [
+              "information",
+              "booked",
+              "pending",
+              "both",
+              "all"
+            ]
           }
-        }
+        },
+        "component": "#/components/parameters/QUERY_bookingStatusGeneric"
+      },
+      {
+        "name": "deltaList",
+        "location": "query",
+        "required": false,
+        "deprecated": false,
+        "description": "This data attribute is indicating that the AISP is in favour to get all transactions after the last report access for this PSU on the addressed account. This is another implementation of a delta access-report. This delta indicator might be rejected by the ASPSP if this function is not supported. Optional if supported by API provider",
+        "schema": {
+          "schema": {
+            "type": "boolean"
+          }
+        },
+        "component": "#/components/parameters/QUERY_deltaList"
       },
       {
         "name": "withBalance",
         "location": "query",
         "required": false,
         "deprecated": false,
+        "description": "If contained, this function reads the requested (account related) resource including the booking balance, \nif granted by the PSU in the related consent and available by the ASPSP. \nThis parameter might be ignored by the ASPSP. \n",
         "schema": {
           "schema": {
             "type": "boolean"
           }
-        }
+        },
+        "component": "#/components/parameters/QUERY_withBalance"
       },
       {
-        "name": "pageSize",
+        "name": "cardBrand",
         "location": "query",
         "required": false,
         "deprecated": false,
-        "description": "Maximum number of entries per page.",
+        "description": "This attribute filters transactions according to their corresponding card brand.\nOnly to be supported in a scenario, where this is used as statements e.g. of card acquirers towards merchants..\n",
+        "schema": {
+          "schema_ref": "Max35Text",
+          "schema": {
+            "$ref": "#/components/schemas/Max35Text"
+          }
+        },
+        "component": "#/components/parameters/QUERY_cardBrand"
+      },
+      {
+        "name": "Digest",
+        "location": "header",
+        "required": false,
+        "deprecated": false,
+        "description": "When API Client include a signature according to this signature profile, they also must include a \\\"Digest\\\" header as defined in [RFC3230]. \nThe \\\"Digest\\\" Header contains a Hash of the message body. If the message does not contain a body, the \\\"Digest\\\" header must contain the hash of an empty byte list.\nThe only hash algorithms that may be used to calculate the Digest within the context of this specification are SHA-256 and SHA-512 as defined in [RFC5843]. \n",
         "schema": {
           "schema": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 1,
-            "maximum": 500
+            "type": "string"
           }
-        }
+        },
+        "component": "#/components/parameters/HEADER_digest"
+      },
+      {
+        "name": "x-jws-signature",
+        "location": "header",
+        "required": false,
+        "deprecated": false,
+        "description": "The attribute x-jws-signature contains the JSON Web Signature.\n",
+        "schema": {
+          "schema": {
+            "type": "string"
+          }
+        },
+        "component": "#/components/parameters/HEADER_xJwsSignature"
+      },
+      {
+        "_truncated_items": 3
       }
     ],
     "responses": [
@@ -295,84 +651,354 @@
         "status": "200",
         "description": "OK",
         "headers": [
+          "X-Reference-API-Document",
+          "X-Reference-API-Name",
+          "X-Reference-API-Version",
           "X-Request-ID"
         ],
         "content": [
           {
             "media_type": "application/json",
             "schema": {
-              "schema_ref": "TransactionsResponse200Json",
               "schema": {
-                "$ref": "#/components/schemas/TransactionsResponse200Json"
+                "type": "object",
+                "required": [
+                  "account"
+                ],
+                "properties": {
+                  "account": {
+                    "description": "Identifier of the addressed account.\n",
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/accountReference"
+                      }
+                    ]
+                  },
+                  "transactions": {
+                    "description": "JSON based account report. This account report contains transactions resulting from the query parameters.\nNote: It is recommended to provide remittance information attributes already here and not only in transaction details. \nSuch an implementation avoids too frequent usage of transaction details by API Clients.\n",
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/accountReport"
+                      }
+                    ]
+                  },
+                  "balances": {
+                    "description": "A list of balances regarding this account, e.g. the current balance, the last booked balance.\n",
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/balance"
+                    }
+                  },
+                  "_links": {
+                    "description": "A list of hyperlinks to be recognised by the TPP. Type of links admitted in this response:\n\\\"download\\\": a link to a resource, where the transaction list might be downloaded from in case where transaction lists have a huge size.\nRemark: This feature shall only be used where camt-data is requested which has a huge size.\n",
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/_links_200_AISACCOUNTTXLIST"
+                      }
+                    ]
+                  }
+                }
               }
             }
-          }
-        ]
-      },
-      {
-        "status": "400",
-        "description": "Bad request",
-        "headers": [],
-        "content": [
+          },
           {
-            "media_type": "application/json",
+            "media_type": "application/xml",
             "schema": {
-              "schema_ref": "Error400",
               "schema": {
-                "$ref": "#/components/schemas/Error400"
+                "description": "In case the ASPSP returns a camt.05x XML structure, the response body consists of either a camt.052 or camt.053 format. The camt.052 may include pending payments which are not yet finally booked. The ASPSP will decide on the format due to the chosen parameters, specifically on the chosen dates relative to the time of the request. In addition the ASPSP might offer camt.054x structure e.g. in a corporate setting.",
+                "type": "string"
+              }
+            }
+          },
+          {
+            "media_type": "text/plain",
+            "schema": {
+              "schema": {
+                "description": "In case the ASPSP returns a MT94x content, the response body consists of an MT940 or MT942 format in a text structure. The MT942 may include pending payments which are not yet finally booked. The ASPSP will decide on the format due to the chosen parameters, specifically on the chosen dates relative to the time of the request.",
+                "type": "string"
               }
             }
           }
         ],
-        "component": "#/components/responses/400_AIS"
+        "component": "#/components/responses/Ok_200_AISACCOUNTTXLIST"
+      },
+      {
+        "status": "400",
+        "description": "Bad Request",
+        "headers": [
+          "ASPSP-Notification-Support",
+          "Location",
+          "X-Reference-API-Document",
+          "X-Reference-API-Name",
+          "X-Reference-API-Version",
+          "X-Request-ID"
+        ],
+        "content": [
+          {
+            "media_type": "application/json",
+            "schema": {
+              "schema_ref": "error_NG_400_AIS",
+              "schema": {
+                "$ref": "#/components/schemas/error_NG_400_AIS"
+              }
+            }
+          },
+          {
+            "media_type": "application/problem+json",
+            "schema": {
+              "schema_ref": "error_RFC7807_400_AIS",
+              "schema": {
+                "$ref": "#/components/schemas/error_RFC7807_400_AIS"
+              }
+            }
+          }
+        ],
+        "component": "#/components/responses/decline_400_AIS"
       },
       {
         "status": "401",
-        "description": "Unauthorized",
-        "headers": [],
-        "content": []
+        "description": "Unauthorised",
+        "headers": [
+          "ASPSP-Notification-Support",
+          "Location",
+          "X-Reference-API-Document",
+          "X-Reference-API-Name",
+          "X-Reference-API-Version",
+          "X-Request-ID"
+        ],
+        "content": [
+          {
+            "media_type": "application/json",
+            "schema": {
+              "schema_ref": "error_NG_401_AIS",
+              "schema": {
+                "$ref": "#/components/schemas/error_NG_401_AIS"
+              }
+            }
+          },
+          {
+            "media_type": "application/problem+json",
+            "schema": {
+              "schema_ref": "error_RFC7807_401_AIS",
+              "schema": {
+                "$ref": "#/components/schemas/error_RFC7807_401_AIS"
+              }
+            }
+          }
+        ],
+        "component": "#/components/responses/decline_401_AIS"
       },
       {
         "status": "403",
         "description": "Forbidden",
-        "headers": [],
-        "content": []
+        "headers": [
+          "ASPSP-Notification-Support",
+          "Location",
+          "X-Reference-API-Document",
+          "X-Reference-API-Name",
+          "X-Reference-API-Version",
+          "X-Request-ID"
+        ],
+        "content": [
+          {
+            "media_type": "application/json",
+            "schema": {
+              "schema_ref": "error_NG_403_AIS",
+              "schema": {
+                "$ref": "#/components/schemas/error_NG_403_AIS"
+              }
+            }
+          },
+          {
+            "media_type": "application/problem+json",
+            "schema": {
+              "schema_ref": "error_RFC7807_403_AIS",
+              "schema": {
+                "$ref": "#/components/schemas/error_RFC7807_403_AIS"
+              }
+            }
+          }
+        ],
+        "component": "#/components/responses/decline_403_AIS"
       },
       {
         "status": "404",
-        "description": "Not found",
-        "headers": [],
-        "content": []
+        "description": "Not Found",
+        "headers": [
+          "ASPSP-Notification-Support",
+          "Location",
+          "X-Reference-API-Document",
+          "X-Reference-API-Name",
+          "X-Reference-API-Version",
+          "X-Request-ID"
+        ],
+        "content": [
+          {
+            "media_type": "application/json",
+            "schema": {
+              "schema_ref": "error_NG_404_AIS",
+              "schema": {
+                "$ref": "#/components/schemas/error_NG_404_AIS"
+              }
+            }
+          },
+          {
+            "media_type": "application/problem+json",
+            "schema": {
+              "schema_ref": "error_RFC7807_404_AIS",
+              "schema": {
+                "$ref": "#/components/schemas/error_RFC7807_404_AIS"
+              }
+            }
+          }
+        ],
+        "component": "#/components/responses/decline_404_AIS"
       },
       {
-        "status": "429",
-        "description": "Too many requests (ACCESS_EXCEEDED)",
-        "headers": [],
-        "content": []
+        "status": "405",
+        "description": "Method not allowed",
+        "headers": [
+          "ASPSP-Notification-Support",
+          "Location",
+          "X-Reference-API-Document",
+          "X-Reference-API-Name",
+          "X-Reference-API-Version",
+          "X-Request-ID"
+        ],
+        "content": [
+          {
+            "media_type": "application/json",
+            "schema": {
+              "schema_ref": "error_NG_405_AIS",
+              "schema": {
+                "$ref": "#/components/schemas/error_NG_405_AIS"
+              }
+            }
+          },
+          {
+            "media_type": "application/problem+json",
+            "schema": {
+              "schema_ref": "error_RFC7807_405_AIS",
+              "schema": {
+                "$ref": "#/components/schemas/error_RFC7807_405_AIS"
+              }
+            }
+          }
+        ],
+        "component": "#/components/responses/decline_405_AIS"
+      },
+      {
+        "status": "406",
+        "description": "Not Acceptable",
+        "headers": [
+          "ASPSP-Notification-Support",
+          "Location",
+          "X-Reference-API-Document",
+          "X-Reference-API-Name",
+          "X-Reference-API-Version",
+          "X-Request-ID"
+        ],
+        "content": [],
+        "component": "#/components/responses/decline_406"
+      },
+      {
+        "status": "408",
+        "description": "Request Timeout",
+        "headers": [
+          "ASPSP-Notification-Support",
+          "Location",
+          "X-Reference-API-Document",
+          "X-Reference-API-Name",
+          "X-Reference-API-Version",
+          "X-Request-ID"
+        ],
+        "content": [],
+        "component": "#/components/responses/decline_408"
+      },
+      {
+        "status": "409",
+        "description": "Conflict",
+        "headers": [
+          "ASPSP-Notification-Support",
+          "Location",
+          "X-Reference-API-Document",
+          "X-Reference-API-Name",
+          "X-Reference-API-Version",
+          "X-Request-ID"
+        ],
+        "content": [
+          {
+            "media_type": "application/json",
+            "schema": {
+              "schema_ref": "error_NG_409_AIS",
+              "schema": {
+                "$ref": "#/components/schemas/error_NG_409_AIS"
+              }
+            }
+          },
+          {
+            "media_type": "application/problem+json",
+            "schema": {
+              "schema_ref": "error_RFC7807_409_AIS",
+              "schema": {
+                "$ref": "#/components/schemas/error_RFC7807_409_AIS"
+              }
+            }
+          }
+        ],
+        "component": "#/components/responses/decline_409_AIS"
+      },
+      {
+        "status": "415",
+        "description": "Unsupported Media Type",
+        "headers": [
+          "ASPSP-Notification-Support",
+          "Location",
+          "X-Reference-API-Document",
+          "X-Reference-API-Name",
+          "X-Reference-API-Version",
+          "X-Request-ID"
+        ],
+        "content": [],
+        "component": "#/components/responses/decline_415"
+      },
+      {
+        "_truncated_items": 3
       }
     ],
     "security": [
+      {},
       {
         "BearerAuthOAuth": []
       }
     ],
-    "security_origin": "global",
+    "security_origin": "operation",
     "referenced_schemas": [
-      "BookingStatus",
-      "Error400",
-      "TransactionsResponse200Json"
+      "ISODate",
+      "Max35Text",
+      "Max70Text",
+      "_links_200_AISACCOUNTTXLIST",
+      "accountReference",
+      "accountReport",
+      "balance",
+      "error_NG_400_AIS",
+      "error_NG_401_AIS",
+      "error_NG_403_AIS",
+      {
+        "_truncated_items": 9
+      }
     ],
-    "json_pointer": "/paths/~1accounts~1{accountId}~1transactions/get",
+    "json_pointer": "/paths/~1v2~1accounts~1{account-id}~1transactions/get",
     "provenance": {
-      "source_id": "bg-openfinance-v2-openapi",
-      "document_id": "bg-openfinance-v2-openapi@edd99f6e0265",
+      "source_id": "bg-openfinance-v2-openapi-ais",
+      "document_id": "bg-openfinance-v2-openapi-ais@d818f580bc87",
       "version": "openfinance-v2",
       "kind": "openapi",
       "authority": "technical",
       "precedence": 90,
-      "locator": "op:GET /accounts/{accountId}/transactions",
-      "sha256": "2935fd27adbb313d52dc8f4b04cee4dc74f1693bf8671549bc9c917adf8f45f5",
-      "document_sha256": "edd99f6e026537a45d3e95f33a35918e0f338914c70879234c5dc3c1e799fdfb"
+      "locator": "op:GET /v2/accounts/{account-id}/transactions",
+      "sha256": "1ac959a669ca13c3a53e7651206e921982b26377bf77fdd32f3a80f1cd31f644",
+      "document_sha256": "d818f580bc8779f28fb28c6a43ba0853650587be536f55ca60ed455005ff847d"
     }
   },
   "changes": [
@@ -380,7 +1006,7 @@
       "area": "endpoint",
       "side": "endpoint",
       "change": "unchanged",
-      "subject": "GET /accounts/{accountId}/transactions"
+      "subject": "GET /v2/accounts/{account-id}/transactions"
     },
     {
       "area": "path",
@@ -388,23 +1014,53 @@
       "change": "modified",
       "subject": "path",
       "before": "/v1/accounts/{account-id}/transactions",
-      "after": "/accounts/{accountId}/transactions"
+      "after": "/v2/accounts/{account-id}/transactions"
     },
     {
       "area": "operation_id",
       "side": "endpoint",
+      "change": "modified",
+      "subject": "operationId",
+      "before": "getTransactionList",
+      "after": "getAccountTransactionList"
+    },
+    {
+      "area": "parameter",
+      "side": "request",
+      "change": "modified",
+      "subject": "header:Consent-ID",
+      "schema_changes": [
+        {
+          "pointer": "/",
+          "kind": "ref_changed",
+          "change": "modified",
+          "before": "#/components/schemas/consentId",
+          "after": "#/components/schemas/Max70Text"
+        },
+        {
+          "pointer": "/maxLength",
+          "kind": "constraint_changed",
+          "change": "added",
+          "after": 70,
+          "schema_name": "Max70Text"
+        }
+      ]
+    },
+    {
+      "area": "parameter",
+      "side": "request",
       "change": "unchanged",
-      "subject": "operationId"
+      "subject": "header:Digest"
     },
     {
       "area": "parameter",
       "side": "request",
       "change": "removed",
-      "subject": "header:Consent-ID",
+      "subject": "header:PSU-Accept",
       "before": {
-        "name": "Consent-ID",
+        "name": "PSU-Accept",
         "in": "header",
-        "required": true,
+        "required": false,
         "deprecated": false,
         "schema": {
           "type": "string"
@@ -414,590 +1070,319 @@
     {
       "area": "parameter",
       "side": "request",
-      "change": "unchanged",
-      "subject": "header:X-Request-ID"
-    },
-    {
-      "area": "parameter",
-      "side": "request",
-      "change": "modified",
-      "subject": "path:accountId",
+      "change": "removed",
+      "subject": "header:PSU-Accept-Charset",
       "before": {
-        "name": "account-id",
-        "required": true,
-        "deprecated": false
-      },
-      "after": {
-        "name": "accountId",
-        "required": true,
-        "deprecated": false
-      }
-    },
-    {
-      "area": "parameter",
-      "side": "request",
-      "change": "modified",
-      "subject": "query:bookingStatus",
-      "schema_changes": [
-        {
-          "pointer": "/enum",
-          "kind": "enum_values_added",
-          "change": "added",
-          "after": [
-            "information",
-            "all"
-          ],
-          "schema_name": "BookingStatus"
-        }
-      ]
-    },
-    {
-      "area": "parameter",
-      "side": "request",
-      "change": "modified",
-      "subject": "query:dateFrom",
-      "before": {
-        "name": "dateFrom",
-        "required": false,
-        "deprecated": false
-      },
-      "after": {
-        "name": "dateFrom",
-        "required": true,
-        "deprecated": false
-      }
-    },
-    {
-      "area": "parameter",
-      "side": "request",
-      "change": "unchanged",
-      "subject": "query:dateTo"
-    },
-    {
-      "area": "parameter",
-      "side": "request",
-      "change": "added",
-      "subject": "query:pageSize",
-      "after": {
-        "name": "pageSize",
-        "in": "query",
+        "name": "PSU-Accept-Charset",
+        "in": "header",
         "required": false,
         "deprecated": false,
         "schema": {
-          "type": "integer",
-          "format": "int32",
-          "minimum": 1,
-          "maximum": 500
+          "type": "string"
         }
       }
     },
     {
       "area": "parameter",
       "side": "request",
-      "change": "unchanged",
-      "subject": "query:withBalance"
-    },
-    {
-      "area": "media_type",
-      "side": "response",
-      "change": "modified",
-      "subject": "response:200 application/json",
-      "schema_changes": [
-        {
-          "pointer": "/properties/transactions/properties/_links",
-          "kind": "property_added",
-          "change": "added",
-          "after": {
-            "required": false,
-            "schema": {
-              "type": "object",
-              "properties": {
-                "next": {
-                  "type": "string",
-                  "format": "uri"
-                }
-              }
-            }
-          },
-          "schema_name": "AccountReport"
-        },
-        {
-          "pointer": "/properties/transactions/properties/booked/items/properties/bookingDate/format",
-          "kind": "format_changed",
-          "change": "modified",
-          "before": "date",
-          "after": "date-time",
-          "schema_name": "Transactions"
-        },
-        {
-          "pointer": "/properties/transactions/properties/booked/items/properties/creditor",
-          "kind": "property_added",
-          "change": "added",
-          "after": {
-            "required": false,
-            "schema": {
-              "$ref": "#/components/schemas/PartyIdentification"
-            }
-          },
-          "schema_name": "Transactions"
-        },
-        {
-          "pointer": "/properties/transactions/properties/booked/items/properties/creditorName",
-          "kind": "property_removed",
-          "change": "removed",
-          "before": {
-            "required": false,
-            "schema": {
-              "type": "string",
-              "maxLength": 70
-            }
-          },
-          "schema_name": "Transactions"
-        },
-        {
-          "pointer": "/properties/transactions/properties/booked/items/properties/merchantCategoryCode",
-          "kind": "property_added",
-          "change": "added",
-          "after": {
-            "required": false,
-            "schema": {
-              "type": "string",
-              "pattern": "[0-9]{4}"
-            }
-          },
-          "schema_name": "Transactions"
-        },
-        {
-          "pointer": "/properties/transactions/properties/booked/items/properties/valueDate",
-          "kind": "nullable_changed",
-          "change": "modified",
-          "before": false,
-          "after": true,
-          "schema_name": "Transactions"
-        },
-        {
-          "pointer": "/properties/transactions/properties/booked/items/properties/bookingDate",
-          "kind": "required_added",
-          "change": "modified",
-          "before": false,
-          "after": true,
-          "schema_name": "Transactions"
+      "change": "removed",
+      "subject": "header:PSU-Accept-Encoding",
+      "before": {
+        "name": "PSU-Accept-Encoding",
+        "in": "header",
+        "required": false,
+        "deprecated": false,
+        "schema": {
+          "type": "string"
         }
-      ]
-    },
-    {
-      "area": "media_type",
-      "side": "response",
-      "change": "modified",
-      "subject": "response:400 application/json",
-      "schema_changes": [
-        {
-          "pointer": "/properties/tppMessages/items/properties/code/enum",
-          "kind": "enum_values_added",
-          "change": "added",
-          "after": [
-            "ACCESS_EXCEEDED"
-          ],
-          "schema_name": "Error400"
-        }
-      ]
-    },
-    {
-      "area": "response",
-      "side": "response",
-      "change": "unchanged",
-      "subject": "response:401"
-    },
-    {
-      "area": "response",
-      "side": "response",
-      "change": "unchanged",
-      "subject": "response:403"
-    },
-    {
-      "area": "response",
-      "side": "response",
-      "change": "unchanged",
-      "subject": "response:404"
-    },
-    {
-      "area": "response",
-      "side": "response",
-      "change": "added",
-      "subject": "response:429",
-      "after": {
-        "description": "Too many requests (ACCESS_EXCEEDED)",
-        "media_types": []
       }
     },
     {
-      "area": "security",
+      "area": "parameter",
       "side": "request",
-      "change": "modified",
-      "subject": "security",
-      "before": [],
-      "after": [
-        {
-          "BearerAuthOAuth": []
+      "change": "removed",
+      "subject": "header:PSU-Accept-Language",
+      "before": {
+        "name": "PSU-Accept-Language",
+        "in": "header",
+        "required": false,
+        "deprecated": false,
+        "schema": {
+          "type": "string"
         }
-      ]
+      }
+    },
+    {
+      "area": "parameter",
+      "side": "request",
+      "change": "removed",
+      "subject": "header:PSU-Device-ID",
+      "before": {
+        "name": "PSU-Device-ID",
+        "in": "header",
+        "required": false,
+        "deprecated": false,
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      }
+    },
+    {
+      "_truncated_items": 88
     }
   ],
   "schema_changes": [
     {
-      "pointer": "/enum",
-      "kind": "enum_values_added",
-      "change": "added",
-      "after": [
-        "information",
-        "all"
-      ],
-      "schema_name": "BookingStatus"
-    },
-    {
-      "pointer": "/properties/transactions/properties/_links",
-      "kind": "property_added",
-      "change": "added",
-      "after": {
-        "required": false,
-        "schema": {
-          "type": "object",
-          "properties": {
-            "next": {
-              "type": "string",
-              "format": "uri"
-            }
-          }
-        }
-      },
-      "schema_name": "AccountReport"
-    },
-    {
-      "pointer": "/properties/transactions/properties/booked/items/properties/bookingDate/format",
-      "kind": "format_changed",
+      "pointer": "/",
+      "kind": "ref_changed",
       "change": "modified",
-      "before": "date",
-      "after": "date-time",
-      "schema_name": "Transactions"
+      "before": "#/components/schemas/consentId",
+      "after": "#/components/schemas/Max70Text"
     },
     {
-      "pointer": "/properties/transactions/properties/booked/items/properties/creditor",
-      "kind": "property_added",
+      "pointer": "/maxLength",
+      "kind": "constraint_changed",
       "change": "added",
-      "after": {
-        "required": false,
-        "schema": {
-          "$ref": "#/components/schemas/PartyIdentification"
-        }
-      },
-      "schema_name": "Transactions"
+      "after": 70,
+      "schema_name": "Max70Text"
     },
     {
-      "pointer": "/properties/transactions/properties/booked/items/properties/creditorName",
-      "kind": "property_removed",
-      "change": "removed",
-      "before": {
-        "required": false,
-        "schema": {
-          "type": "string",
-          "maxLength": 70
-        }
-      },
-      "schema_name": "Transactions"
-    },
-    {
-      "pointer": "/properties/transactions/properties/booked/items/properties/merchantCategoryCode",
-      "kind": "property_added",
-      "change": "added",
-      "after": {
-        "required": false,
-        "schema": {
-          "type": "string",
-          "pattern": "[0-9]{4}"
-        }
-      },
-      "schema_name": "Transactions"
-    },
-    {
-      "pointer": "/properties/transactions/properties/booked/items/properties/valueDate",
-      "kind": "nullable_changed",
+      "pointer": "/",
+      "kind": "ref_changed",
       "change": "modified",
-      "before": false,
-      "after": true,
-      "schema_name": "Transactions"
+      "before": "#/components/schemas/accountId",
+      "after": "#/components/schemas/Max70Text"
     },
     {
-      "pointer": "/properties/transactions/properties/booked/items/properties/bookingDate",
-      "kind": "required_added",
-      "change": "modified",
-      "before": false,
-      "after": true,
-      "schema_name": "Transactions"
-    },
-    {
-      "pointer": "/properties/tppMessages/items/properties/code/enum",
-      "kind": "enum_values_added",
+      "pointer": "/maxLength",
+      "kind": "constraint_changed",
       "change": "added",
-      "after": [
-        "ACCESS_EXCEEDED"
-      ],
-      "schema_name": "Error400"
+      "after": 70,
+      "schema_name": "Max70Text"
+    },
+    {
+      "pointer": "/",
+      "kind": "ref_changed",
+      "change": "modified",
+      "before": "inline",
+      "after": "#/components/schemas/ISODate"
+    },
+    {
+      "pointer": "/",
+      "kind": "ref_changed",
+      "change": "modified",
+      "before": "inline",
+      "after": "#/components/schemas/ISODate"
+    },
+    {
+      "pointer": "/",
+      "kind": "ref_changed",
+      "change": "modified",
+      "before": "inline",
+      "after": "#/components/schemas/Max35Text"
+    },
+    {
+      "pointer": "/maxLength",
+      "kind": "constraint_changed",
+      "change": "added",
+      "after": 35,
+      "schema_name": "Max35Text"
+    },
+    {
+      "pointer": "/",
+      "kind": "ref_changed",
+      "change": "modified",
+      "before": "#/components/schemas/transactionsResponse-200_json",
+      "after": "inline"
+    },
+    {
+      "pointer": "/properties/_links",
+      "kind": "ref_changed",
+      "change": "modified",
+      "before": "#/components/schemas/_linksDownload",
+      "after": "inline",
+      "schema_name": "transactionsResponse-200_json"
+    },
+    {
+      "_truncated_items": 1921
     }
   ],
   "counts": {
-    "added": 2,
-    "removed": 1,
-    "modified": 7,
+    "added": 53,
+    "removed": 15,
+    "modified": 22,
     "unchanged": 8,
-    "schema_changes": 9
+    "schema_changes": 1931
   },
   "compatibility_relevant_facts": [
     {
       "side": "endpoint",
       "subject": "path",
-      "statement": "Path 'path' changed from \"/v1/accounts/{account-id}/transactions\" (nextgenpsd2-v1.3) to \"/accounts/{accountId}/transactions\" (openfinance-v2)."
+      "statement": "Path 'path' changed from \"/v1/accounts/{account-id}/transactions\" (nextgenpsd2-v1.3) to \"/v2/accounts/{account-id}/transactions\" (openfinance-v2)."
+    },
+    {
+      "side": "endpoint",
+      "subject": "operationId",
+      "statement": "OperationId 'operationId' changed from \"getTransactionList\" (nextgenpsd2-v1.3) to \"getAccountTransactionList\" (openfinance-v2)."
     },
     {
       "side": "request",
       "subject": "header:Consent-ID",
-      "statement": "Parameter 'header:Consent-ID' exists in nextgenpsd2-v1.3 but not in openfinance-v2."
+      "statement": "request schema of 'header:Consent-ID' at /: referenced schema changed; nextgenpsd2-v1.3=\"#/components/schemas/consentId\" openfinance-v2=\"#/components/schemas/Max70Text\"."
     },
     {
       "side": "request",
-      "subject": "path:accountId",
-      "statement": "Parameter 'path:accountId' changed from {\"name\":\"account-id\",\"required\":true,\"deprecated\":false} (nextgenpsd2-v1.3) to {\"name\":\"accountId\",\"required\":true,\"deprecated\":false} (openfinance-v2)."
+      "subject": "header:Consent-ID",
+      "statement": "request schema of 'header:Consent-ID' at /maxLength (schema Max70Text): constraint changed; nextgenpsd2-v1.3=- openfinance-v2=70."
     },
     {
       "side": "request",
-      "subject": "query:bookingStatus",
-      "statement": "request schema of 'query:bookingStatus' at /enum (schema BookingStatus): enum values added; nextgenpsd2-v1.3=- openfinance-v2=[\"information\",\"all\"]."
+      "subject": "header:PSU-Accept",
+      "statement": "Parameter 'header:PSU-Accept' exists in nextgenpsd2-v1.3 but not in openfinance-v2."
     },
     {
       "side": "request",
-      "subject": "query:dateFrom",
-      "statement": "Parameter 'query:dateFrom' changed from {\"name\":\"dateFrom\",\"required\":false,\"deprecated\":false} (nextgenpsd2-v1.3) to {\"name\":\"dateFrom\",\"required\":true,\"deprecated\":false} (openfinance-v2)."
+      "subject": "header:PSU-Accept-Charset",
+      "statement": "Parameter 'header:PSU-Accept-Charset' exists in nextgenpsd2-v1.3 but not in openfinance-v2."
     },
     {
       "side": "request",
-      "subject": "query:pageSize",
-      "statement": "Optional request parameter 'query:pageSize' exists in openfinance-v2 but not in nextgenpsd2-v1.3."
-    },
-    {
-      "side": "response",
-      "subject": "response:200 application/json",
-      "statement": "response schema of 'response:200 application/json' at /properties/transactions/properties/_links (schema AccountReport): property added; nextgenpsd2-v1.3=- openfinance-v2={\"required\":false,\"schema\":{\"type\":\"object\",\"properties\":{\"next\":{\"type\":\"string\",\"format\":\"uri\"}}}}."
-    },
-    {
-      "side": "response",
-      "subject": "response:200 application/json",
-      "statement": "response schema of 'response:200 application/json' at /properties/transactions/properties/booked/items/properties/bookingDate/format (schema Transactions): format changed; nextgenpsd2-v1.3=\"date\" openfinance-v2=\"date-time\"."
-    },
-    {
-      "side": "response",
-      "subject": "response:200 application/json",
-      "statement": "response schema of 'response:200 application/json' at /properties/transactions/properties/booked/items/properties/creditor (schema Transactions): property added; nextgenpsd2-v1.3=- openfinance-v2={\"required\":false,\"schema\":{\"$ref\":\"#/components/schemas/PartyIdentification\"}}."
-    },
-    {
-      "side": "response",
-      "subject": "response:200 application/json",
-      "statement": "response schema of 'response:200 application/json' at /properties/transactions/properties/booked/items/properties/creditorName (schema Transactions): property removed; nextgenpsd2-v1.3={\"required\":false,\"schema\":{\"type\":\"string\",\"maxLength\":70}} openfinance-v2=-."
-    },
-    {
-      "side": "response",
-      "subject": "response:200 application/json",
-      "statement": "response schema of 'response:200 application/json' at /properties/transactions/properties/booked/items/properties/merchantCategoryCode (schema Transactions): property added; nextgenpsd2-v1.3=- openfinance-v2={\"required\":false,\"schema\":{\"type\":\"string\",\"pattern\":\"[0-9]{4}\"}}."
-    },
-    {
-      "side": "response",
-      "subject": "response:200 application/json",
-      "statement": "response schema of 'response:200 application/json' at /properties/transactions/properties/booked/items/properties/valueDate (schema Transactions): nullable changed; nextgenpsd2-v1.3=false openfinance-v2=true."
-    },
-    {
-      "side": "response",
-      "subject": "response:200 application/json",
-      "statement": "response schema of 'response:200 application/json' at /properties/transactions/properties/booked/items/properties/bookingDate (schema Transactions): property became required; nextgenpsd2-v1.3=false openfinance-v2=true."
-    },
-    {
-      "side": "response",
-      "subject": "response:400 application/json",
-      "statement": "response schema of 'response:400 application/json' at /properties/tppMessages/items/properties/code/enum (schema Error400): enum values added; nextgenpsd2-v1.3=- openfinance-v2=[\"ACCESS_EXCEEDED\"]."
-    },
-    {
-      "side": "response",
-      "subject": "response:429",
-      "statement": "Response 'response:429' exists in openfinance-v2 but not in nextgenpsd2-v1.3."
+      "subject": "header:PSU-Accept-Encoding",
+      "statement": "Parameter 'header:PSU-Accept-Encoding' exists in nextgenpsd2-v1.3 but not in openfinance-v2."
     },
     {
       "side": "request",
-      "subject": "security",
-      "statement": "Security 'security' changed from [] (nextgenpsd2-v1.3) to [{\"BearerAuthOAuth\":[]}] (openfinance-v2)."
+      "subject": "header:PSU-Accept-Language",
+      "statement": "Parameter 'header:PSU-Accept-Language' exists in nextgenpsd2-v1.3 but not in openfinance-v2."
+    },
+    {
+      "side": "request",
+      "subject": "header:PSU-Device-ID",
+      "statement": "Parameter 'header:PSU-Device-ID' exists in nextgenpsd2-v1.3 but not in openfinance-v2."
+    },
+    {
+      "side": "request",
+      "subject": "header:PSU-Geo-Location",
+      "statement": "Parameter 'header:PSU-Geo-Location' exists in nextgenpsd2-v1.3 but not in openfinance-v2."
+    },
+    {
+      "_truncated_items": 1991
     }
   ],
   "sources": [
     {
       "source_id": "bg-nextgenpsd2-v1.3-openapi",
-      "document_id": "bg-nextgenpsd2-v1.3-openapi@45501c5076b9",
+      "document_id": "bg-nextgenpsd2-v1.3-openapi@ab6893b24fe0",
       "version": "nextgenpsd2-v1.3",
       "kind": "openapi",
       "authority": "technical",
       "precedence": 90,
       "locator": "op:GET /v1/accounts/{account-id}/transactions",
-      "sha256": "4442846ccabe17fa690f0765a827ed5d849672c36671585687253555df68985d",
-      "document_sha256": "45501c5076b98ccd3f755581d51a3a32e9c82710d2ef18b9f574dc93fee014b2"
+      "sha256": "e017ec23adebf33be407f1b8f5ab59b798033a8a360939c87eece3eeaddf785a",
+      "document_sha256": "ab6893b24fe06e773b53af42d10fad465cbe11935d67e2c2d69a6c3efd688b4b"
     },
     {
       "source_id": "bg-nextgenpsd2-v1.3-openapi",
-      "document_id": "bg-nextgenpsd2-v1.3-openapi@45501c5076b9",
+      "document_id": "bg-nextgenpsd2-v1.3-openapi@ab6893b24fe0",
       "version": "nextgenpsd2-v1.3",
       "kind": "openapi",
       "authority": "technical",
       "precedence": 90,
-      "locator": "schema:AccountReport",
-      "sha256": "776204af517f0f2bf3702e83cd50b7385695c159ee269a7ede8aede2f6505b20",
-      "document_sha256": "45501c5076b98ccd3f755581d51a3a32e9c82710d2ef18b9f574dc93fee014b2"
+      "locator": "schema:EntryDetailsElement",
+      "sha256": "7a9167207b5419a7d6e663d5be7d76c19262d95caa73c642babf11bdbb28b9b4",
+      "document_sha256": "ab6893b24fe06e773b53af42d10fad465cbe11935d67e2c2d69a6c3efd688b4b"
     },
     {
       "source_id": "bg-nextgenpsd2-v1.3-openapi",
-      "document_id": "bg-nextgenpsd2-v1.3-openapi@45501c5076b9",
+      "document_id": "bg-nextgenpsd2-v1.3-openapi@ab6893b24fe0",
       "version": "nextgenpsd2-v1.3",
       "kind": "openapi",
       "authority": "technical",
       "precedence": 90,
-      "locator": "schema:Amount",
-      "sha256": "516ad2819374af39b1f04bd69f80cbb0d0c8db76d6b74bff9f7b301b90413643",
-      "document_sha256": "45501c5076b98ccd3f755581d51a3a32e9c82710d2ef18b9f574dc93fee014b2"
+      "locator": "schema:Error400_AIS",
+      "sha256": "529dfa4acd3ca79d1e9563b6c86863437fb9a0463aac3f91c060f13bea4173ba",
+      "document_sha256": "ab6893b24fe06e773b53af42d10fad465cbe11935d67e2c2d69a6c3efd688b4b"
     },
     {
       "source_id": "bg-nextgenpsd2-v1.3-openapi",
-      "document_id": "bg-nextgenpsd2-v1.3-openapi@45501c5076b9",
+      "document_id": "bg-nextgenpsd2-v1.3-openapi@ab6893b24fe0",
       "version": "nextgenpsd2-v1.3",
       "kind": "openapi",
       "authority": "technical",
       "precedence": 90,
-      "locator": "schema:BookingStatus",
-      "sha256": "4edeffcc7ca16246066563dbb1e017ecb69b9d2f575b806be399c1aee247ba64",
-      "document_sha256": "45501c5076b98ccd3f755581d51a3a32e9c82710d2ef18b9f574dc93fee014b2"
+      "locator": "schema:Error400_NG_AIS",
+      "sha256": "eb8eba925152dd74dbf389c580939341e7ac3ed469cc0f602cd9e76544457cee",
+      "document_sha256": "ab6893b24fe06e773b53af42d10fad465cbe11935d67e2c2d69a6c3efd688b4b"
     },
     {
       "source_id": "bg-nextgenpsd2-v1.3-openapi",
-      "document_id": "bg-nextgenpsd2-v1.3-openapi@45501c5076b9",
+      "document_id": "bg-nextgenpsd2-v1.3-openapi@ab6893b24fe0",
       "version": "nextgenpsd2-v1.3",
       "kind": "openapi",
       "authority": "technical",
       "precedence": 90,
-      "locator": "schema:Error400",
-      "sha256": "cd55d0239faafed833e6e6525ef3180dc7cc05e70a4408aad94179e9914fe6ad",
-      "document_sha256": "45501c5076b98ccd3f755581d51a3a32e9c82710d2ef18b9f574dc93fee014b2"
+      "locator": "schema:Error401_AIS",
+      "sha256": "7a62f9c293676fe799f5fed1101a54f2b12f218c546f184d7802d827ba21fcb4",
+      "document_sha256": "ab6893b24fe06e773b53af42d10fad465cbe11935d67e2c2d69a6c3efd688b4b"
     },
     {
       "source_id": "bg-nextgenpsd2-v1.3-openapi",
-      "document_id": "bg-nextgenpsd2-v1.3-openapi@45501c5076b9",
+      "document_id": "bg-nextgenpsd2-v1.3-openapi@ab6893b24fe0",
       "version": "nextgenpsd2-v1.3",
       "kind": "openapi",
       "authority": "technical",
       "precedence": 90,
-      "locator": "schema:Transactions",
-      "sha256": "2c2d485b4e7672901fa740a7fad2637ab7881ef2d00d640ecf0750ce85ab6b3e",
-      "document_sha256": "45501c5076b98ccd3f755581d51a3a32e9c82710d2ef18b9f574dc93fee014b2"
+      "locator": "schema:Error401_NG_AIS",
+      "sha256": "0a8e9924b90434eb04d2ac3481d7ae72fea5aeda890b99c560dff48e7548501e",
+      "document_sha256": "ab6893b24fe06e773b53af42d10fad465cbe11935d67e2c2d69a6c3efd688b4b"
     },
     {
       "source_id": "bg-nextgenpsd2-v1.3-openapi",
-      "document_id": "bg-nextgenpsd2-v1.3-openapi@45501c5076b9",
+      "document_id": "bg-nextgenpsd2-v1.3-openapi@ab6893b24fe0",
       "version": "nextgenpsd2-v1.3",
       "kind": "openapi",
       "authority": "technical",
       "precedence": 90,
-      "locator": "schema:TransactionsResponse200Json",
-      "sha256": "570a3ed1d4cd773e1c62f4f9559ee1b5360d5e2291f52c033a5c653ec65fafbf",
-      "document_sha256": "45501c5076b98ccd3f755581d51a3a32e9c82710d2ef18b9f574dc93fee014b2"
+      "locator": "schema:Error403_AIS",
+      "sha256": "6c6472e35636380fbd987afc0b7b132533210d44c5066e6278dc56908467840a",
+      "document_sha256": "ab6893b24fe06e773b53af42d10fad465cbe11935d67e2c2d69a6c3efd688b4b"
     },
     {
-      "source_id": "bg-openfinance-v2-openapi",
-      "document_id": "bg-openfinance-v2-openapi@edd99f6e0265",
-      "version": "openfinance-v2",
+      "source_id": "bg-nextgenpsd2-v1.3-openapi",
+      "document_id": "bg-nextgenpsd2-v1.3-openapi@ab6893b24fe0",
+      "version": "nextgenpsd2-v1.3",
       "kind": "openapi",
       "authority": "technical",
       "precedence": 90,
-      "locator": "op:GET /accounts/{accountId}/transactions",
-      "sha256": "2935fd27adbb313d52dc8f4b04cee4dc74f1693bf8671549bc9c917adf8f45f5",
-      "document_sha256": "edd99f6e026537a45d3e95f33a35918e0f338914c70879234c5dc3c1e799fdfb"
+      "locator": "schema:Error403_NG_AIS",
+      "sha256": "7cf5d2232007f0c857eaf3c8b7e72c91281d5468938425a55496c1c422aaccce",
+      "document_sha256": "ab6893b24fe06e773b53af42d10fad465cbe11935d67e2c2d69a6c3efd688b4b"
     },
     {
-      "source_id": "bg-openfinance-v2-openapi",
-      "document_id": "bg-openfinance-v2-openapi@edd99f6e0265",
-      "version": "openfinance-v2",
+      "source_id": "bg-nextgenpsd2-v1.3-openapi",
+      "document_id": "bg-nextgenpsd2-v1.3-openapi@ab6893b24fe0",
+      "version": "nextgenpsd2-v1.3",
       "kind": "openapi",
       "authority": "technical",
       "precedence": 90,
-      "locator": "schema:AccountReport",
-      "sha256": "b8721b53771ae3838aa068e85fef440eac58cdaf08d877403218c6c4a4e92931",
-      "document_sha256": "edd99f6e026537a45d3e95f33a35918e0f338914c70879234c5dc3c1e799fdfb"
+      "locator": "schema:Error404_AIS",
+      "sha256": "2c1562057d50f21763c772e7c8ab2a272dac08a86dea5e7ad671efb4a9c73f58",
+      "document_sha256": "ab6893b24fe06e773b53af42d10fad465cbe11935d67e2c2d69a6c3efd688b4b"
     },
     {
-      "source_id": "bg-openfinance-v2-openapi",
-      "document_id": "bg-openfinance-v2-openapi@edd99f6e0265",
-      "version": "openfinance-v2",
+      "source_id": "bg-nextgenpsd2-v1.3-openapi",
+      "document_id": "bg-nextgenpsd2-v1.3-openapi@ab6893b24fe0",
+      "version": "nextgenpsd2-v1.3",
       "kind": "openapi",
       "authority": "technical",
       "precedence": 90,
-      "locator": "schema:Amount",
-      "sha256": "516ad2819374af39b1f04bd69f80cbb0d0c8db76d6b74bff9f7b301b90413643",
-      "document_sha256": "edd99f6e026537a45d3e95f33a35918e0f338914c70879234c5dc3c1e799fdfb"
+      "locator": "schema:Error404_NG_AIS",
+      "sha256": "137bd176cd74c1764cfc97589233584ab1bc274e0a6194c228da0d1dc6ed54fb",
+      "document_sha256": "ab6893b24fe06e773b53af42d10fad465cbe11935d67e2c2d69a6c3efd688b4b"
     },
     {
-      "source_id": "bg-openfinance-v2-openapi",
-      "document_id": "bg-openfinance-v2-openapi@edd99f6e0265",
-      "version": "openfinance-v2",
-      "kind": "openapi",
-      "authority": "technical",
-      "precedence": 90,
-      "locator": "schema:BookingStatus",
-      "sha256": "135c445e43a83060bb57dd851a9d23c96b1ee6e9d6218e57f315d32475a8f6ef",
-      "document_sha256": "edd99f6e026537a45d3e95f33a35918e0f338914c70879234c5dc3c1e799fdfb"
-    },
-    {
-      "source_id": "bg-openfinance-v2-openapi",
-      "document_id": "bg-openfinance-v2-openapi@edd99f6e0265",
-      "version": "openfinance-v2",
-      "kind": "openapi",
-      "authority": "technical",
-      "precedence": 90,
-      "locator": "schema:Error400",
-      "sha256": "1a39bd25253f9f4b7d097adc731e34f40347ebbbc385b68f4c5a642e8ab09221",
-      "document_sha256": "edd99f6e026537a45d3e95f33a35918e0f338914c70879234c5dc3c1e799fdfb"
-    },
-    {
-      "source_id": "bg-openfinance-v2-openapi",
-      "document_id": "bg-openfinance-v2-openapi@edd99f6e0265",
-      "version": "openfinance-v2",
-      "kind": "openapi",
-      "authority": "technical",
-      "precedence": 90,
-      "locator": "schema:PartyIdentification",
-      "sha256": "4faa87ec1820bf0dd561b2b2feee8900864eca6afa8c1d14a7850de07d89df99",
-      "document_sha256": "edd99f6e026537a45d3e95f33a35918e0f338914c70879234c5dc3c1e799fdfb"
-    },
-    {
-      "source_id": "bg-openfinance-v2-openapi",
-      "document_id": "bg-openfinance-v2-openapi@edd99f6e0265",
-      "version": "openfinance-v2",
-      "kind": "openapi",
-      "authority": "technical",
-      "precedence": 90,
-      "locator": "schema:Transactions",
-      "sha256": "3e0fd453f446a53f019806fb665d35ddc229a944547c37b2e0b37e8657967330",
-      "document_sha256": "edd99f6e026537a45d3e95f33a35918e0f338914c70879234c5dc3c1e799fdfb"
-    },
-    {
-      "source_id": "bg-openfinance-v2-openapi",
-      "document_id": "bg-openfinance-v2-openapi@edd99f6e0265",
-      "version": "openfinance-v2",
-      "kind": "openapi",
-      "authority": "technical",
-      "precedence": 90,
-      "locator": "schema:TransactionsResponse200Json",
-      "sha256": "570a3ed1d4cd773e1c62f4f9559ee1b5360d5e2291f52c033a5c653ec65fafbf",
-      "document_sha256": "edd99f6e026537a45d3e95f33a35918e0f338914c70879234c5dc3c1e799fdfb"
+      "_truncated_items": 204
     }
   ]
 }

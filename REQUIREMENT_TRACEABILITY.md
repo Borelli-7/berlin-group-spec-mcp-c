@@ -17,30 +17,34 @@ Requirement ──► Source (+ locator, optional sha256 pin)
 ```yaml
 schema_version: 1
 requirements:
-  - id: OFV2-TRANSACTIONS-001                # [A-Z0-9][A-Z0-9._-]*, ≤128 chars, unique
+  - id: OFV2-AIS-TRANSACTIONS-001            # [A-Z0-9][A-Z0-9._-]*, ≤128 chars, unique
     version: openfinance-v2
-    title: Read transaction list with mandatory bookingStatus and dateFrom
+    title: Read transaction list with mandatory bookingStatus and conditional dateFrom
     description: >-                          # optional
       ...
     sources:                                 # ≥1: no requirement without provenance
-      - source_id: bg-openfinance-v2-implementation-guidelines
-        locator: section:4.2                 # any locator (see MCP_TOOLS.md)
+      - source_id: bg-openfinance-v2-xs2a-implementation-guidelines
+        locator: section:4.4.4               # any locator (see MCP_TOOLS.md)
         note: Read Transaction List          # optional
-      - source_id: bg-openfinance-v2-implementation-guidelines
-        locator: page:3
+      - source_id: bg-openfinance-v2-xs2a-implementation-guidelines
+        locator: page:95-101                 # physical PDF pages, not the printed footer numbers
         sha256: 3f5a9c0d1e2b                 # optional pin (≥12 hex chars, prefix of the document hash)
-      - source_id: bg-openfinance-v2-openapi
-        locator: op:GET /accounts/{accountId}/transactions
+      - source_id: bg-openfinance-v2-openapi-ais
+        locator: op:GET /v2/accounts/{account-id}/transactions
     endpoints:                               # optional "METHOD /path"
-      - GET /accounts/{accountId}/transactions
-    schemas: [TransactionsResponse200Json]   # optional component schema names
+      - GET /v2/accounts/{account-id}/transactions
+    schemas: [accountReport, transactions]   # optional component schema names
     acceptance_criteria:
-      - "A request without bookingStatus is rejected with HTTP 400."
+      - "A request without the bookingStatus query parameter is rejected with HTTP 400 FORMAT_ERROR."
     conflicts_with:                          # optional, never self-referencing
-      - requirement_id: OFV2-TRANSACTIONS-003
-        note: Operational rules vs errata E-07
+      - requirement_id: OFV2-EXAMPLE-002     # see OFV2-SCA-APPROACH-001 ↔ -002 for a real case
+        note: why the two requirements contradict each other
     tags: [ais, transactions]
 ```
+
+`page:N` locators count the physical pages of the PDF (as extracted by the indexer). Many Berlin Group
+PDFs print a different number in the footer, for example physical page 95 of the XS2A Implementation
+Guidelines 2.4 is printed as page 90.
 
 The file is validated during indexing (for schema version, id format, duplicates, empty titles, missing sources,
 locator syntax, pin format, and self-conflicts), so an invalid file fails `bg-spec index`. If a `source_id` is unknown to the
@@ -54,6 +58,17 @@ sha256}`. Acceptance criteria get stable ids (`<ID>/AC1`, `<ID>/AC2`, …) and c
 `get_endpoint_requirements` links a curated requirement to an operation when either of these is true:
 * it lists the endpoint under `endpoints` (compared by canonical path key, so `{accountId}` ≡ `{account-id}`), or
 * one of its sources uses an `op:` or `path:` locator on an OpenAPI source of that version.
+
+The canonical path key strips the version prefix configured in `[versions.path_prefixes]`
+(`/v1` for `nextgenpsd2-v1.3`, `/v2` for `openfinance-v2`), so `/v1/accounts/{account-id}/transactions`
+and `/v2/accounts/{account-id}/transactions` share the key `/accounts/{}/transactions`. A lookup first
+uses the prefix of the requested version and then the prefixes of the other versions, so a v1 path
+finds the v2 operation and vice versa (`matched_by: canonical`). When several templates share one key
+(e.g. `/{payment-service}/{payment-product}/{paymentId}` and
+`/{resource-path}/{resourceId}/{authorisation-category}`), the operation with the same parameter names
+is preferred. Structurally different paths (v1 `POST /v1/{payment-service}/{payment-product}` vs
+v2 `POST /v2/payments/{payment-product}`, `/v1/consents` vs `/v2/consents/account-access`) are not
+matched; cite both explicitly in the requirement if they belong together.
 
 ## Trace output (`trace_requirement`)
 
@@ -84,7 +99,27 @@ Endpoints and schemas carry `via`, which records how they were reached, and `fou
 The server **reports** conflicts with citations and provenance. Deciding which source prevails
 (for example by comparing precedence and authority) is left to the consuming agent or a human.
 
-## Example-corpus scenarios
+## Corpus scenarios
+
+### Official corpus (`corpus/`)
+
+`corpus/requirements/requirements.yaml` maps 14 requirements (11 `OFV2-*`, 3 `NGPSD2-*` baseline) onto the
+official Berlin Group files. Discrepancies between those files are recorded as project errata in
+`corpus/text/v2/errata.md` (source `project-openfinance-v2-errata`, authority `project`, precedence 10).
+
+| Requirement | Demonstrates |
+|---|---|
+| `OFV2-AIS-TRANSACTIONS-001` | A clean trace: IG 2.4 section 4.4.4 + pages 95-101 + Operational Rules 4.10 + Data Dictionary + OpenAPI operation → schemas → 7 criteria |
+| `OFV2-SCA-APPROACH-001` ↔ `-002` | `declared` conflict: Protocol Functions 8.4.2 lists `SIGNATURE`, the OpenAPI enum omits it (errata E-01) |
+| `OFV2-AIS-TRANSACTIONS-002`, `OFV2-AIS-FREQUENCY-001` | Normative sources complemented by project errata (E-03 `pageSize`, E-07 access counting) |
+| `NGPSD2-AIS-TRANSACTIONS-001`, `NGPSD2-AIS-BALANCES-001` | v1.3 baseline reached from the v2 path through the `/v1` ↔ `/v2` canonical key |
+
+The ignored smoke test `cargo test -p bg-spec-indexer --release --test real_corpus -- --ignored` indexes
+this corpus and asserts that every cited locator resolves and that only declared conflicts remain.
+
+### Test fixture corpus (`crates/bg-spec-indexer/tests/fixtures/corpus/`)
+
+The integration and MCP tests use a small synthetic corpus that deliberately contains curation problems:
 
 | Requirement | Demonstrates |
 |---|---|

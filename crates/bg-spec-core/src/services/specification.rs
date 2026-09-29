@@ -6,7 +6,7 @@ use crate::{
         OpenApiOperation, OpenApiSchema, PageStatus, Provenance, SearchQuery, SearchResult,
         SourceLocator, SpecificationVersion,
     },
-    openapi_path::{normalize_method, path_key, validate_path},
+    openapi_path::{normalize_method, path_key, template_params, validate_path},
     ports::{CatalogRepository, CatalogStats, IndexMeta, SearchRepository},
 };
 use schemars::JsonSchema;
@@ -260,6 +260,19 @@ impl SpecificationService {
 
     pub fn path_key_for(&self, version: &SpecificationVersion, path: &str) -> String {
         path_key(path, self.settings.prefix_for(version))
+    }
+
+    /// Lookup keys in priority order: the version's own prefix first, then every other
+    /// configured prefix, so `/v1/...` and `/v2/...` paths resolve in either version.
+    pub fn candidate_path_keys(&self, version: &SpecificationVersion, path: &str) -> Vec<String> {
+        let mut keys = vec![self.path_key_for(version, path)];
+        for prefix in self.settings.path_prefixes.values() {
+            let key = path_key(path, Some(prefix));
+            if !keys.contains(&key) {
+                keys.push(key);
+            }
+        }
+        keys
     }
 
     async fn known_versions(&self) -> Result<BTreeSet<String>> {
@@ -608,14 +621,26 @@ impl SpecificationService {
     ) -> Result<Option<OperationLookup>> {
         let method = normalize_method(method)?;
         let path = validate_path(path)?;
-        let key = self.path_key_for(version, &path);
-        let mut ops = self.catalog.find_operations(version, &method, &key).await?;
+        let mut ops = Vec::new();
+        for key in self.candidate_path_keys(version, &path) {
+            ops = self.catalog.find_operations(version, &method, &key).await?;
+            if !ops.is_empty() {
+                break;
+            }
+        }
         if ops.is_empty() {
             return Ok(None);
         }
+        let wanted = template_params(&path);
         let (idx, matched_by) = match ops.iter().position(|o| o.path == path) {
             Some(i) => (i, MatchedBy::Exact),
-            None => (0, MatchedBy::Canonical),
+            // All-parameter templates share one key; prefer the same parameter names.
+            None => (
+                ops.iter()
+                    .position(|o| template_params(&o.path) == wanted)
+                    .unwrap_or(0),
+                MatchedBy::Canonical,
+            ),
         };
         let primary = ops.remove(idx);
         Ok(Some(OperationLookup {

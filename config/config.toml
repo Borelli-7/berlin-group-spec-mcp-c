@@ -10,8 +10,9 @@ baseline = "nextgenpsd2-v1.3"
 target = "openfinance-v2"
 
 [versions.path_prefixes]
-# NextGenPSD2 1.3 paths are published as /v1/...; stripped for cross-version matching.
+# Version prefixes are stripped for cross-version matching (/v1/accounts/{} ≡ /v2/accounts/{}).
 "nextgenpsd2-v1.3" = "/v1"
+"openfinance-v2" = "/v2"
 
 [chunking]
 max_chars = 6000

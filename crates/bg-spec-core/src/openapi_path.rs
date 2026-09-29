@@ -97,6 +97,23 @@ mod tests {
     }
 
     #[test]
+    fn v1_and_v2_keys_match_across_versions() {
+        assert_eq!(
+            path_key("/v1/accounts/{account-id}/transactions", Some("/v1")),
+            path_key("/v2/accounts/{account-id}/transactions", Some("/v2"))
+        );
+        assert_eq!(
+            path_key("/v2/accounts/{account-id}/balances", Some("/v2")),
+            path_key("/accounts/{accountId}/balances", Some("/v2"))
+        );
+        // Prefixes are per version: a /v2 path under the /v1 version is kept as is.
+        assert_eq!(
+            path_key("/v2/consents/confirmation-of-funds", Some("/v1")),
+            "/v2/consents/confirmation-of-funds"
+        );
+    }
+
+    #[test]
     fn params() {
         assert_eq!(
             template_params("/a/{x}/b/{y-z}"),

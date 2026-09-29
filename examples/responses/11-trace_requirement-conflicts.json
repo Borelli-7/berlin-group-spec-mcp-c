@@ -1,429 +1,636 @@
 {
-  "requirement_id": "OFV2-TRANSACTIONS-003",
+  "requirement_id": "OFV2-SCA-APPROACH-001",
   "classification": "authoritative_requirement",
   "requirement": {
-    "id": "OFV2-TRANSACTIONS-003",
+    "id": "OFV2-SCA-APPROACH-001",
     "version": "openfinance-v2",
-    "title": "Transaction list access frequency counted per consent (errata E-07)",
+    "title": "ASPSP-SCA-Approach header values including SIGNATURE",
     "sources": [
       {
-        "source_id": "bg-openfinance-v2-errata",
-        "locator": "section:E-07",
-        "sha256": "000000000000",
-        "note": "Pinned to the errata revision reviewed at curation time."
+        "source_id": "bg-openfinance-v2-protocol-functions",
+        "locator": "section:8.4.2",
+        "note": "Related Response Headers"
       },
       {
-        "source_id": "bg-openfinance-v2-operational-rules",
-        "locator": "page:2"
+        "source_id": "bg-openfinance-v2-protocol-functions",
+        "locator": "page:95"
+      },
+      {
+        "source_id": "bg-openfinance-v2-consent-api",
+        "locator": "page:32",
+        "note": "Example response with ASPSP-SCA-Approach SIGNATURE"
+      },
+      {
+        "source_id": "project-openfinance-v2-errata",
+        "locator": "section:E-01"
       }
     ],
     "endpoints": [
-      "GET /accounts/{accountId}/transactions"
+      "POST /v2/payments/{payment-product}",
+      "POST /v2/consents/account-access"
     ],
     "schemas": [],
     "acceptance_criteria": [
-      "The access counter for transaction list reads is maintained per consent."
+      "ASPSP-SCA-Approach is contained if the SCA approach is already fixed.",
+      "Permitted values are EMBEDDED, DECOUPLED, REDIRECT, ASPSP-CHANNEL and SIGNATURE.",
+      "The OAuth SCA approach is reported as REDIRECT."
     ],
-    "conflicts_with": [],
+    "conflicts_with": [
+      {
+        "requirement_id": "OFV2-SCA-APPROACH-002",
+        "note": "The OpenAPI enum omits SIGNATURE although the PDF and the header description list it (errata E-01)."
+      }
+    ],
     "tags": [
-      "ais",
-      "transactions",
-      "frequency",
+      "sca",
+      "authorisation",
       "errata"
     ]
   },
   "mapping": {
     "file": "requirements/requirements.yaml",
-    "file_sha256": "91f9b55e4d5f1b425fe608d1e6442edfdf06e9f2749b02ebe53d781b477da13c",
-    "locator": "requirement:OFV2-TRANSACTIONS-003",
-    "sha256": "0fb15b83a96250f902cce39a345ffabb7cca9f268ef41ce52f2158968db26118"
+    "file_sha256": "9ea404b1b672915d530528ae7207e864ebf5aa196bb7d05f59fe9f1ddebe0b43",
+    "locator": "requirement:OFV2-SCA-APPROACH-001",
+    "sha256": "23ed73fb597a5eed14c7ff1a02c582fdef2900090a720dc3ac37cc1ce1df5cd0"
   },
   "sources": [
     {
-      "source_id": "bg-openfinance-v2-errata",
-      "locator": "section:E-07",
-      "note": "Pinned to the errata revision reviewed at curation time.",
-      "status": "stale",
+      "source_id": "bg-openfinance-v2-protocol-functions",
+      "locator": "section:8.4.2",
+      "note": "Related Response Headers",
+      "status": "resolved",
       "document": {
-        "title": "Open Finance v2 Errata and Clarifications (synthetic fixture)",
-        "kind": "text",
+        "title": "openFinance Implementation Guidelines - Protocol Functions and Security Measures 2.3 (2025-10-31)",
+        "kind": "pdf",
         "version": "openfinance-v2",
-        "authority": "informative",
-        "precedence": 80,
-        "sha256": "809757ca2bdef7b43e9f039df0c5277a4c347c1a95489097efa54695c7c1e91d",
+        "authority": "normative",
+        "precedence": 100,
+        "sha256": "323d2484a9cb08a8e657699180557244843f74605bdeec16349654114d5aa851",
         "status": "indexed"
       },
-      "excerpt": "E-07 Transaction list access frequency\n\nClarification: the limit of four transaction list reads per calendar day without PSU\ninvolvement is counted per consent only, not per account.",
+      "excerpt": "8.4.2 Related Response Headers ............................................... 87\n8.4.2 Related Response Headers\n\nThe following header is used by the ASPSP to transmit decisions of the chosen SCA Approach\nto the third party.\n\nPublished by the Berlin Group under Creative Commons Attribution-NoDerivatives 4.0 International Public License Page 87\n  (ref. License Notice for full license conditions)\nSecurity Measures supported by XS2A and openFinance API\n\nAttribute Type\n\nASPSP-SCA- String\nApproach",
       "provenance": [
         {
-          "source_id": "bg-openfinance-v2-errata",
-          "document_id": "bg-openfinance-v2-errata@809757ca2bde",
+          "source_id": "bg-openfinance-v2-protocol-functions",
+          "document_id": "bg-openfinance-v2-protocol-functions@323d2484a9cb",
           "version": "openfinance-v2",
-          "kind": "text",
-          "authority": "informative",
-          "precedence": 80,
-          "locator": "chunk:bg-openfinance-v2-errata:p1:c1",
-          "sha256": "dfa8ea7a43492195dc217d436f78b8ee9b2410bb56c56ec34d556d1ecc2d1959",
-          "document_sha256": "809757ca2bdef7b43e9f039df0c5277a4c347c1a95489097efa54695c7c1e91d"
+          "kind": "pdf",
+          "authority": "normative",
+          "precedence": 100,
+          "locator": "chunk:bg-openfinance-v2-protocol-functions:p5:c9",
+          "sha256": "699cb4302edcb500cf626de3001825c6bf729bd893edf4241dd86599a2b5e476",
+          "document_sha256": "323d2484a9cb08a8e657699180557244843f74605bdeec16349654114d5aa851"
+        },
+        {
+          "source_id": "bg-openfinance-v2-protocol-functions",
+          "document_id": "bg-openfinance-v2-protocol-functions@323d2484a9cb",
+          "version": "openfinance-v2",
+          "kind": "pdf",
+          "authority": "normative",
+          "precedence": 100,
+          "locator": "chunk:bg-openfinance-v2-protocol-functions:p94:c1",
+          "sha256": "be2edc2d5a56c57b8f5e00ec8490c337b58b2a5c56f4244352b89ba6653d94eb",
+          "document_sha256": "323d2484a9cb08a8e657699180557244843f74605bdeec16349654114d5aa851"
+        },
+        {
+          "source_id": "bg-openfinance-v2-protocol-functions",
+          "document_id": "bg-openfinance-v2-protocol-functions@323d2484a9cb",
+          "version": "openfinance-v2",
+          "kind": "pdf",
+          "authority": "normative",
+          "precedence": 100,
+          "locator": "chunk:bg-openfinance-v2-protocol-functions:p95:c0",
+          "sha256": "4846cf088006b01689389a3bcf0e54741cc129f2674c60e36e76d2c4739f119c",
+          "document_sha256": "323d2484a9cb08a8e657699180557244843f74605bdeec16349654114d5aa851"
         }
       ]
     },
     {
-      "source_id": "bg-openfinance-v2-operational-rules",
-      "locator": "page:2",
+      "source_id": "bg-openfinance-v2-protocol-functions",
+      "locator": "page:95",
       "status": "resolved",
       "document": {
-        "title": "Open Finance v2 Operational Rules (synthetic fixture)",
+        "title": "openFinance Implementation Guidelines - Protocol Functions and Security Measures 2.3 (2025-10-31)",
         "kind": "pdf",
         "version": "openfinance-v2",
         "authority": "normative",
-        "precedence": 80,
-        "sha256": "80430186dc34e00a77e634344b432b302e43b08bb45b9d7b52ba5d91d00adfe9",
+        "precedence": 100,
+        "sha256": "323d2484a9cb08a8e657699180557244843f74605bdeec16349654114d5aa851",
         "status": "indexed"
       },
-      "excerpt": "3 Transaction History Access\n\nThe ASPSP SHALL make at least 90 days of transaction history available through the\ntransaction list endpoint.\n\nWithout active PSU involvement the TPP MUST NOT read the transaction list of an account more\nthan four times per calendar day. The limit is counted per account and per consent.",
+      "excerpt": "Security Measures supported by XS2A and openFinance API\n\n\nAttribute Type\n\nASPSP-SCA- String\nApproach\n\n\n\n\n8.5 Embedded SCA Approach\n\nThe Embedded SCA Approach is defined as the scenario where all PSU credentials are\ntransmitted via the XS2A API resp. the openFinance API. PSU identification data are\ntransported using the related header parameters as defined in Section\nInitiation Request and Response, an authorisation sub-resource is either implicitly generated\nby the ASPSP or needs to be explicitly created by the API Client in a next step, cp. Section\n\nThe API calls to create an authorisation sub-resource as well as the API calls to transmit PSU\ncredentials to the related authorisation resource within an Embedded SCA Approach are\ndefined in Section 9.4 and Section\nindicated by related hyperlinks presented by the ASPSP before.\n\n8.6 Decoupled SCA Approach\n\nThe Decoupled SCA Approach differs from the Embedded SCA Approach by using an ASPSP\nauthentication app for the strong customer authentication and dynamic linking if applicable.\nThe app is used by the PSU also for authentication of transaction in the online channels. Since\nthe XS2A API resp. the openFinance API is not involved in this…",
       "provenance": [
         {
-          "source_id": "bg-openfinance-v2-operational-rules",
-          "document_id": "bg-openfinance-v2-operational-rules@80430186dc34",
+          "source_id": "bg-openfinance-v2-protocol-functions",
+          "document_id": "bg-openfinance-v2-protocol-functions@323d2484a9cb",
           "version": "openfinance-v2",
           "kind": "pdf",
           "authority": "normative",
-          "precedence": 80,
-          "locator": "page:2",
-          "sha256": "07fcee82a83b379bc569924f5a6cc45ee1bfe4abb2036222fb4c6fcd24093ec8",
-          "document_sha256": "80430186dc34e00a77e634344b432b302e43b08bb45b9d7b52ba5d91d00adfe9"
+          "precedence": 100,
+          "locator": "page:95",
+          "sha256": "3c77d5e2775a09e4d7991e52cc61f0494a43b7c34bace106ae26df7558b96e9e",
+          "document_sha256": "323d2484a9cb08a8e657699180557244843f74605bdeec16349654114d5aa851"
+        }
+      ]
+    },
+    {
+      "source_id": "bg-openfinance-v2-consent-api",
+      "locator": "page:32",
+      "note": "Example response with ASPSP-SCA-Approach SIGNATURE",
+      "status": "resolved",
+      "document": {
+        "title": "openFinance Implementation Guidelines - Consent API for V2.x 2.2 (2025-10-31)",
+        "kind": "pdf",
+        "version": "openfinance-v2",
+        "authority": "normative",
+        "precedence": 100,
+        "sha256": "d5a4d89fc5600ace24dae0910c2020040bf205ef7a60881aa1e8b6bec79909f7",
+        "status": "indexed"
+      },
+      "excerpt": "Consent API Establish Consents Messages\n\n\n\n\nResponse in case of the decoupled approach\n\nHTTP/1.x 201 Created\nX-Request-ID: 99391c7e-ad88-49ec-a2ad-99ddcb1f7721\nASPSP-SCA-Approach: DECOUPLED\nDate: Sun, 06 Aug 2017 15:05:47 GMT\nLocation: \"/psd2/v2/consents/account-access/3d9a81b3-a47d-\n4130-8765-a9c0ff861101\"\nContent-Type: application/json\n\n{\n  \"consentStatus\": \"received\",\n  \"consentId\": \"3d9a81b3-a47d-4130-8765-a9c0ff861101\",\n  \"_links\": {\n    \"startAuthorisationWithPsuIdentification\": {\"href\":\n\"/psd2/v2/consents/account-access/3d9a81b3-a47d-4130-8765-\na9c0ff861101/authorisations\"}\n  }\n}\nResponse in case of the embedded approach\n\nHTTP/1.x 201 Created\nX-Request-ID: 99391c7e-ad88-49ec-a2ad-99ddcb1f7721\nASPSP-SCA-Approach: EMBEDDED\nDate: Sun, 06 Aug 2017 15:05:47 GMT\nLocation: \"/psd2/v2/consents/account-access/3d9a81b3-a47d-\n4130-8765-a9c0ff861101\"\nContent-Type: application/json\n\n{\n  \"consentStatus\": \"received\",\n  \"consentId\": \"3d9a81b3-a47d-4130-8765-a9c0ff861101\",\n  \"_links\": {\n    \"startAuthorisationWithPsuAuthentication\": {\"href\":\n\"/psd2/v2/consents/account-access/3d9a81b3-a47d-4130-8765-\na9c0ff861101/authorisations\"}\n  }\n}\n\nResponse in case of the signature approach\n\nHTTP/1.x 201 …",
+      "provenance": [
+        {
+          "source_id": "bg-openfinance-v2-consent-api",
+          "document_id": "bg-openfinance-v2-consent-api@d5a4d89fc560",
+          "version": "openfinance-v2",
+          "kind": "pdf",
+          "authority": "normative",
+          "precedence": 100,
+          "locator": "page:32",
+          "sha256": "9be732848c857d7897cf43cacf2261d700e8baa2461c9b3fcb9fb3896ea66294",
+          "document_sha256": "d5a4d89fc5600ace24dae0910c2020040bf205ef7a60881aa1e8b6bec79909f7"
+        }
+      ]
+    },
+    {
+      "source_id": "project-openfinance-v2-errata",
+      "locator": "section:E-01",
+      "status": "resolved",
+      "document": {
+        "title": "Project errata and clarifications on the openFinance v2 corpus",
+        "kind": "text",
+        "version": "openfinance-v2",
+        "authority": "project",
+        "precedence": 10,
+        "sha256": "0526127db9e64ec84102c2472ddb7f6b8170e284ec73ac508a7ef28ac161d431",
+        "status": "indexed"
+      },
+      "excerpt": "E-01 ASPSP-SCA-Approach value SIGNATURE missing from the OpenAPI enum\n\nProtocol Functions and Security Measures 2.3, section 8.4.2 (page 95), lists the values\nEMBEDDED, DECOUPLED, REDIRECT, ASPSP-CHANNEL and SIGNATURE for the ASPSP-SCA-Approach\nresponse header. Consent API 2.2 uses \"ASPSP-SCA-Approach: SIGNATURE\" in an example (page 32).\nThe header definitions in the Signing Basket 2.3, Consent 2.1 and PIS 2.3 OpenAPI files list\nSIGNATURE in the description, but their enum only contains EMBEDDED, DECOUPLED, REDIRECT and\nASPSP-CHANNEL.\n\nClarification: the PDF value list prevails. SIGNATURE is a valid ASPSP-SCA-Approach value;\nclients generated from the OpenAPI enum must tolerate it.",
+      "provenance": [
+        {
+          "source_id": "project-openfinance-v2-errata",
+          "document_id": "project-openfinance-v2-errata@0526127db9e6",
+          "version": "openfinance-v2",
+          "kind": "text",
+          "authority": "project",
+          "precedence": 10,
+          "locator": "chunk:project-openfinance-v2-errata:p1:c1",
+          "sha256": "f61fbf5b2dc6599f89948614cf01a732dbd705e76cfaf0454af9775125bc5697",
+          "document_sha256": "0526127db9e64ec84102c2472ddb7f6b8170e284ec73ac508a7ef28ac161d431"
         }
       ]
     }
   ],
   "endpoints": [
     {
-      "endpoint": "GET /accounts/{accountId}/transactions",
+      "endpoint": "POST /v2/payments/{payment-product}",
       "via": "endpoints",
       "found": true,
       "operation": {
-        "method": "GET",
-        "path": "/accounts/{accountId}/transactions",
-        "operation_id": "getTransactionList",
-        "summary": "Read transaction list of an account",
+        "method": "POST",
+        "path": "/v2/payments/{payment-product}",
+        "operation_id": "initiatePayment",
+        "summary": "Payment Initiation Request for Single Payments",
         "response_statuses": [
-          "200",
+          "201",
           "400",
           "401",
           "403",
           "404",
-          "429"
+          "405",
+          "406",
+          "408",
+          "409",
+          "415",
+          {
+            "_truncated_items": 2
+          }
         ],
         "referenced_schemas": [
-          "BookingStatus",
-          "Error400",
-          "TransactionsResponse200Json"
+          "Max140Text",
+          "Max35Text",
+          "Max500Text",
+          "Max70Text",
+          "SinglePayment_Cross_Border_CT_Core",
+          "SinglePayment_SCT_Core",
+          "SinglePayment_SCT_inst_Core",
+          "SinglePayment_Target2_Core",
+          "TransactionStatus",
+          "_links_201_PIS",
+          {
+            "_truncated_items": 16
+          }
         ]
       },
       "provenance": {
-        "source_id": "bg-openfinance-v2-openapi",
-        "document_id": "bg-openfinance-v2-openapi@edd99f6e0265",
+        "source_id": "bg-openfinance-v2-openapi-pis",
+        "document_id": "bg-openfinance-v2-openapi-pis@40df88473357",
         "version": "openfinance-v2",
         "kind": "openapi",
         "authority": "technical",
         "precedence": 90,
-        "locator": "op:GET /accounts/{accountId}/transactions",
-        "sha256": "2935fd27adbb313d52dc8f4b04cee4dc74f1693bf8671549bc9c917adf8f45f5",
-        "document_sha256": "edd99f6e026537a45d3e95f33a35918e0f338914c70879234c5dc3c1e799fdfb"
+        "locator": "op:POST /v2/payments/{payment-product}",
+        "sha256": "901c5bd1231caa24b65956cfa110841e0aead60125b474569ade81fb1736e828",
+        "document_sha256": "40df884733574661ccba8befdaa55217d1b76ac526def827d64dbd80aaa0ef13"
+      }
+    },
+    {
+      "endpoint": "POST /v2/consents/account-access",
+      "via": "endpoints",
+      "found": true,
+      "operation": {
+        "method": "POST",
+        "path": "/v2/consents/account-access",
+        "operation_id": "establishConsentForAccountInformation",
+        "summary": "Consent Request for Account Information",
+        "response_statuses": [
+          "201",
+          "400",
+          "401",
+          "403",
+          "404",
+          "405",
+          "406",
+          "408",
+          "409",
+          "415",
+          {
+            "_truncated_items": 2
+          }
+        ],
+        "referenced_schemas": [
+          "ConsentStatus",
+          "ConsentTypeCode",
+          "ISODate",
+          "Max140Text",
+          "Max35Text",
+          "Max500Text",
+          "Max70Text",
+          "_links_201_CONSENT_ACCOUNT",
+          "accountAccess",
+          "authenticationObject",
+          {
+            "_truncated_items": 13
+          }
+        ]
+      },
+      "provenance": {
+        "source_id": "bg-openfinance-v2-openapi-consent",
+        "document_id": "bg-openfinance-v2-openapi-consent@583c831921f2",
+        "version": "openfinance-v2",
+        "kind": "openapi",
+        "authority": "technical",
+        "precedence": 90,
+        "locator": "op:POST /v2/consents/account-access",
+        "sha256": "8155a059933b85ed760e28179b460e97b3d4111469633f9b622b99ec66729edb",
+        "document_sha256": "583c831921f2703031dc0f36eff03ff3a23dbd38b9dbecde9fd826d6bb7c8aeb"
       }
     }
   ],
   "schemas": [
     {
-      "name": "BookingStatus",
-      "via": "operation:GET /accounts/{accountId}/transactions",
+      "name": "Max140Text",
+      "via": "operation:POST /v2/payments/{payment-product}",
       "found": true,
       "referenced_schemas": [],
       "provenance": {
-        "source_id": "bg-openfinance-v2-openapi",
-        "document_id": "bg-openfinance-v2-openapi@edd99f6e0265",
+        "source_id": "bg-openfinance-v2-openapi-pis",
+        "document_id": "bg-openfinance-v2-openapi-pis@40df88473357",
         "version": "openfinance-v2",
         "kind": "openapi",
         "authority": "technical",
         "precedence": 90,
-        "locator": "schema:BookingStatus",
-        "sha256": "135c445e43a83060bb57dd851a9d23c96b1ee6e9d6218e57f315d32475a8f6ef",
-        "document_sha256": "edd99f6e026537a45d3e95f33a35918e0f338914c70879234c5dc3c1e799fdfb"
+        "locator": "schema:Max140Text",
+        "sha256": "d4ecb52d941602fde294427563668db378524a2a193ac2f48a4ce85a6d27c944",
+        "document_sha256": "40df884733574661ccba8befdaa55217d1b76ac526def827d64dbd80aaa0ef13"
       }
     },
     {
-      "name": "Error400",
-      "via": "operation:GET /accounts/{accountId}/transactions",
+      "name": "Max35Text",
+      "via": "operation:POST /v2/payments/{payment-product}",
       "found": true,
       "referenced_schemas": [],
       "provenance": {
-        "source_id": "bg-openfinance-v2-openapi",
-        "document_id": "bg-openfinance-v2-openapi@edd99f6e0265",
+        "source_id": "bg-openfinance-v2-openapi-pis",
+        "document_id": "bg-openfinance-v2-openapi-pis@40df88473357",
         "version": "openfinance-v2",
         "kind": "openapi",
         "authority": "technical",
         "precedence": 90,
-        "locator": "schema:Error400",
-        "sha256": "1a39bd25253f9f4b7d097adc731e34f40347ebbbc385b68f4c5a642e8ab09221",
-        "document_sha256": "edd99f6e026537a45d3e95f33a35918e0f338914c70879234c5dc3c1e799fdfb"
+        "locator": "schema:Max35Text",
+        "sha256": "71dc158f0afa6c2d71f31e1227703fb8fedd5b3c69f1c186b5877805be8ac140",
+        "document_sha256": "40df884733574661ccba8befdaa55217d1b76ac526def827d64dbd80aaa0ef13"
       }
     },
     {
-      "name": "TransactionsResponse200Json",
-      "via": "operation:GET /accounts/{accountId}/transactions",
+      "name": "Max500Text",
+      "via": "operation:POST /v2/payments/{payment-product}",
+      "found": true,
+      "referenced_schemas": [],
+      "provenance": {
+        "source_id": "bg-openfinance-v2-openapi-pis",
+        "document_id": "bg-openfinance-v2-openapi-pis@40df88473357",
+        "version": "openfinance-v2",
+        "kind": "openapi",
+        "authority": "technical",
+        "precedence": 90,
+        "locator": "schema:Max500Text",
+        "sha256": "30a96c9797d9b2f1b2559239b26cdb1bbcd14a157ab2fe2ed664bb25cb573e66",
+        "document_sha256": "40df884733574661ccba8befdaa55217d1b76ac526def827d64dbd80aaa0ef13"
+      }
+    },
+    {
+      "name": "Max70Text",
+      "via": "operation:POST /v2/payments/{payment-product}",
+      "found": true,
+      "referenced_schemas": [],
+      "provenance": {
+        "source_id": "bg-openfinance-v2-openapi-pis",
+        "document_id": "bg-openfinance-v2-openapi-pis@40df88473357",
+        "version": "openfinance-v2",
+        "kind": "openapi",
+        "authority": "technical",
+        "precedence": 90,
+        "locator": "schema:Max70Text",
+        "sha256": "87447cb1aea0813e4d296bf59b3e305281f18c920ebfb54e2274039536db02e0",
+        "document_sha256": "40df884733574661ccba8befdaa55217d1b76ac526def827d64dbd80aaa0ef13"
+      }
+    },
+    {
+      "name": "SinglePayment_Cross_Border_CT_Core",
+      "via": "operation:POST /v2/payments/{payment-product}",
       "found": true,
       "referenced_schemas": [
-        "AccountReport"
+        "accountReference1",
+        "minimum_Cross_Border_CT_Core"
       ],
       "provenance": {
-        "source_id": "bg-openfinance-v2-openapi",
-        "document_id": "bg-openfinance-v2-openapi@edd99f6e0265",
+        "source_id": "bg-openfinance-v2-openapi-pis",
+        "document_id": "bg-openfinance-v2-openapi-pis@40df88473357",
         "version": "openfinance-v2",
         "kind": "openapi",
         "authority": "technical",
         "precedence": 90,
-        "locator": "schema:TransactionsResponse200Json",
-        "sha256": "570a3ed1d4cd773e1c62f4f9559ee1b5360d5e2291f52c033a5c653ec65fafbf",
-        "document_sha256": "edd99f6e026537a45d3e95f33a35918e0f338914c70879234c5dc3c1e799fdfb"
+        "locator": "schema:SinglePayment_Cross_Border_CT_Core",
+        "sha256": "00816a100f5297c99ce05cc91285e903fcb53ea5052566e4e9159000405b56f6",
+        "document_sha256": "40df884733574661ccba8befdaa55217d1b76ac526def827d64dbd80aaa0ef13"
       }
     },
     {
-      "name": "AccountReport",
-      "via": "transitive:TransactionsResponse200Json",
-      "found": true,
-      "referenced_schemas": [
-        "Transactions"
-      ],
-      "provenance": {
-        "source_id": "bg-openfinance-v2-openapi",
-        "document_id": "bg-openfinance-v2-openapi@edd99f6e0265",
-        "version": "openfinance-v2",
-        "kind": "openapi",
-        "authority": "technical",
-        "precedence": 90,
-        "locator": "schema:AccountReport",
-        "sha256": "b8721b53771ae3838aa068e85fef440eac58cdaf08d877403218c6c4a4e92931",
-        "document_sha256": "edd99f6e026537a45d3e95f33a35918e0f338914c70879234c5dc3c1e799fdfb"
-      }
-    },
-    {
-      "name": "Amount",
-      "via": "transitive:TransactionsResponse200Json",
+      "name": "AccountIdentificationCode",
+      "via": "transitive:SinglePayment_Cross_Border_CT_Core",
       "found": true,
       "referenced_schemas": [],
       "provenance": {
-        "source_id": "bg-openfinance-v2-openapi",
-        "document_id": "bg-openfinance-v2-openapi@edd99f6e0265",
+        "source_id": "bg-openfinance-v2-openapi-pis",
+        "document_id": "bg-openfinance-v2-openapi-pis@40df88473357",
         "version": "openfinance-v2",
         "kind": "openapi",
         "authority": "technical",
         "precedence": 90,
-        "locator": "schema:Amount",
-        "sha256": "516ad2819374af39b1f04bd69f80cbb0d0c8db76d6b74bff9f7b301b90413643",
-        "document_sha256": "edd99f6e026537a45d3e95f33a35918e0f338914c70879234c5dc3c1e799fdfb"
+        "locator": "schema:AccountIdentificationCode",
+        "sha256": "15d970e37997e96ca902ec91baa098e4b0c6b9d22b72809ba13849cafeb3a3fd",
+        "document_sha256": "40df884733574661ccba8befdaa55217d1b76ac526def827d64dbd80aaa0ef13"
       }
     },
     {
-      "name": "PartyIdentification",
-      "via": "transitive:TransactionsResponse200Json",
+      "name": "BBAN",
+      "via": "transitive:SinglePayment_Cross_Border_CT_Core",
       "found": true,
       "referenced_schemas": [],
       "provenance": {
-        "source_id": "bg-openfinance-v2-openapi",
-        "document_id": "bg-openfinance-v2-openapi@edd99f6e0265",
+        "source_id": "bg-openfinance-v2-openapi-pis",
+        "document_id": "bg-openfinance-v2-openapi-pis@40df88473357",
         "version": "openfinance-v2",
         "kind": "openapi",
         "authority": "technical",
         "precedence": 90,
-        "locator": "schema:PartyIdentification",
-        "sha256": "4faa87ec1820bf0dd561b2b2feee8900864eca6afa8c1d14a7850de07d89df99",
-        "document_sha256": "edd99f6e026537a45d3e95f33a35918e0f338914c70879234c5dc3c1e799fdfb"
+        "locator": "schema:BBAN",
+        "sha256": "e607d5ee96f90b0e0cc4fa0bf3be4e6dab8bd44b547d40b06f6dc0f430c9ed34",
+        "document_sha256": "40df884733574661ccba8befdaa55217d1b76ac526def827d64dbd80aaa0ef13"
       }
     },
     {
-      "name": "Transactions",
-      "via": "transitive:TransactionsResponse200Json",
+      "name": "BICFI",
+      "via": "transitive:SinglePayment_Cross_Border_CT_Core",
       "found": true,
-      "referenced_schemas": [
-        "Amount",
-        "PartyIdentification"
-      ],
+      "referenced_schemas": [],
       "provenance": {
-        "source_id": "bg-openfinance-v2-openapi",
-        "document_id": "bg-openfinance-v2-openapi@edd99f6e0265",
+        "source_id": "bg-openfinance-v2-openapi-pis",
+        "document_id": "bg-openfinance-v2-openapi-pis@40df88473357",
         "version": "openfinance-v2",
         "kind": "openapi",
         "authority": "technical",
         "precedence": 90,
-        "locator": "schema:Transactions",
-        "sha256": "3e0fd453f446a53f019806fb665d35ddc229a944547c37b2e0b37e8657967330",
-        "document_sha256": "edd99f6e026537a45d3e95f33a35918e0f338914c70879234c5dc3c1e799fdfb"
+        "locator": "schema:BICFI",
+        "sha256": "844130c1543f90dc5dc31388196ab9ad1b529e863722fa809fa61f09bd4a0779",
+        "document_sha256": "40df884733574661ccba8befdaa55217d1b76ac526def827d64dbd80aaa0ef13"
       }
+    },
+    {
+      "name": "ChargeBearer",
+      "via": "transitive:SinglePayment_Cross_Border_CT_Core",
+      "found": true,
+      "referenced_schemas": [],
+      "provenance": {
+        "source_id": "bg-openfinance-v2-openapi-pis",
+        "document_id": "bg-openfinance-v2-openapi-pis@40df88473357",
+        "version": "openfinance-v2",
+        "kind": "openapi",
+        "authority": "technical",
+        "precedence": 90,
+        "locator": "schema:ChargeBearer",
+        "sha256": "b05f03f18f4b8a8930f38cbb94605df062905f9514b3b78921a30069223741be",
+        "document_sha256": "40df884733574661ccba8befdaa55217d1b76ac526def827d64dbd80aaa0ef13"
+      }
+    },
+    {
+      "name": "ClearingSystemIdentificationCode",
+      "via": "transitive:SinglePayment_Cross_Border_CT_Core",
+      "found": true,
+      "referenced_schemas": [],
+      "provenance": {
+        "source_id": "bg-openfinance-v2-openapi-pis",
+        "document_id": "bg-openfinance-v2-openapi-pis@40df88473357",
+        "version": "openfinance-v2",
+        "kind": "openapi",
+        "authority": "technical",
+        "precedence": 90,
+        "locator": "schema:ClearingSystemIdentificationCode",
+        "sha256": "e3ae1d713a4d01712288c203507825de050c6fab5a8f9b3e140556932ebf490d",
+        "document_sha256": "40df884733574661ccba8befdaa55217d1b76ac526def827d64dbd80aaa0ef13"
+      }
+    },
+    {
+      "_truncated_items": 127
     }
   ],
   "acceptance_criteria": [
     {
-      "id": "OFV2-TRANSACTIONS-003/AC1",
-      "requirement_id": "OFV2-TRANSACTIONS-003",
-      "text": "The access counter for transaction list reads is maintained per consent.",
+      "id": "OFV2-SCA-APPROACH-001/AC1",
+      "requirement_id": "OFV2-SCA-APPROACH-001",
+      "text": "ASPSP-SCA-Approach is contained if the SCA approach is already fixed.",
       "mapping": {
         "file": "requirements/requirements.yaml",
-        "file_sha256": "91f9b55e4d5f1b425fe608d1e6442edfdf06e9f2749b02ebe53d781b477da13c",
-        "locator": "requirement:OFV2-TRANSACTIONS-003",
-        "sha256": "0fb15b83a96250f902cce39a345ffabb7cca9f268ef41ce52f2158968db26118"
+        "file_sha256": "9ea404b1b672915d530528ae7207e864ebf5aa196bb7d05f59fe9f1ddebe0b43",
+        "locator": "requirement:OFV2-SCA-APPROACH-001",
+        "sha256": "23ed73fb597a5eed14c7ff1a02c582fdef2900090a720dc3ac37cc1ce1df5cd0"
+      }
+    },
+    {
+      "id": "OFV2-SCA-APPROACH-001/AC2",
+      "requirement_id": "OFV2-SCA-APPROACH-001",
+      "text": "Permitted values are EMBEDDED, DECOUPLED, REDIRECT, ASPSP-CHANNEL and SIGNATURE.",
+      "mapping": {
+        "file": "requirements/requirements.yaml",
+        "file_sha256": "9ea404b1b672915d530528ae7207e864ebf5aa196bb7d05f59fe9f1ddebe0b43",
+        "locator": "requirement:OFV2-SCA-APPROACH-001",
+        "sha256": "23ed73fb597a5eed14c7ff1a02c582fdef2900090a720dc3ac37cc1ce1df5cd0"
+      }
+    },
+    {
+      "id": "OFV2-SCA-APPROACH-001/AC3",
+      "requirement_id": "OFV2-SCA-APPROACH-001",
+      "text": "The OAuth SCA approach is reported as REDIRECT.",
+      "mapping": {
+        "file": "requirements/requirements.yaml",
+        "file_sha256": "9ea404b1b672915d530528ae7207e864ebf5aa196bb7d05f59fe9f1ddebe0b43",
+        "locator": "requirement:OFV2-SCA-APPROACH-001",
+        "sha256": "23ed73fb597a5eed14c7ff1a02c582fdef2900090a720dc3ac37cc1ce1df5cd0"
       }
     }
   ],
   "related_evidence": [
     {
-      "record_id": "bg-openfinance-v2-errata:p1:c1",
+      "record_id": "project-openfinance-v2-errata:p1:c1",
       "record_type": "chunk",
-      "source_id": "bg-openfinance-v2-errata",
-      "document_id": "bg-openfinance-v2-errata@809757ca2bde",
+      "source_id": "project-openfinance-v2-errata",
+      "document_id": "project-openfinance-v2-errata@0526127db9e6",
       "version": "openfinance-v2",
       "kind": "text",
-      "authority": "informative",
-      "title": "Open Finance v2 Errata and Clarifications (synthetic fixture) — E-07 Transaction list access frequency",
-      "locator": "chunk:bg-openfinance-v2-errata:p1:c1",
+      "authority": "project",
+      "title": "Project errata and clarifications on the openFinance v2 corpus — E-01 ASPSP-SCA-Approach value SIGNATURE missing from the OpenAPI enum",
+      "locator": "chunk:project-openfinance-v2-errata:p1:c1",
       "page": 1,
-      "evidence": "E-07 Transaction list access frequency\n\nClarification: the limit of four transaction list reads per calendar day without PSU\ninvolvement is counted per consent only, not per account",
-      "relevance": 34.266998291015625,
-      "sha256": "dfa8ea7a43492195dc217d436f78b8ee9b2410bb56c56ec34d556d1ecc2d1959",
+      "evidence": "E-01 ASPSP-SCA-Approach value SIGNATURE missing from the OpenAPI enum\n\nProtocol Functions and Security Measures 2.3, section 8.4.2 (page 95), lists the values\nEMBEDDED, DECOUPLED, REDIRECT, ASPSP-CHANNEL and SIGNATURE for the ASPSP-SCA-Approach\nresponse header. Consent API 2.2 uses \"ASPSP-SCA-Approach: SIGNATURE\" in an example (page 32).\nThe header definitions in the Signing Basket 2.3, Consent 2",
+      "relevance": 69.14199829101562,
+      "sha256": "f61fbf5b2dc6599f89948614cf01a732dbd705e76cfaf0454af9775125bc5697",
       "classification": "discovered_evidence"
     },
     {
-      "record_id": "bg-openfinance-v2-operational-rules:p2:c0",
+      "record_id": "project-openfinance-v2-errata:p1:c2",
       "record_type": "chunk",
-      "source_id": "bg-openfinance-v2-operational-rules",
-      "document_id": "bg-openfinance-v2-operational-rules@80430186dc34",
-      "version": "openfinance-v2",
-      "kind": "pdf",
-      "authority": "normative",
-      "title": "Open Finance v2 Operational Rules (synthetic fixture) — 3 Transaction History Access",
-      "locator": "chunk:bg-openfinance-v2-operational-rules:p2:c0",
-      "page": 2,
-      "evidence": "3 Transaction History Access\n\nThe ASPSP SHALL make at least 90 days of transaction history available through the\ntransaction list endpoint.\n\nWithout active PSU involvement the TPP MUST NOT read the transaction list of an account more\nthan four times per calendar day. The limit is counted per account and per consent",
-      "relevance": 19.113000869750977,
-      "sha256": "07fcee82a83b379bc569924f5a6cc45ee1bfe4abb2036222fb4c6fcd24093ec8",
-      "classification": "discovered_evidence"
-    },
-    {
-      "record_id": "bg-openfinance-v2-implementation-guidelines:p3:c0",
-      "record_type": "chunk",
-      "source_id": "bg-openfinance-v2-implementation-guidelines",
-      "document_id": "bg-openfinance-v2-implementation-guidelines@8eec1c4376ce",
-      "version": "openfinance-v2",
-      "kind": "pdf",
-      "authority": "normative",
-      "title": "Open Finance v2 Implementation Guidelines (synthetic fixture) — 4.2 Read Transaction List",
-      "locator": "chunk:bg-openfinance-v2-implementation-guidelines:p3:c0",
-      "page": 3,
-      "evidence": "error code ACCESS_EXCEEDED when the access\nfrequency limit of the consent is exceeded.\n\nEach returned transaction MUST contain transactionAmount and bookingDate. The bookingDate is\nreturned as date-time in version 2",
-      "relevance": 11.015000343322754,
-      "sha256": "ffb004d5d4d60493cbcc67cbdf923ef7f782113b7492240ba869ba9de5de294a",
-      "classification": "discovered_evidence"
-    },
-    {
-      "record_id": "bg-openfinance-v2-errata:p1:c0",
-      "record_type": "chunk",
-      "source_id": "bg-openfinance-v2-errata",
-      "document_id": "bg-openfinance-v2-errata@809757ca2bde",
+      "source_id": "project-openfinance-v2-errata",
+      "document_id": "project-openfinance-v2-errata@0526127db9e6",
       "version": "openfinance-v2",
       "kind": "text",
-      "authority": "informative",
-      "title": "Open Finance v2 Errata and Clarifications (synthetic fixture) — Open Finance Framework v2 - Errata and Clarifications (synthetic fixture)",
-      "locator": "chunk:bg-openfinance-v2-errata:p1:c0",
+      "authority": "project",
+      "title": "Project errata and clarifications on the openFinance v2 corpus — E-02 SCA Approach Type codes in the Data Dictionary differ from header values",
+      "locator": "chunk:project-openfinance-v2-errata:p1:c2",
       "page": 1,
-      "evidence": "Open Finance Framework v2 - Errata and Clarifications (synthetic fixture)\n\nSYNTHETIC TEST FIXTURE. Original test data created for the bg-spec MCP server; not a\nBerlin Group publication and without normative value",
-      "relevance": 10.72700023651123,
-      "sha256": "8ab84f6d66458e7cd13f98ab3e834538f767a10a7478904b79ea879f8fc6fd98",
+      "evidence": "E-02 SCA Approach Type codes in the Data Dictionary differ from header values\n\nData Dictionary 2.3.1, section 3.39 SCA Approach Type (page 213), and the schema\nSCAApproachType of the Data Dictionary OpenAPI 2.3.1 define the codes Decoupled, Embedded,\nOAauth2, Redirect and Online-Channel. The header values of E-01 use ASPSP-CHANNEL instead of\nOnline-Channel, subsume OAuth under REDIRECT and add",
+      "relevance": 55.196998596191406,
+      "sha256": "ef27daf89a42822d0e08ef41e72cad7a6b8006fda2ef2ff1aa4a09cd629f59df",
       "classification": "discovered_evidence"
     },
     {
-      "record_id": "bg-openfinance-v2-implementation-guidelines:p6:c0",
+      "record_id": "bg-openfinance-v2-protocol-functions:p102:c4",
       "record_type": "chunk",
-      "source_id": "bg-openfinance-v2-implementation-guidelines",
-      "document_id": "bg-openfinance-v2-implementation-guidelines@8eec1c4376ce",
+      "source_id": "bg-openfinance-v2-protocol-functions",
+      "document_id": "bg-openfinance-v2-protocol-functions@323d2484a9cb",
       "version": "openfinance-v2",
       "kind": "pdf",
       "authority": "normative",
-      "title": "Open Finance v2 Implementation Guidelines (synthetic fixture) — 5 Error Codes",
-      "locator": "chunk:bg-openfinance-v2-implementation-guidelines:p6:c0",
-      "page": 6,
-      "evidence": "5 Error Codes\n\nFORMAT_ERROR (400): the request does not match the syntax of the interface.\n\nPERIOD_INVALID (400): the requested period is outside the supported range.\n\nCONSENT_INVALID (401): the consent was created but is not valid for the addressed service.\n\nACCESS_EXCEEDED (429): the access frequency limit of the consent is exceeded",
-      "relevance": 8.027999877929688,
-      "sha256": "d4881f769cf543273b50d3b16bcb3fb1b3a1fecb5c4f18a616d45d081a4e4566",
+      "title": "openFinance Implementation Guidelines - Protocol Functions and Security Measures 2.3 (2025-10-31) — 8.10 Signature SCA Approach",
+      "locator": "chunk:bg-openfinance-v2-protocol-functions:p102:c4",
+      "page": 102,
+      "evidence": "8.10 Signature SCA Approach\n\nThe Signature SCA Approach is defined to be the SCA approach, where the PSU is providing\na digital signature on transaction data submitted to the ASPSP. After a Transaction Initiation",
+      "relevance": 37.43000030517578,
+      "sha256": "d7e6e7be9c98641465b75dc3eb1b4d6c16ad0d5b030f51a091c915bee6bbd722",
+      "classification": "discovered_evidence"
+    },
+    {
+      "record_id": "bg-openfinance-v2-protocol-functions:p93:c2",
+      "record_type": "chunk",
+      "source_id": "bg-openfinance-v2-protocol-functions",
+      "document_id": "bg-openfinance-v2-protocol-functions@323d2484a9cb",
+      "version": "openfinance-v2",
+      "kind": "pdf",
+      "authority": "normative",
+      "title": "openFinance Implementation Guidelines - Protocol Functions and Security Measures 2.3 (2025-10-31) — 8.4.1 Request Header Parameters Steering SCA Approaches",
+      "locator": "chunk:bg-openfinance-v2-protocol-functions:p93:c2",
+      "page": 93,
+      "evidence": "8.4.1 Request Header Parameters Steering SCA Approaches\n\nThe following request headers might be used by an API Client in a Transaction Initiation\nRequest to communicate SCA preferences to the ASPSP for transaction authorisation.\n\nAttribute Type Condition\n\nClient-SCA- Max35Text Optional\nApproach-\nPreference\n\nPublished by the Berlin Group under Creative Commons Attribution-NoDerivatives 4.0",
+      "relevance": 36.51599884033203,
+      "sha256": "8d0f334c9a74beec2e325f0e25871d5bd5d02e8456fb5c8483217ec7ac70e35a",
+      "classification": "discovered_evidence"
+    },
+    {
+      "record_id": "bg-openfinance-v2-basic-operational-rules:p29:c1",
+      "record_type": "chunk",
+      "source_id": "bg-openfinance-v2-basic-operational-rules",
+      "document_id": "bg-openfinance-v2-basic-operational-rules@54fe7e764f36",
+      "version": "openfinance-v2",
+      "kind": "pdf",
+      "authority": "normative",
+      "title": "openFinance API Framework - Basic Operational Rules of the Framework 2.0 (2025-10-31) — 4.8.6 SCA using the digital signature SCA approach",
+      "locator": "chunk:bg-openfinance-v2-basic-operational-rules:p29:c1",
+      "page": 29,
+      "evidence": "4.8.6 SCA using the digital signature SCA approach\n\nInstead of having a distinct authorisation phase during or after the transaction initiation where\nthe ASPSP receives the PSU's consent, this SCA approach relies on the usage of certificates\nwhich have been submitted to the ASPSP and activated in a process including the ASPSP and\nthe PSU beforehand. Then these certificates can be used to digitally",
+      "relevance": 35.02399826049805,
+      "sha256": "6f766f1fb0894d88f88908e34a00648b3e6d6ba99aed8dc18749db2b133097c6",
       "classification": "discovered_evidence"
     }
   ],
   "conflicts": [
     {
       "kind": "declared",
-      "description": "OFV2-TRANSACTIONS-002 declares a conflict with OFV2-TRANSACTIONS-003: Operational rules count per account and consent; errata E-07 counts per consent only.",
+      "description": "OFV2-SCA-APPROACH-001 declares a conflict with OFV2-SCA-APPROACH-002: The OpenAPI enum omits SIGNATURE although the PDF and the header description list it (errata E-01).",
       "requirement_ids": [
-        "OFV2-TRANSACTIONS-002",
-        "OFV2-TRANSACTIONS-003"
+        "OFV2-SCA-APPROACH-001",
+        "OFV2-SCA-APPROACH-002"
       ],
       "citations": [
         {
-          "source_id": "bg-openfinance-v2-errata",
-          "locator": "section:E-07"
+          "source_id": "bg-openfinance-v2-consent-api",
+          "locator": "page:32"
         },
         {
-          "source_id": "bg-openfinance-v2-implementation-guidelines",
-          "locator": "page:3"
+          "source_id": "bg-openfinance-v2-openapi-consent",
+          "locator": "op:POST /v2/consents/account-access"
         },
         {
-          "source_id": "bg-openfinance-v2-operational-rules",
-          "locator": "page:2"
+          "source_id": "bg-openfinance-v2-openapi-pis",
+          "locator": "op:POST /v2/payments/{payment-product}"
+        },
+        {
+          "source_id": "bg-openfinance-v2-openapi-signing-basket",
+          "locator": "op:POST /v2/signing-baskets"
+        },
+        {
+          "source_id": "bg-openfinance-v2-protocol-functions",
+          "locator": "page:95"
+        },
+        {
+          "source_id": "bg-openfinance-v2-protocol-functions",
+          "locator": "section:8.4.2"
+        },
+        {
+          "source_id": "project-openfinance-v2-errata",
+          "locator": "section:E-01"
         }
       ],
       "provenance": []
-    },
-    {
-      "kind": "precedence_tie",
-      "description": "OFV2-TRANSACTIONS-003: sources bg-openfinance-v2-errata, bg-openfinance-v2-operational-rules of version openfinance-v2 share precedence 80 but differ in authority (normative vs informative)",
-      "requirement_ids": [
-        "OFV2-TRANSACTIONS-003"
-      ],
-      "citations": [
-        {
-          "source_id": "bg-openfinance-v2-errata",
-          "locator": "section:E-07"
-        },
-        {
-          "source_id": "bg-openfinance-v2-operational-rules",
-          "locator": "page:2"
-        }
-      ],
-      "provenance": []
-    },
-    {
-      "kind": "stale_source",
-      "description": "OFV2-TRANSACTIONS-003 pins bg-openfinance-v2-errata to sha256 000000000000 but the indexed document is 809757ca2bdef7b43e9f039df0c5277a4c347c1a95489097efa54695c7c1e91d",
-      "requirement_ids": [
-        "OFV2-TRANSACTIONS-003"
-      ],
-      "citations": [
-        {
-          "source_id": "bg-openfinance-v2-errata",
-          "locator": "section:E-07"
-        }
-      ],
-      "provenance": [
-        {
-          "source_id": "bg-openfinance-v2-errata",
-          "document_id": "bg-openfinance-v2-errata@809757ca2bde",
-          "version": "openfinance-v2",
-          "kind": "text",
-          "authority": "informative",
-          "precedence": 80,
-          "locator": "document",
-          "sha256": "809757ca2bdef7b43e9f039df0c5277a4c347c1a95489097efa54695c7c1e91d",
-          "document_sha256": "809757ca2bdef7b43e9f039df0c5277a4c347c1a95489097efa54695c7c1e91d"
-        }
-      ]
     }
   ],
   "notice": "The requirement and acceptance criteria come from the curated mapping. 'related_evidence' is discovered evidence only."

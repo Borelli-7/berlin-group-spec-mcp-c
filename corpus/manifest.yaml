@@ -1,55 +1,268 @@
 # Corpus manifest: the ONLY place where authority and precedence are declared.
 # Authority is never inferred from file names. Paths are relative to this directory.
 #
-# All documents referenced below are SYNTHETIC TEST FIXTURES. Replace them with the
-# official Berlin Group files you are licensed to use (see README.md, "Corpus").
+# Official Berlin Group publications (NextGenPSD2 v1.3.x and openFinance API Framework v2.x).
+# Precedence ladder, kept distinct per authority so that no unintended precedence_tie arises:
+#   100 normative implementation guidelines      95 normative data dictionary
+#    90 technical OpenAPI contracts              85 normative domestic definitions
+#    80 normative operational rules              50 informative guides / bulletins
+#    10 project clarifications (text/v2/errata.md)
 schema_version: 1
 sources:
+  # ---------------------------------------------------------------- NextGenPSD2 v1.3.x
   - id: bg-nextgenpsd2-v1.3-openapi
     kind: openapi
     version: nextgenpsd2-v1.3
     authority: technical
     precedence: 90
-    path: openapi/v1/psd2-api-1.3.yaml
-    title: NextGenPSD2 v1.3 OpenAPI (synthetic fixture)
+    path: openapi/v1/psd2-api_v1.3.16-2025-11-27.openapi.yaml
+    title: NextGenPSD2 XS2A Framework OpenAPI 1.3.16 (2025-11-27)
+    description: Core PIS, AIS, PIIS, signing basket and VOP operations under /v1.
+    tags: [pis, ais, piis, signing-basket, vop, core]
+
+  - id: bg-nextgenpsd2-v1.3-openapi-ais-single-cards
+    kind: openapi
+    version: nextgenpsd2-v1.3
+    authority: technical
+    precedence: 90
+    path: openapi/v1/psd2-api-ais-single-cards_v1.x_recent.openapi.yaml
+    title: NextGenPSD2 Extended Services - AIS for Single Cards OpenAPI 1.3.0 (2021-06-30)
+    tags: [ais, cards, extended-service]
+
+  - id: bg-nextgenpsd2-v1.3-openapi-cof-consent
+    kind: openapi
+    version: nextgenpsd2-v1.3
+    authority: technical
+    precedence: 90
+    path: openapi/v1/psd2-api-confirmation-of-funds-consent_v2.x_recent.openapi.yaml
+    title: NextGenPSD2 Extended Services - Confirmation of Funds Consent OpenAPI 2.0 (2019-03-01)
+    description: Extended service for NextGenPSD2 1.3; its paths are published under /v2/consents/confirmation-of-funds.
+    tags: [piis, consent, extended-service]
+
+  - id: bg-nextgenpsd2-v1.3-openapi-lean-push
+    kind: openapi
+    version: nextgenpsd2-v1.3
+    authority: technical
+    precedence: 90
+    path: openapi/v1/psd2-api-lean_push_notifications_v1.x_recent.openapi.yaml
+    title: NextGenPSD2 Extended Services - Lean Push Notifications OpenAPI 1.0.0 (2019-04-16)
+    tags: [push, notification, extended-service]
+
+  - id: bg-nextgenpsd2-v1.3-openapi-trusted-beneficiaries
+    kind: openapi
+    version: nextgenpsd2-v1.3
+    authority: technical
+    precedence: 90
+    path: openapi/v1/psd2-api-trusted_beneficiaries_v1.x_recent.openapi.yaml
+    title: NextGenPSD2 Extended Services - Trusted Beneficiaries OpenAPI 1.0.0 (2020-05-06)
+    tags: [ais, trusted-beneficiaries, extended-service]
 
   - id: bg-nextgenpsd2-v1.3-implementation-guidelines
     kind: pdf
     version: nextgenpsd2-v1.3
     authority: normative
     precedence: 100
-    path: pdf/v1/implementation-guidelines-v1.3.pdf
-    title: NextGenPSD2 v1.3 Implementation Guidelines (synthetic fixture)
+    path: pdf/v1/NextGenPSD2 XS2A Framework Implementation Guidelines.pdf
+    title: NextGenPSD2 XS2A Framework Implementation Guidelines 1.3.16 (2025-11-27)
+    tags: [implementation-guidelines, pis, ais, piis]
 
-  - id: bg-openfinance-v2-openapi
+  - id: bg-nextgenpsd2-v1.3-domestic-pis-ais-definitions
+    kind: pdf
+    version: nextgenpsd2-v1.3
+    authority: normative
+    precedence: 85
+    path: pdf/v1/NextGenPSD2 XS2A Framework Domestic PIS and AIS Definitions.pdf
+    title: NextGenPSD2 XS2A Framework Domestic PIS and AIS Definitions (2025-11-27)
+    tags: [domestic, pis, ais]
+
+  - id: bg-nextgenpsd2-v1.3-operational-rules
+    kind: pdf
+    version: nextgenpsd2-v1.3
+    authority: normative
+    precedence: 80
+    path: pdf/v1/02. NextGenPSD2 Access to Account Interoperability Framework - Operational Rules V1.3_20181221.pdf
+    title: NextGenPSD2 Access to Account Interoperability Framework - Operational Rules 1.3 (2018-12-21)
+    tags: [operational-rules]
+
+  - id: bg-nextgenpsd2-v1.3-general-introduction
+    kind: pdf
+    version: nextgenpsd2-v1.3
+    authority: informative
+    precedence: 50
+    path: pdf/v1/01. NextGenPSD2 Access to Account Interoperability Framework - General Introduction Paper V2_20190325.pdf
+    title: NextGenPSD2 Access to Account Interoperability Framework - General Introduction Paper V2 (2019-03-25)
+    tags: [introduction]
+
+  - id: bg-nextgenpsd2-v1.3-security-bulletin
+    kind: pdf
+    version: nextgenpsd2-v1.3
+    authority: informative
+    precedence: 50
+    path: pdf/v1/06. NextGenPSD2 Access to Account Interoperability Framework - Security Bulletin V1.1_20201030.pdf
+    title: NextGenPSD2 Access to Account Interoperability Framework - Security Bulletin 1.1 (2020-10-30)
+    tags: [security]
+
+  # ---------------------------------------------------------------- openFinance API Framework v2.x
+  - id: bg-openfinance-v2-openapi-ais
     kind: openapi
     version: openfinance-v2
     authority: technical
     precedence: 90
-    path: openapi/v2/openfinance-api-v2.yaml
-    title: Open Finance v2 OpenAPI (synthetic fixture)
+    path: openapi/v2/BG_oFA_AIS_Version_2.3_20260204.openapi.yaml
+    title: openFinance XS2A API - Account Information Service OpenAPI 2.3 (2026-02-04)
+    tags: [ais]
 
-  - id: bg-openfinance-v2-implementation-guidelines
+  - id: bg-openfinance-v2-openapi-pis
+    kind: openapi
+    version: openfinance-v2
+    authority: technical
+    precedence: 90
+    path: openapi/v2/BG_oFA_PIS_Version_2.3_20260204.openapi.yaml
+    title: openFinance XS2A API - Payment Initiation Service OpenAPI 2.3 (2026-02-04)
+    tags: [pis, authorisation]
+
+  - id: bg-openfinance-v2-openapi-piis
+    kind: openapi
+    version: openfinance-v2
+    authority: technical
+    precedence: 90
+    path: openapi/v2/BG_oFA_PIIS_Version_2.3_20260107.openapi.yaml
+    title: openFinance XS2A API - Confirmation of Funds Service OpenAPI 2.3 (2026-01-07)
+    tags: [piis]
+
+  - id: bg-openfinance-v2-openapi-consent
+    kind: openapi
+    version: openfinance-v2
+    authority: technical
+    precedence: 90
+    path: openapi/v2/BG_oFA_Consent_Version_2.1_20260204.openapi.yaml
+    title: openFinance Consent API for V2.x OpenAPI 2.1 (2026-02-04)
+    tags: [consent, authorisation]
+
+  - id: bg-openfinance-v2-openapi-signing-basket
+    kind: openapi
+    version: openfinance-v2
+    authority: technical
+    precedence: 90
+    path: openapi/v2/BG_oFA_BASK_Version_2.3_20260204.openapi.yaml
+    title: openFinance Protocol Functions and Security Measures - Signing Basket OpenAPI 2.3 (2026-02-04)
+    tags: [signing-basket, authorisation]
+
+  - id: bg-openfinance-v2-openapi-push
+    kind: openapi
+    version: openfinance-v2
+    authority: technical
+    precedence: 90
+    path: openapi/v2/BG_oFA_PUSH_Version_2.3_20260204.openapi.yaml
+    title: openFinance Protocol Functions and Security Measures - Resource Status Notification OpenAPI 2.3 (2026-02-04)
+    tags: [push, notification]
+
+  - id: bg-openfinance-v2-openapi-data-dictionary
+    kind: openapi
+    version: openfinance-v2
+    authority: technical
+    precedence: 90
+    path: openapi/v2/BG_oFA_dataDictionary_Version_2.3.1_20260204.openapi.yaml
+    title: openFinance API Framework Data Dictionary OpenAPI 2.3.1 (2026-02-04)
+    description: Component schemas only (no paths).
+    tags: [data-dictionary]
+
+  - id: bg-openfinance-v2-xs2a-implementation-guidelines
     kind: pdf
     version: openfinance-v2
     authority: normative
     precedence: 100
-    path: pdf/v2/implementation-guidelines.pdf
-    title: Open Finance v2 Implementation Guidelines (synthetic fixture)
-    tags: [implementation-guidelines]
+    path: pdf/v2/XS2A API as PSD2 Interface implementation guide line-2.4.pdf
+    title: openFinance XS2A API as PSD2 Interface - Implementation Guidelines 2.4 (2025-10-31)
+    tags: [implementation-guidelines, pis, ais, piis]
 
-  - id: bg-openfinance-v2-operational-rules
+  - id: bg-openfinance-v2-consent-api
+    kind: pdf
+    version: openfinance-v2
+    authority: normative
+    precedence: 100
+    path: pdf/v2/Consent API for V2.x-2.2.pdf
+    title: openFinance Implementation Guidelines - Consent API for V2.x 2.2 (2025-10-31)
+    tags: [implementation-guidelines, consent]
+
+  - id: bg-openfinance-v2-protocol-functions
+    kind: pdf
+    version: openfinance-v2
+    authority: normative
+    precedence: 100
+    path: pdf/v2/Protocole Function and Security mesures - 2.3.pdf
+    title: openFinance Implementation Guidelines - Protocol Functions and Security Measures 2.3 (2025-10-31)
+    tags: [implementation-guidelines, security, authorisation, signing-basket, push]
+
+  - id: bg-openfinance-v2-administrative-services
+    kind: pdf
+    version: openfinance-v2
+    authority: normative
+    precedence: 100
+    path: pdf/v2/openFinance API Framework Implementation Guidelines for Administrative Services-1.1.pdf
+    title: openFinance Implementation Guidelines for Administrative Services 1.1 (2024-09-09)
+    tags: [implementation-guidelines, administrative-services]
+
+  - id: bg-openfinance-v2-data-dictionary
+    kind: pdf
+    version: openfinance-v2
+    authority: normative
+    precedence: 95
+    path: pdf/v2/Data Dictionary-2.3.1.pdf
+    title: openFinance API Framework Data Dictionary 2.3.1 (2025-12-11)
+    tags: [data-dictionary]
+
+  - id: bg-openfinance-v2-domestic-ais-pis-definitions
+    kind: pdf
+    version: openfinance-v2
+    authority: normative
+    precedence: 85
+    path: pdf/v2/openFinance API Framework Domestic AIS-PIS Definitions for Version 2.x2.1.pdf
+    title: openFinance Domestic AIS/PIS Definitions for Version 2.x 2.1 (2025-10-31)
+    tags: [domestic, pis, ais]
+
+  - id: bg-openfinance-v2-xs2a-operational-rules
     kind: pdf
     version: openfinance-v2
     authority: normative
     precedence: 80
-    path: pdf/v2/operational-rules.pdf
-    title: Open Finance v2 Operational Rules (synthetic fixture)
+    path: pdf/v2/XS2A API as PSD2 Interface Operational Rules-2.0.pdf
+    title: openFinance XS2A API as PSD2 Interface - Operational Rules 2.0 (2025-10-31)
+    tags: [operational-rules]
 
-  - id: bg-openfinance-v2-errata
-    kind: text
+  - id: bg-openfinance-v2-consent-operational-rules
+    kind: pdf
+    version: openfinance-v2
+    authority: normative
+    precedence: 80
+    path: pdf/v2/Consent API for V2.x operational rules-2.0.pdf
+    title: openFinance Operational Rules - Consent API for V2.x 2.0 (2025-10-31)
+    tags: [operational-rules, consent]
+
+  - id: bg-openfinance-v2-basic-operational-rules
+    kind: pdf
+    version: openfinance-v2
+    authority: normative
+    precedence: 80
+    path: pdf/v2/Basic Operational Rules of the Framework-2.0.pdf
+    title: openFinance API Framework - Basic Operational Rules of the Framework 2.0 (2025-10-31)
+    tags: [operational-rules]
+
+  - id: bg-openfinance-v2-guide
+    kind: pdf
     version: openfinance-v2
     authority: informative
-    precedence: 80
+    precedence: 50
+    path: pdf/v2/A Guide to Version 2.3.pdf
+    title: openFinance API Framework - A Guide to Version 2.3 (2026-01-16)
+    tags: [introduction]
+
+  - id: project-openfinance-v2-errata
+    kind: text
+    version: openfinance-v2
+    authority: project
+    precedence: 10
     path: text/v2/errata.md
-    title: Open Finance v2 Errata and Clarifications (synthetic fixture)
+    title: Project errata and clarifications on the openFinance v2 corpus
+    description: Curated cross-document discrepancies found in the official files. Not a Berlin Group publication.
+    tags: [errata, project]

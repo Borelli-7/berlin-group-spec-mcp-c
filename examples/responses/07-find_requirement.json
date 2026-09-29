@@ -3,131 +3,211 @@
   "notice": "'requirements' contains curated requirement mappings only (authoritative_requirement). Search results are discovered evidence retrieved by full-text relevance. They are NOT authoritative requirements. Only curated requirement mappings (classification 'authoritative_requirement') are requirements; verify evidence with read_source before relying on it. No requirement id is ever generated from search hits.",
   "requirements": [
     {
-      "requirement_id": "OFV2-TRANSACTIONS-002",
+      "requirement_id": "OFV2-AIS-FREQUENCY-001",
       "classification": "authoritative_requirement",
       "version": "openfinance-v2",
-      "title": "Transaction list access frequency limited per account and consent",
+      "title": "Access frequency without PSU involvement and ASPSP-declared counting method",
       "match_reason": "text",
       "sources": [
         {
-          "source_id": "bg-openfinance-v2-operational-rules",
-          "locator": "page:2"
+          "source_id": "bg-openfinance-v2-consent-api",
+          "locator": "page:25-26"
         },
         {
-          "source_id": "bg-openfinance-v2-implementation-guidelines",
-          "locator": "page:3"
+          "source_id": "bg-openfinance-v2-data-dictionary",
+          "locator": "page:100"
+        },
+        {
+          "source_id": "bg-openfinance-v2-data-dictionary",
+          "locator": "page:203"
+        },
+        {
+          "source_id": "project-openfinance-v2-errata",
+          "locator": "section:E-07"
         }
       ],
       "related_endpoints": [
-        "GET /accounts/{accountId}/transactions"
+        "GET /v2/accounts/{account-id}/transactions",
+        "GET /v2/accounts/{account-id}/balances"
       ],
       "acceptance_criteria": [
         {
-          "id": "OFV2-TRANSACTIONS-002/AC1",
-          "requirement_id": "OFV2-TRANSACTIONS-002",
-          "text": "The fifth transaction list read of an account within one calendar day without PSU involvement is rejected with HTTP 429 ACCESS_EXCEEDED.",
+          "id": "OFV2-AIS-FREQUENCY-001/AC1",
+          "requirement_id": "OFV2-AIS-FREQUENCY-001",
+          "text": "The ASPSP declares countingOfAisRequests as \"none\", \"timeslot\" or \"byEndpointCall\".",
           "mapping": {
             "file": "requirements/requirements.yaml",
-            "file_sha256": "91f9b55e4d5f1b425fe608d1e6442edfdf06e9f2749b02ebe53d781b477da13c",
-            "locator": "requirement:OFV2-TRANSACTIONS-002",
-            "sha256": "dd1e84c7f0434421084654429d110383315eb66295bafd572a2d54e8d97d4b32"
+            "file_sha256": "9ea404b1b672915d530528ae7207e864ebf5aa196bb7d05f59fe9f1ddebe0b43",
+            "locator": "requirement:OFV2-AIS-FREQUENCY-001",
+            "sha256": "8d0eee6ecb6939782e1391bf11b09be66d9c2168b5cb96924f51d6dd1ad4e306"
+          }
+        },
+        {
+          "id": "OFV2-AIS-FREQUENCY-001/AC2",
+          "requirement_id": "OFV2-AIS-FREQUENCY-001",
+          "text": "Accesses without PSU involvement beyond the consented frequencyPerDay are rejected with HTTP 429 ACCESS_EXCEEDED.",
+          "mapping": {
+            "file": "requirements/requirements.yaml",
+            "file_sha256": "9ea404b1b672915d530528ae7207e864ebf5aa196bb7d05f59fe9f1ddebe0b43",
+            "locator": "requirement:OFV2-AIS-FREQUENCY-001",
+            "sha256": "8d0eee6ecb6939782e1391bf11b09be66d9c2168b5cb96924f51d6dd1ad4e306"
           }
         }
       ],
       "mapping": {
         "file": "requirements/requirements.yaml",
-        "file_sha256": "91f9b55e4d5f1b425fe608d1e6442edfdf06e9f2749b02ebe53d781b477da13c",
-        "locator": "requirement:OFV2-TRANSACTIONS-002",
-        "sha256": "dd1e84c7f0434421084654429d110383315eb66295bafd572a2d54e8d97d4b32"
+        "file_sha256": "9ea404b1b672915d530528ae7207e864ebf5aa196bb7d05f59fe9f1ddebe0b43",
+        "locator": "requirement:OFV2-AIS-FREQUENCY-001",
+        "sha256": "8d0eee6ecb6939782e1391bf11b09be66d9c2168b5cb96924f51d6dd1ad4e306"
       }
     },
     {
-      "requirement_id": "OFV2-TRANSACTIONS-003",
+      "requirement_id": "OFV2-CONSENT-AIS-001",
       "classification": "authoritative_requirement",
       "version": "openfinance-v2",
-      "title": "Transaction list access frequency counted per consent (errata E-07)",
+      "title": "Establish an account information consent",
       "match_reason": "text",
       "sources": [
         {
-          "source_id": "bg-openfinance-v2-errata",
-          "locator": "section:E-07"
+          "source_id": "bg-openfinance-v2-consent-api",
+          "locator": "section:3.4.1"
         },
         {
-          "source_id": "bg-openfinance-v2-operational-rules",
-          "locator": "page:2"
+          "source_id": "bg-openfinance-v2-consent-api",
+          "locator": "page:23-28"
+        },
+        {
+          "source_id": "bg-openfinance-v2-openapi-consent",
+          "locator": "op:POST /v2/consents/account-access"
         }
       ],
       "related_endpoints": [
-        "GET /accounts/{accountId}/transactions"
+        "POST /v2/consents/account-access",
+        "POST /v2/consents/account-access"
       ],
       "acceptance_criteria": [
         {
-          "id": "OFV2-TRANSACTIONS-003/AC1",
-          "requirement_id": "OFV2-TRANSACTIONS-003",
-          "text": "The access counter for transaction list reads is maintained per consent.",
+          "id": "OFV2-CONSENT-AIS-001/AC1",
+          "requirement_id": "OFV2-CONSENT-AIS-001",
+          "text": "access, consentType, recurringIndicator, validTo and frequencyPerDay are mandatory in the request body.",
           "mapping": {
             "file": "requirements/requirements.yaml",
-            "file_sha256": "91f9b55e4d5f1b425fe608d1e6442edfdf06e9f2749b02ebe53d781b477da13c",
-            "locator": "requirement:OFV2-TRANSACTIONS-003",
-            "sha256": "0fb15b83a96250f902cce39a345ffabb7cca9f268ef41ce52f2158968db26118"
+            "file_sha256": "9ea404b1b672915d530528ae7207e864ebf5aa196bb7d05f59fe9f1ddebe0b43",
+            "locator": "requirement:OFV2-CONSENT-AIS-001",
+            "sha256": "b8336d107c307e4cb51be32363eacde5530e52a6501e8c06f9645bc607a6fb73"
+          }
+        },
+        {
+          "id": "OFV2-CONSENT-AIS-001/AC2",
+          "requirement_id": "OFV2-CONSENT-AIS-001",
+          "text": "frequencyPerDay is at least 1 and, unless agreed bilaterally, at most 4; a one-off access uses 1.",
+          "mapping": {
+            "file": "requirements/requirements.yaml",
+            "file_sha256": "9ea404b1b672915d530528ae7207e864ebf5aa196bb7d05f59fe9f1ddebe0b43",
+            "locator": "requirement:OFV2-CONSENT-AIS-001",
+            "sha256": "b8336d107c307e4cb51be32363eacde5530e52a6501e8c06f9645bc607a6fb73"
+          }
+        },
+        {
+          "id": "OFV2-CONSENT-AIS-001/AC3",
+          "requirement_id": "OFV2-CONSENT-AIS-001",
+          "text": "validTo \"9999-12-31\" requests the maximum validity; the ASPSP may adjust the date.",
+          "mapping": {
+            "file": "requirements/requirements.yaml",
+            "file_sha256": "9ea404b1b672915d530528ae7207e864ebf5aa196bb7d05f59fe9f1ddebe0b43",
+            "locator": "requirement:OFV2-CONSENT-AIS-001",
+            "sha256": "b8336d107c307e4cb51be32363eacde5530e52a6501e8c06f9645bc607a6fb73"
+          }
+        },
+        {
+          "id": "OFV2-CONSENT-AIS-001/AC4",
+          "requirement_id": "OFV2-CONSENT-AIS-001",
+          "text": "consentType \"detailed\" is supported by every ASPSP.",
+          "mapping": {
+            "file": "requirements/requirements.yaml",
+            "file_sha256": "9ea404b1b672915d530528ae7207e864ebf5aa196bb7d05f59fe9f1ddebe0b43",
+            "locator": "requirement:OFV2-CONSENT-AIS-001",
+            "sha256": "b8336d107c307e4cb51be32363eacde5530e52a6501e8c06f9645bc607a6fb73"
+          }
+        },
+        {
+          "id": "OFV2-CONSENT-AIS-001/AC5",
+          "requirement_id": "OFV2-CONSENT-AIS-001",
+          "text": "A successful response has HTTP 201 and contains consentStatus and consentId.",
+          "mapping": {
+            "file": "requirements/requirements.yaml",
+            "file_sha256": "9ea404b1b672915d530528ae7207e864ebf5aa196bb7d05f59fe9f1ddebe0b43",
+            "locator": "requirement:OFV2-CONSENT-AIS-001",
+            "sha256": "b8336d107c307e4cb51be32363eacde5530e52a6501e8c06f9645bc607a6fb73"
+          }
+        },
+        {
+          "id": "OFV2-CONSENT-AIS-001/AC6",
+          "requirement_id": "OFV2-CONSENT-AIS-001",
+          "text": "An authorised recurring consent lets a former recurring consent of the same PSU and API Client expire, unless the Multiple Consents Service is offered.",
+          "mapping": {
+            "file": "requirements/requirements.yaml",
+            "file_sha256": "9ea404b1b672915d530528ae7207e864ebf5aa196bb7d05f59fe9f1ddebe0b43",
+            "locator": "requirement:OFV2-CONSENT-AIS-001",
+            "sha256": "b8336d107c307e4cb51be32363eacde5530e52a6501e8c06f9645bc607a6fb73"
           }
         }
       ],
       "mapping": {
         "file": "requirements/requirements.yaml",
-        "file_sha256": "91f9b55e4d5f1b425fe608d1e6442edfdf06e9f2749b02ebe53d781b477da13c",
-        "locator": "requirement:OFV2-TRANSACTIONS-003",
-        "sha256": "0fb15b83a96250f902cce39a345ffabb7cca9f268ef41ce52f2158968db26118"
+        "file_sha256": "9ea404b1b672915d530528ae7207e864ebf5aa196bb7d05f59fe9f1ddebe0b43",
+        "locator": "requirement:OFV2-CONSENT-AIS-001",
+        "sha256": "b8336d107c307e4cb51be32363eacde5530e52a6501e8c06f9645bc607a6fb73"
       }
     }
   ],
   "discovered_evidence": [
     {
-      "record_id": "bg-openfinance-v2-errata:p1:c1",
+      "record_id": "bg-openfinance-v2-data-dictionary:p244:c2",
       "record_type": "chunk",
-      "source_id": "bg-openfinance-v2-errata",
-      "document_id": "bg-openfinance-v2-errata@809757ca2bde",
-      "version": "openfinance-v2",
-      "kind": "text",
-      "authority": "informative",
-      "title": "Open Finance v2 Errata and Clarifications (synthetic fixture) — E-07 Transaction list access frequency",
-      "locator": "chunk:bg-openfinance-v2-errata:p1:c1",
-      "page": 1,
-      "evidence": "E-07 Transaction list access frequency\n\nClarification: the limit of four transaction list reads per calendar day without PSU\ninvolvement is counted per consent only, not per account",
-      "relevance": 13.057999610900879,
-      "sha256": "dfa8ea7a43492195dc217d436f78b8ee9b2410bb56c56ec34d556d1ecc2d1959",
-      "classification": "discovered_evidence"
-    },
-    {
-      "record_id": "bg-openfinance-v2-operational-rules:p2:c0",
-      "record_type": "chunk",
-      "source_id": "bg-openfinance-v2-operational-rules",
-      "document_id": "bg-openfinance-v2-operational-rules@80430186dc34",
+      "source_id": "bg-openfinance-v2-data-dictionary",
+      "document_id": "bg-openfinance-v2-data-dictionary@28600a346af9",
       "version": "openfinance-v2",
       "kind": "pdf",
       "authority": "normative",
-      "title": "Open Finance v2 Operational Rules (synthetic fixture) — 3 Transaction History Access",
-      "locator": "chunk:bg-openfinance-v2-operational-rules:p2:c0",
-      "page": 2,
-      "evidence": "3 Transaction History Access\n\nThe ASPSP SHALL make at least 90 days of transaction history available through the\ntransaction list endpoint.\n\nWithout active PSU involvement the TPP MUST NOT read the transaction list of an account more\nthan four times per calendar day. The limit is counted per account and per consent",
-      "relevance": 6.136000156402588,
-      "sha256": "07fcee82a83b379bc569924f5a6cc45ee1bfe4abb2036222fb4c6fcd24093ec8",
+      "title": "openFinance API Framework Data Dictionary 2.3.1 (2025-12-11) — 3.19 Renamed Frequency Code to",
+      "locator": "chunk:bg-openfinance-v2-data-dictionary:p244:c2",
+      "page": 244,
+      "evidence": "3.19 Renamed Frequency Code to\n\nEvent Frequency Code\nISO20022 compliance.\nTo differentiate between standing\norders Frequency Code and Mandate\nFrequency Code, which are slightly\ndifferent in ISO20022",
+      "relevance": 20.5939998626709,
+      "sha256": "acd66821f9136f34981af84d810ec59964fb2ad2a2fc1677d9ef51d384abd140",
       "classification": "discovered_evidence"
     },
     {
-      "record_id": "bg-openfinance-v2-implementation-guidelines:p6:c0",
+      "record_id": "bg-openfinance-v2-data-dictionary:p10:c7",
       "record_type": "chunk",
-      "source_id": "bg-openfinance-v2-implementation-guidelines",
-      "document_id": "bg-openfinance-v2-implementation-guidelines@8eec1c4376ce",
+      "source_id": "bg-openfinance-v2-data-dictionary",
+      "document_id": "bg-openfinance-v2-data-dictionary@28600a346af9",
       "version": "openfinance-v2",
       "kind": "pdf",
       "authority": "normative",
-      "title": "Open Finance v2 Implementation Guidelines (synthetic fixture) — 5 Error Codes",
-      "locator": "chunk:bg-openfinance-v2-implementation-guidelines:p6:c0",
-      "page": 6,
-      "evidence": "5 Error Codes\n\nFORMAT_ERROR (400): the request does not match the syntax of the interface.\n\nPERIOD_INVALID (400): the requested period is outside the supported range.\n\nCONSENT_INVALID (401): the consent was created but is not valid for the addressed service.\n\nACCESS_EXCEEDED (429): the access frequency limit of the consent is exceeded",
-      "relevance": 4.5229997634887695,
-      "sha256": "d4881f769cf543273b50d3b16bcb3fb1b3a1fecb5c4f18a616d45d081a4e4566",
+      "title": "openFinance API Framework Data Dictionary 2.3.1 (2025-12-11) — 3.19 Event Frequency Code ................................................................ 184",
+      "locator": "chunk:bg-openfinance-v2-data-dictionary:p10:c7",
+      "page": 10,
+      "evidence": "3.19 Event Frequency Code ................................................................ 184",
+      "relevance": 19.291000366210938,
+      "sha256": "aa05bb76611529359a319f4170c3cc53386b6df4dfb143c98269639aff7e9b04",
+      "classification": "discovered_evidence"
+    },
+    {
+      "record_id": "bg-openfinance-v2-data-dictionary:p196:c1",
+      "record_type": "chunk",
+      "source_id": "bg-openfinance-v2-data-dictionary",
+      "document_id": "bg-openfinance-v2-data-dictionary@28600a346af9",
+      "version": "openfinance-v2",
+      "kind": "pdf",
+      "authority": "normative",
+      "title": "openFinance API Framework Data Dictionary 2.3.1 (2025-12-11) — 3.19 Event Frequency Code",
+      "locator": "chunk:bg-openfinance-v2-data-dictionary:p196:c1",
+      "page": 196,
+      "evidence": "3.19 Event Frequency Code\n\nThe following codes from the \"EventFrequency7Code\" of ISO 20022 are supported:\n\n• Daily\n• Weekly\n• EveryTwoWeeks\n• Monthly\n• EveryTwoMonths\n• Quarterly\n• SemiAnnual\n• Annual\n• MonthlyVariable\n\nThis code is used in [oFA-IG-Com], [oFA-IG-XPIS",
+      "relevance": 18.454999923706055,
+      "sha256": "81e85b8487392870fa63e96900f21ed49f9b9fd53730803310d296a8c61f5c9b",
       "classification": "discovered_evidence"
     }
   ]

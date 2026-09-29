@@ -4,118 +4,335 @@
 # Only requirements listed here are returned as `authoritative_requirement`.
 # Everything found by search is `discovered_evidence`.
 #
-# NOTE: the example corpus deliberately contains curation problems so that the conflict
-# detection can be demonstrated (see REQUIREMENT_TRACEABILITY.md):
-#   * OFV2-TRANSACTIONS-002 <-> OFV2-TRANSACTIONS-003: declared conflict
-#   * OFV2-TRANSACTIONS-003: precedence tie (operational rules vs errata) + stale sha256 pin
-#   * OFV2-BALANCES-001: dangling references (page out of range, unknown schema)
+# Page locators are physical PDF pages (as indexed), not the printed footer page numbers.
+# Known contradictions between official files are recorded with `conflicts_with` and
+# explained in text/v2/errata.md (source project-openfinance-v2-errata).
 schema_version: 1
 requirements:
-  - id: OFV2-TRANSACTIONS-001
+  # ======================================================== openFinance v2
+  - id: OFV2-AIS-TRANSACTIONS-001
     version: openfinance-v2
-    title: Read transaction list with mandatory bookingStatus and dateFrom
+    title: Read transaction list with mandatory bookingStatus and conditional dateFrom
     description: >-
-      The ASPSP exposes GET /accounts/{accountId}/transactions. bookingStatus and dateFrom
-      are mandatory query parameters; responses are paginated.
+      GET /v2/accounts/{account-id}/transactions reads booked or pending transactions or standing
+      orders of an account. bookingStatus is mandatory; dateFrom is mandated unless a delta access
+      is used or bookingStatus equals "information".
     sources:
-      - source_id: bg-openfinance-v2-implementation-guidelines
-        locator: section:4.2
+      - source_id: bg-openfinance-v2-xs2a-implementation-guidelines
+        locator: section:4.4.4
         note: Read Transaction List
-      - source_id: bg-openfinance-v2-implementation-guidelines
-        locator: page:3
-      - source_id: bg-openfinance-v2-openapi
-        locator: op:GET /accounts/{accountId}/transactions
+      - source_id: bg-openfinance-v2-xs2a-implementation-guidelines
+        locator: page:95-101
+      - source_id: bg-openfinance-v2-xs2a-operational-rules
+        locator: section:4.10
+        note: API Service Get transaction information for a given account
+      - source_id: bg-openfinance-v2-data-dictionary
+        locator: page:200
+        note: FORMAT_ERROR
+      - source_id: bg-openfinance-v2-openapi-ais
+        locator: op:GET /v2/accounts/{account-id}/transactions
     endpoints:
-      - GET /accounts/{accountId}/transactions
+      - GET /v2/accounts/{account-id}/transactions
     schemas:
-      - TransactionsResponse200Json
-      - BookingStatus
+      - accountReport
+      - transactions
     acceptance_criteria:
-      - "A request without bookingStatus is rejected with HTTP 400."
-      - "The values booked, pending and both of bookingStatus are supported."
-      - "A request without dateFrom (and without deltaList) is rejected with HTTP 400 FORMAT_ERROR."
-      - "When more entries exist than fit into one page, the response contains _links.next."
-      - "The optional pageSize query parameter limits the number of returned entries."
+      - "A request without the bookingStatus query parameter is rejected with HTTP 400 FORMAT_ERROR."
+      - "bookingStatus \"booked\" is supported; \"pending\" is supported if the ASPSP online channels show pending transactions."
+      - "bookingStatus \"both\", \"information\" and \"all\" are optional; an unsupported value is answered with an error code."
+      - "dateFrom is mandatory unless deltaList or entryReferenceFrom is used or bookingStatus equals \"information\"."
+      - "If dateTo is absent, \"today\" is used as end date."
+      - "For bookingStatus \"information\", dateFrom, dateTo, withBalance, deltaList and entryReferenceFrom have no effect."
+      - "A successful response has HTTP 200 and contains the mandatory account reference."
     tags: [ais, transactions]
 
-  - id: OFV2-TRANSACTIONS-002
+  - id: OFV2-AIS-TRANSACTIONS-002
     version: openfinance-v2
-    title: Transaction list access frequency limited per account and consent
+    title: Optional pageSize query parameter for the transaction list
+    description: >-
+      The Implementation Guidelines define pageSize ("optional if supported by API provider") and
+      the Data Dictionary defines maxPageSize, but the AIS OpenAPI does not declare pageSize
+      (errata E-03).
     sources:
-      - source_id: bg-openfinance-v2-operational-rules
-        locator: page:2
-      - source_id: bg-openfinance-v2-implementation-guidelines
-        locator: page:3
+      - source_id: bg-openfinance-v2-xs2a-implementation-guidelines
+        locator: page:96
+        note: pageSize row of the query parameter table in section 4.4.4
+      - source_id: bg-openfinance-v2-data-dictionary
+        locator: page:99
+        note: supportedQueryParametersTransactions and maxPageSize
+      - source_id: bg-openfinance-v2-data-dictionary
+        locator: page:200
+        note: PARAMETER_NOT_SUPPORTED
+      - source_id: project-openfinance-v2-errata
+        locator: section:E-03
     endpoints:
-      - GET /accounts/{accountId}/transactions
+      - GET /v2/accounts/{account-id}/transactions
     acceptance_criteria:
-      - "The fifth transaction list read of an account within one calendar day without PSU involvement is rejected with HTTP 429 ACCESS_EXCEEDED."
-    conflicts_with:
-      - requirement_id: OFV2-TRANSACTIONS-003
-        note: Operational rules count per account and consent; errata E-07 counts per consent only.
-    tags: [ais, transactions, frequency]
+      - "If pageSize is not supported, a request containing it is rejected with HTTP 400 PARAMETER_NOT_SUPPORTED."
+      - "If pageSize is supported and exceeds maxPageSize, the request is rejected."
+      - "If pageSize is supported, maxPageSize is published and \"pageSize\" is listed in supportedQueryParametersTransactions."
+    tags: [ais, transactions, pagination, errata]
 
-  - id: OFV2-TRANSACTIONS-003
+  - id: OFV2-AIS-TRANSACTION-DETAILS-001
     version: openfinance-v2
-    title: Transaction list access frequency counted per consent (errata E-07)
+    title: Read transaction details of a JSON-reported transaction
     sources:
-      - source_id: bg-openfinance-v2-errata
-        locator: section:E-07
-        sha256: "000000000000"
-        note: Pinned to the errata revision reviewed at curation time.
-      - source_id: bg-openfinance-v2-operational-rules
-        locator: page:2
+      - source_id: bg-openfinance-v2-xs2a-implementation-guidelines
+        locator: section:4.4.5
+        note: Read Transaction Details
+      - source_id: bg-openfinance-v2-xs2a-implementation-guidelines
+        locator: page:104-106
+      - source_id: bg-openfinance-v2-data-dictionary
+        locator: page:201
+        note: RESOURCE_UNKNOWN
+      - source_id: bg-openfinance-v2-openapi-ais
+        locator: op:GET /v2/accounts/{account-id}/transactions/{transactionId}
     endpoints:
-      - GET /accounts/{accountId}/transactions
+      - GET /v2/accounts/{account-id}/transactions/{transactionId}
     acceptance_criteria:
-      - "The access counter for transaction list reads is maintained per consent."
-    tags: [ais, transactions, frequency, errata]
-
-  - id: OFV2-TRANSACTION-DETAILS-001
-    version: openfinance-v2
-    title: Read transaction details
-    sources:
-      - source_id: bg-openfinance-v2-implementation-guidelines
-        locator: section:4.3
-      - source_id: bg-openfinance-v2-openapi
-        locator: op:GET /accounts/{accountId}/transactions/{transactionId}
-    endpoints:
-      - GET /accounts/{accountId}/transactions/{transactionId}
-    schemas:
-      - Transactions
-    acceptance_criteria:
-      - "An unknown transactionId is answered with HTTP 404."
+      - "The call is only available for transactions reported in JSON format."
+      - "transactionId is the transactionId attribute of an entry of the transaction list."
+      - "An unknown transactionId is answered with HTTP 404 RESOURCE_UNKNOWN."
     tags: [ais, transactions]
 
-  - id: OFV2-BALANCES-001
+  - id: OFV2-AIS-BALANCES-001
     version: openfinance-v2
-    title: Read balances returns closingBooked or interimAvailable
+    title: Read balances of an account
     sources:
-      - source_id: bg-openfinance-v2-implementation-guidelines
-        locator: page:42
-      - source_id: bg-openfinance-v2-openapi
-        locator: schema:BalanceList
+      - source_id: bg-openfinance-v2-xs2a-implementation-guidelines
+        locator: section:4.4.3
+        note: Read Balance
+      - source_id: bg-openfinance-v2-xs2a-implementation-guidelines
+        locator: page:92-93
+      - source_id: bg-openfinance-v2-xs2a-operational-rules
+        locator: section:4.9
+        note: API Service Get balances for a given account (mandatory)
+      - source_id: bg-openfinance-v2-openapi-ais
+        locator: op:GET /v2/accounts/{account-id}/balances
     endpoints:
-      - GET /accounts/{accountId}/balances
+      - GET /v2/accounts/{account-id}/balances
     schemas:
-      - BalanceList
+      - balance
     acceptance_criteria:
-      - "At least one balance of type closingBooked or interimAvailable is returned."
+      - "The service is supported by every ASPSP (mandatory API service)."
+      - "A successful response has HTTP 200 and contains the mandatory account reference and balances list."
+      - "For a multicurrency account the balances of all sub-accounts are returned."
+      - "The request carries a mandatory Consent-ID header."
     tags: [ais, balances]
 
-  - id: NGPSD2-TRANSACTIONS-001
+  - id: OFV2-CONSENT-AIS-001
+    version: openfinance-v2
+    title: Establish an account information consent
+    sources:
+      - source_id: bg-openfinance-v2-consent-api
+        locator: section:3.4.1
+        note: Consent Request for Account Information
+      - source_id: bg-openfinance-v2-consent-api
+        locator: page:23-28
+      - source_id: bg-openfinance-v2-openapi-consent
+        locator: op:POST /v2/consents/account-access
+    endpoints:
+      - POST /v2/consents/account-access
+    schemas:
+      - accountAccess
+      - ConsentStatus
+    acceptance_criteria:
+      - "access, consentType, recurringIndicator, validTo and frequencyPerDay are mandatory in the request body."
+      - "frequencyPerDay is at least 1 and, unless agreed bilaterally, at most 4; a one-off access uses 1."
+      - "validTo \"9999-12-31\" requests the maximum validity; the ASPSP may adjust the date."
+      - "consentType \"detailed\" is supported by every ASPSP."
+      - "A successful response has HTTP 201 and contains consentStatus and consentId."
+      - "An authorised recurring consent lets a former recurring consent of the same PSU and API Client expire, unless the Multiple Consents Service is offered."
+    tags: [consent, ais]
+
+  - id: OFV2-CONSENT-STATUS-001
+    version: openfinance-v2
+    title: Get the status of a consent of any consent category
+    sources:
+      - source_id: bg-openfinance-v2-consent-api
+        locator: section:3.8
+        note: Get Consent Status Request
+      - source_id: bg-openfinance-v2-consent-api
+        locator: page:69-70
+      - source_id: bg-openfinance-v2-openapi-consent
+        locator: op:GET /v2/consents/{consent-category}/{consentId}/status
+    endpoints:
+      - GET /v2/consents/{consent-category}/{consentId}/status
+    schemas:
+      - ConsentStatus
+    acceptance_criteria:
+      - "consent-category supports account-access, funds-confirmations, user-parameters-access and document-services."
+      - "A successful response has HTTP 200 and contains the mandatory consentStatus."
+    tags: [consent]
+
+  - id: OFV2-AIS-FREQUENCY-001
+    version: openfinance-v2
+    title: Access frequency without PSU involvement and ASPSP-declared counting method
+    sources:
+      - source_id: bg-openfinance-v2-consent-api
+        locator: page:25-26
+        note: frequencyPerDay
+      - source_id: bg-openfinance-v2-data-dictionary
+        locator: page:100
+        note: countingOfAisRequests
+      - source_id: bg-openfinance-v2-data-dictionary
+        locator: page:203
+        note: ACCESS_EXCEEDED
+      - source_id: project-openfinance-v2-errata
+        locator: section:E-07
+    endpoints:
+      - GET /v2/accounts/{account-id}/transactions
+      - GET /v2/accounts/{account-id}/balances
+    acceptance_criteria:
+      - "The ASPSP declares countingOfAisRequests as \"none\", \"timeslot\" or \"byEndpointCall\"."
+      - "Accesses without PSU involvement beyond the consented frequencyPerDay are rejected with HTTP 429 ACCESS_EXCEEDED."
+    tags: [ais, frequency, errata]
+
+  - id: OFV2-PIS-INITIATION-001
+    version: openfinance-v2
+    title: Initiate a single payment with JSON payment instruction
+    sources:
+      - source_id: bg-openfinance-v2-xs2a-implementation-guidelines
+        locator: section:3.4.1
+        note: Payment Initiation with JSON encoding of the Payment Instruction
+      - source_id: bg-openfinance-v2-xs2a-implementation-guidelines
+        locator: page:39-42
+      - source_id: bg-openfinance-v2-openapi-pis
+        locator: op:POST /v2/payments/{payment-product}
+    endpoints:
+      - POST /v2/payments/{payment-product}
+    schemas:
+      - TransactionStatus
+    acceptance_criteria:
+      - "A successful response has HTTP 201."
+      - "The response contains the mandatory transactionStatus and paymentId (Max70Text)."
+    tags: [pis]
+
+  - id: OFV2-PIIS-FUNDS-001
+    version: openfinance-v2
+    title: Confirmation of funds request
+    sources:
+      - source_id: bg-openfinance-v2-xs2a-implementation-guidelines
+        locator: section:5.2
+        note: Confirmation of Funds Request
+      - source_id: bg-openfinance-v2-xs2a-implementation-guidelines
+        locator: page:120-122
+      - source_id: bg-openfinance-v2-openapi-piis
+        locator: op:POST /v2/funds-confirmations
+    endpoints:
+      - POST /v2/funds-confirmations
+    acceptance_criteria:
+      - "account and instructedAmount are mandatory in the request body; cardNumber and payee are optional."
+      - "Consent-ID is provided if the PSU consent was given through the funds-confirmations consent process."
+      - "A successful response has HTTP 200 and contains the mandatory boolean fundsAvailable."
+    tags: [piis]
+
+  - id: OFV2-SCA-APPROACH-001
+    version: openfinance-v2
+    title: ASPSP-SCA-Approach header values including SIGNATURE
+    sources:
+      - source_id: bg-openfinance-v2-protocol-functions
+        locator: section:8.4.2
+        note: Related Response Headers
+      - source_id: bg-openfinance-v2-protocol-functions
+        locator: page:95
+      - source_id: bg-openfinance-v2-consent-api
+        locator: page:32
+        note: Example response with ASPSP-SCA-Approach SIGNATURE
+      - source_id: project-openfinance-v2-errata
+        locator: section:E-01
+    endpoints:
+      - POST /v2/payments/{payment-product}
+      - POST /v2/consents/account-access
+    acceptance_criteria:
+      - "ASPSP-SCA-Approach is contained if the SCA approach is already fixed."
+      - "Permitted values are EMBEDDED, DECOUPLED, REDIRECT, ASPSP-CHANNEL and SIGNATURE."
+      - "The OAuth SCA approach is reported as REDIRECT."
+    conflicts_with:
+      - requirement_id: OFV2-SCA-APPROACH-002
+        note: The OpenAPI enum omits SIGNATURE although the PDF and the header description list it (errata E-01).
+    tags: [sca, authorisation, errata]
+
+  - id: OFV2-SCA-APPROACH-002
+    version: openfinance-v2
+    title: ASPSP-SCA-Approach header enum as published in the OpenAPI contracts
+    sources:
+      - source_id: bg-openfinance-v2-openapi-pis
+        locator: op:POST /v2/payments/{payment-product}
+      - source_id: bg-openfinance-v2-openapi-consent
+        locator: op:POST /v2/consents/account-access
+      - source_id: bg-openfinance-v2-openapi-signing-basket
+        locator: op:POST /v2/signing-baskets
+    endpoints:
+      - POST /v2/payments/{payment-product}
+      - POST /v2/consents/account-access
+      - POST /v2/signing-baskets
+    acceptance_criteria:
+      - "The ASPSP-SCA-Approach enum contains EMBEDDED, DECOUPLED, REDIRECT and ASPSP-CHANNEL."
+    tags: [sca, authorisation, contract]
+
+  # ======================================================== NextGenPSD2 v1.3 baseline
+  - id: NGPSD2-AIS-TRANSACTIONS-001
     version: nextgenpsd2-v1.3
-    title: Read transaction list (NextGenPSD2 v1.3 baseline)
+    title: Read transaction list (NextGenPSD2 1.3.16 baseline)
     sources:
       - source_id: bg-nextgenpsd2-v1.3-implementation-guidelines
-        locator: section:6.3
+        locator: section:6.5.4
+        note: Read Transaction List
+      - source_id: bg-nextgenpsd2-v1.3-implementation-guidelines
+        locator: page:185-190
       - source_id: bg-nextgenpsd2-v1.3-openapi
         locator: op:GET /v1/accounts/{account-id}/transactions
     endpoints:
       - GET /v1/accounts/{account-id}/transactions
     schemas:
-      - TransactionsResponse200Json
+      - transactionsResponse-200_json
     acceptance_criteria:
-      - "bookingStatus is mandatory and supports booked, pending and both."
-      - "dateFrom is mandatory unless deltaList is used."
+      - "bookingStatus is mandatory; permitted codes are booked, pending, both, information and all."
+      - "dateFrom is mandatory unless a delta access is used or bookingStatus equals \"information\"."
+      - "No pageSize query parameter is defined."
     tags: [ais, transactions, baseline]
+
+  - id: NGPSD2-AIS-BALANCES-001
+    version: nextgenpsd2-v1.3
+    title: Read balances (NextGenPSD2 1.3.16 baseline)
+    sources:
+      - source_id: bg-nextgenpsd2-v1.3-implementation-guidelines
+        locator: section:6.5.3
+        note: Read Balance
+      - source_id: bg-nextgenpsd2-v1.3-implementation-guidelines
+        locator: page:181-183
+      - source_id: bg-nextgenpsd2-v1.3-openapi
+        locator: op:GET /v1/accounts/{account-id}/balances
+    endpoints:
+      - GET /v1/accounts/{account-id}/balances
+    schemas:
+      - readAccountBalanceResponse-200
+    acceptance_criteria:
+      - "A successful response has HTTP 200 and contains the mandatory balances list."
+    tags: [ais, balances, baseline]
+
+  - id: NGPSD2-CONSENT-AIS-001
+    version: nextgenpsd2-v1.3
+    title: Establish an account information consent (NextGenPSD2 1.3.16 baseline)
+    sources:
+      - source_id: bg-nextgenpsd2-v1.3-implementation-guidelines
+        locator: section:6.3.1
+        note: Account Information Consent Request
+      - source_id: bg-nextgenpsd2-v1.3-implementation-guidelines
+        locator: page:155-158
+      - source_id: bg-nextgenpsd2-v1.3-implementation-guidelines
+        locator: page:309
+        note: ACCESS_EXCEEDED
+      - source_id: bg-nextgenpsd2-v1.3-openapi
+        locator: op:POST /v1/consents
+    endpoints:
+      - POST /v1/consents
+    schemas:
+      - consents
+    acceptance_criteria:
+      - "access, recurringIndicator, validUntil, frequencyPerDay and combinedServiceIndicator are mandatory in the request body."
+      - "frequencyPerDay is at least 1 and, unless agreed bilaterally, at most 4."
+      - "A successful response has HTTP 201 and contains consentStatus and consentId."
+      - "Accesses beyond the consented frequency without PSU involvement are rejected with HTTP 429 ACCESS_EXCEEDED."
+    tags: [consent, ais, baseline]

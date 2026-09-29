@@ -36,7 +36,9 @@ The MSRV is Rust 1.91 (edition 2024), and `rust-toolchain.toml` tracks stable.
 
 * Unit tests live next to the code. Integration tests are in `crates/bg-spec-indexer/tests/`, MCP
   protocol tests use an in-memory duplex in `crates/bg-spec-mcp/tests/`, and CLI tests are in `crates/bg-spec-cli/tests/`.
-* Integration and MCP tests copy the example corpus into a temp dir (`bg_spec_indexer::testing`).
+* Integration and MCP tests copy the synthetic fixture corpus `crates/bg-spec-indexer/tests/fixtures/corpus/`
+  into a temp dir (`bg_spec_indexer::testing`); they never read the official files in `corpus/`.
+  `cargo test -p bg-spec-indexer --release --test real_corpus -- --ignored` smoke-tests `corpus/`.
 * Snapshots use `insta`. To accept intended changes:
   ```bash
   INSTA_UPDATE=always cargo test -p bg-spec-indexer --test integration   # or: cargo insta review

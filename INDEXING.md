@@ -80,7 +80,7 @@ page → section (heading) → paragraph → sentence → chunk
     schema names, and a JSON pointer.
   * **Schemas**, one per `components.schemas` entry, with the locator `schema:Name` and their direct `$ref` names.
 * `path_key` is the canonical path: the version prefix is stripped and parameters are replaced with `{}`. It enables
-  cross-version matching (`/v1/accounts/{account-id}` ≡ `/accounts/{accountId}`).
+  cross-version matching (`/v1/accounts/{account-id}` ≡ `/v2/accounts/{account-id}` ≡ `/accounts/{accountId}`).
 
 ## Text sources
 

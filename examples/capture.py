@@ -1,7 +1,11 @@
 #!/usr/bin/env python3
 """Replays examples/calls/*.json against bg-spec-mcp over stdio and writes the structured
-responses to examples/responses/. Usage: python3 examples/capture.py <bg-spec-mcp> <config>"""
+responses to examples/responses/. Usage: python3 examples/capture.py <bg-spec-mcp> <config>
+
+Arrays longer than MAX_ITEMS are cut and end with {"_truncated_items": <count>}."""
 import json, pathlib, subprocess, sys
+
+MAX_ITEMS = 10
 
 binary, config = sys.argv[1], sys.argv[2]
 root = pathlib.Path(__file__).parent
@@ -27,7 +31,10 @@ def scrub(v):
     if isinstance(v, dict):
         return {k: ("<timestamp>" if k in ("indexed_at_unix", "last_indexed_at_unix") else scrub(x)) for k, x in v.items()}
     if isinstance(v, list):
-        return [scrub(x) for x in v]
+        items = [scrub(x) for x in v[:MAX_ITEMS]]
+        if len(v) > MAX_ITEMS:
+            items.append({"_truncated_items": len(v) - MAX_ITEMS})
+        return items
     return v
 
 for call in sorted((root / "calls").glob("*.json")):

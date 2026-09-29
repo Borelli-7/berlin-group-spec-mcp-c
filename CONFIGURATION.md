@@ -17,6 +17,7 @@ target   = "openfinance-v2"     # default version for endpoint/schema tools and 
 [versions.path_prefixes]
 # The version publishes paths under a prefix, and the prefix is stripped for cross-version matching.
 "nextgenpsd2-v1.3" = "/v1"
+"openfinance-v2"   = "/v2"
 
 [chunking]
 max_chars     = 6000   # >= 500
@@ -52,15 +53,15 @@ No secrets are required.
 ```yaml
 schema_version: 1
 sources:
-  - id: bg-openfinance-v2-implementation-guidelines   # stable id: [a-z0-9][a-z0-9._-]{0,127}
-    kind: pdf                                         # pdf | openapi | text
+  - id: bg-openfinance-v2-xs2a-implementation-guidelines   # stable id: [a-z0-9][a-z0-9._-]{0,127}
+    kind: pdf                                              # pdf | openapi | text
     version: openfinance-v2
     authority: normative      # normative | technical | informative | project | test | unknown
     precedence: 100           # 0..=1000; higher wins when sources of one version overlap
-    path: pdf/v2/implementation-guidelines.pdf        # relative to the corpus root
-    title: Open Finance v2 Implementation Guidelines  # optional
-    description: ...                                  # optional
-    tags: [ig]                                        # optional
+    path: pdf/v2/XS2A API as PSD2 Interface implementation guide line-2.4.pdf   # relative to the corpus root
+    title: openFinance XS2A API as PSD2 Interface - Implementation Guidelines 2.4 (2025-10-31)   # optional
+    description: ...                                       # optional
+    tags: [implementation-guidelines]                      # optional
 ```
 
 Rules:

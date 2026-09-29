@@ -1,4 +1,4 @@
-//! Content of the synthetic fixture PDFs shipped in `corpus/pdf`.
+//! Content of the synthetic fixture PDFs shipped in `crates/bg-spec-indexer/tests/fixtures/corpus/pdf`.
 //!
 //! All text is ORIGINAL SYNTHETIC TEST DATA written for this project. It paraphrases the
 //! general shape of an account-information API so the pipeline can be exercised end to

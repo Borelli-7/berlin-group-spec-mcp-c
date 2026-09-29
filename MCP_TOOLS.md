@@ -5,8 +5,9 @@ mirrored as text) and has these annotations: `readOnlyHint: true`, `destructiveH
 `idempotentHint: true`, `openWorldHint: false`. Inputs reject unknown fields.
 
 Complete requests are in [`examples/calls/`](examples/calls) and the responses captured from the
-example corpus are in [`examples/responses/`](examples/responses). To regenerate them, run `python3
-examples/capture.py target/release/bg-spec-mcp config/config.toml` after `bg-spec index`.
+official corpus (`corpus/`) are in [`examples/responses/`](examples/responses). To regenerate them, run `python3
+examples/capture.py target/release/bg-spec-mcp config/config.toml` after `bg-spec index`. Arrays longer than
+10 items are cut in the captures and end with `{"_truncated_items": N}`; the server itself never truncates.
 
 ## Evidence classification
 
@@ -25,8 +26,8 @@ Every evidence item carries **provenance**: `source_id`, `document_id`, `version
 |---|---|
 | `document` | The whole document (all pages, or the operation and schema list). |
 | `page:N` / `page:N-M` | PDF or text pages (a range covers at most 50 pages). |
-| `section:4.2` | Chunks whose section equals the value or is a subsection of it (`4.2`, `4.2.1`, `4.2 Title`; also `section:E-07`). |
-| `chunk:<chunk_id>` | One chunk, e.g. `chunk:bg-openfinance-v2-implementation-guidelines:p3:c0`. |
+| `section:4.4.4` | Chunks whose section equals the value or is a subsection of it (`4.4`, `4.4.4`, `4.4.4 Title`; also `section:E-01`). |
+| `chunk:<chunk_id>` | One chunk, e.g. `chunk:bg-openfinance-v2-xs2a-implementation-guidelines:p95:c0`. |
 | `op:GET /path` | An OpenAPI operation. |
 | `path:/path` | All operations on a path. |
 | `schema:Name` | A component schema. |
@@ -49,8 +50,9 @@ Unknown or missing fields are rejected by rmcp with `failed to deserialize param
 (`isError: true`). Storage and search failures are returned as JSON-RPC internal errors.
 
 Endpoint lookups first try an **exact** match on the path template, then a **canonical** match:
-the configured version prefix (e.g. `/v1`) is stripped and parameter names are ignored, so
-`/accounts/{account-id}` matches `/accounts/{accountId}`. The response reports which one was used in `matched_by`.
+the configured version prefixes (`/v1`, `/v2`) are stripped and parameter names are ignored, so
+`/v1/accounts/{account-id}` matches `/v2/accounts/{account-id}` and `/accounts/{accountId}`. The response
+reports which one was used in `matched_by`.
 
 ---
 
@@ -157,9 +159,9 @@ search_documents, versions, problems}`. See [10](examples/responses/10-health.js
 ## Acceptance workflow (Requirements Agent)
 
 ```text
-get_endpoint_requirements {path:"/accounts/{accountId}/transactions", method:"GET"}
+get_endpoint_requirements {path:"/v2/accounts/{account-id}/transactions", method:"GET"}
   → read_openapi_endpoint   (contract)
-  → trace_requirement       {requirement_id:"OFV2-TRANSACTIONS-001"}
-  → read_source             {source_id:"bg-openfinance-v2-implementation-guidelines", locator:"section:4.2"}
-  → compare_v1_v2           {path:"/accounts/{accountId}/transactions", method:"GET"}
+  → trace_requirement       {requirement_id:"OFV2-AIS-TRANSACTIONS-001"}
+  → read_source             {source_id:"bg-openfinance-v2-xs2a-implementation-guidelines", locator:"section:4.4.4"}
+  → compare_v1_v2           {path:"/v1/accounts/{account-id}/transactions", method:"GET"}
 ```
