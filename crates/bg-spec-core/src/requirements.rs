@@ -25,7 +25,8 @@ pub fn is_valid_requirement_id(id: &str) -> bool {
     let mut chars = id.chars();
     matches!(chars.next(), Some(c) if c.is_ascii_uppercase() || c.is_ascii_digit())
         && id.len() <= 128
-        && chars.all(|c| c.is_ascii_uppercase() || c.is_ascii_digit() || matches!(c, '.' | '_' | '-'))
+        && chars
+            .all(|c| c.is_ascii_uppercase() || c.is_ascii_digit() || matches!(c, '.' | '_' | '-'))
 }
 
 impl RequirementsFile {
@@ -51,7 +52,9 @@ impl RequirementsFile {
         for r in &self.requirements {
             let err = |msg: String| CoreError::Requirements(format!("{}: {msg}", r.id));
             if !is_valid_requirement_id(&r.id) {
-                return Err(err("invalid requirement id (expected [A-Z0-9][A-Z0-9._-]*)".into()));
+                return Err(err(
+                    "invalid requirement id (expected [A-Z0-9][A-Z0-9._-]*)".into(),
+                ));
             }
             if !ids.insert(r.id.as_str()) {
                 return Err(err("duplicate requirement id".into()));
@@ -91,8 +94,8 @@ impl RequirementsFile {
         self.requirements
             .into_iter()
             .map(|r| {
-                let json = serde_json::to_vec(&r)
-                    .map_err(|e| CoreError::Requirements(e.to_string()))?;
+                let json =
+                    serde_json::to_vec(&r).map_err(|e| CoreError::Requirements(e.to_string()))?;
                 Ok(RequirementRecord {
                     mapping: MappingProvenance {
                         file: file.to_owned(),
@@ -133,7 +136,10 @@ requirements:
         let r = &f.requirements[0];
         assert_eq!(r.id, "OFV2-TRANSACTIONS-001");
         assert_eq!(r.endpoints[0].method, "GET");
-        let recs = f.clone().into_records("requirements/requirements.yaml", "abc").unwrap();
+        let recs = f
+            .clone()
+            .into_records("requirements/requirements.yaml", "abc")
+            .unwrap();
         assert_eq!(recs[0].mapping.locator, "requirement:OFV2-TRANSACTIONS-001");
         assert_eq!(recs[0].mapping.sha256.len(), 64);
     }

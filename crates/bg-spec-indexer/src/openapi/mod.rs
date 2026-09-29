@@ -20,12 +20,16 @@ use serde_json::Value;
 /// Parses a YAML or JSON OpenAPI document into a JSON tree.
 pub fn parse_document(raw: &str, file_name: &str) -> Result<Value> {
     let value: Value = if file_name.ends_with(".json") {
-        serde_json::from_str(raw).map_err(|e| CoreError::Integrity(format!("{file_name}: invalid JSON: {e}")))?
+        serde_json::from_str(raw)
+            .map_err(|e| CoreError::Integrity(format!("{file_name}: invalid JSON: {e}")))?
     } else {
-        serde_saphyr::from_str(raw).map_err(|e| CoreError::Integrity(format!("{file_name}: invalid YAML: {e}")))?
+        serde_saphyr::from_str(raw)
+            .map_err(|e| CoreError::Integrity(format!("{file_name}: invalid YAML: {e}")))?
     };
     if !value.is_object() {
-        return Err(CoreError::Integrity(format!("{file_name}: OpenAPI root must be a mapping")));
+        return Err(CoreError::Integrity(format!(
+            "{file_name}: OpenAPI root must be a mapping"
+        )));
     }
     Ok(value)
 }
@@ -39,7 +43,9 @@ pub enum Dialect {
 
 pub fn detect_dialect(root: &Value) -> Result<Dialect> {
     if root.get("swagger").is_some() {
-        return Err(CoreError::Integrity("Swagger 2.0 documents are not supported; convert to OpenAPI 3".into()));
+        return Err(CoreError::Integrity(
+            "Swagger 2.0 documents are not supported; convert to OpenAPI 3".into(),
+        ));
     }
     let v = root
         .get("openapi")
@@ -50,6 +56,8 @@ pub fn detect_dialect(root: &Value) -> Result<Dialect> {
     } else if v.starts_with("3.1") || v.starts_with("3.2") {
         Ok(Dialect::V31(v.to_owned()))
     } else {
-        Err(CoreError::Integrity(format!("unsupported OpenAPI version '{v}'")))
+        Err(CoreError::Integrity(format!(
+            "unsupported OpenAPI version '{v}'"
+        )))
     }
 }

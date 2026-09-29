@@ -1,0 +1,1007 @@
+---
+source: crates/bg-spec-indexer/tests/integration.rs
+expression: json
+---
+{
+  "method": "GET",
+  "path": "/accounts/{accountId}/transactions",
+  "from": {
+    "version": "nextgenpsd2-v1.3",
+    "found": true,
+    "matched_by": "canonical",
+    "unresolved_schemas": []
+  },
+  "to": {
+    "version": "openfinance-v2",
+    "found": true,
+    "matched_by": "exact",
+    "unresolved_schemas": []
+  },
+  "notice": "Structural differences only. No backward-compatibility verdict is made; interpretation is the responsibility of the consuming agent.",
+  "v1_operation": {
+    "version": "nextgenpsd2-v1.3",
+    "path": "/v1/accounts/{account-id}/transactions",
+    "method": "GET",
+    "operation_id": "getTransactionList",
+    "summary": "Read transaction list of an account",
+    "description": "Reads account data from a given account addressed by account-id.",
+    "tags": [
+      "Account Information Service (AIS)"
+    ],
+    "deprecated": false,
+    "parameters": [
+      {
+        "name": "account-id",
+        "location": "path",
+        "required": true,
+        "deprecated": false,
+        "description": "Resource identification of the addressed account.",
+        "schema": {
+          "schema": {
+            "type": "string"
+          }
+        },
+        "component": "#/components/parameters/AccountID"
+      },
+      {
+        "name": "X-Request-ID",
+        "location": "header",
+        "required": true,
+        "deprecated": false,
+        "schema": {
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "component": "#/components/parameters/X-Request-ID"
+      },
+      {
+        "name": "Consent-ID",
+        "location": "header",
+        "required": true,
+        "deprecated": false,
+        "schema": {
+          "schema": {
+            "type": "string"
+          }
+        },
+        "component": "#/components/parameters/Consent-ID"
+      },
+      {
+        "name": "dateFrom",
+        "location": "query",
+        "required": false,
+        "deprecated": false,
+        "description": "Conditional; mandatory unless deltaList is used.",
+        "schema": {
+          "schema": {
+            "type": "string",
+            "format": "date"
+          }
+        }
+      },
+      {
+        "name": "dateTo",
+        "location": "query",
+        "required": false,
+        "deprecated": false,
+        "schema": {
+          "schema": {
+            "type": "string",
+            "format": "date"
+          }
+        }
+      },
+      {
+        "name": "bookingStatus",
+        "location": "query",
+        "required": true,
+        "deprecated": false,
+        "schema": {
+          "schema_ref": "BookingStatus",
+          "schema": {
+            "$ref": "#/components/schemas/BookingStatus"
+          }
+        }
+      },
+      {
+        "name": "withBalance",
+        "location": "query",
+        "required": false,
+        "deprecated": false,
+        "schema": {
+          "schema": {
+            "type": "boolean"
+          }
+        }
+      }
+    ],
+    "responses": [
+      {
+        "status": "200",
+        "description": "OK",
+        "headers": [
+          "X-Request-ID"
+        ],
+        "content": [
+          {
+            "media_type": "application/json",
+            "schema": {
+              "schema_ref": "TransactionsResponse200Json",
+              "schema": {
+                "$ref": "#/components/schemas/TransactionsResponse200Json"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "status": "400",
+        "description": "Bad request",
+        "headers": [],
+        "content": [
+          {
+            "media_type": "application/json",
+            "schema": {
+              "schema_ref": "Error400",
+              "schema": {
+                "$ref": "#/components/schemas/Error400"
+              }
+            }
+          }
+        ],
+        "component": "#/components/responses/400_AIS"
+      },
+      {
+        "status": "401",
+        "description": "Unauthorized",
+        "headers": [],
+        "content": []
+      },
+      {
+        "status": "403",
+        "description": "Forbidden",
+        "headers": [],
+        "content": []
+      },
+      {
+        "status": "404",
+        "description": "Not found",
+        "headers": [],
+        "content": []
+      }
+    ],
+    "security": [],
+    "security_origin": "none",
+    "referenced_schemas": [
+      "BookingStatus",
+      "Error400",
+      "TransactionsResponse200Json"
+    ],
+    "json_pointer": "/paths/~1v1~1accounts~1{account-id}~1transactions/get",
+    "provenance": {
+      "source_id": "bg-nextgenpsd2-v1.3-openapi",
+      "document_id": "bg-nextgenpsd2-v1.3-openapi@45501c5076b9",
+      "version": "nextgenpsd2-v1.3",
+      "kind": "openapi",
+      "authority": "technical",
+      "precedence": 90,
+      "locator": "op:GET /v1/accounts/{account-id}/transactions",
+      "sha256": "4442846ccabe17fa690f0765a827ed5d849672c36671585687253555df68985d",
+      "document_sha256": "45501c5076b98ccd3f755581d51a3a32e9c82710d2ef18b9f574dc93fee014b2"
+    }
+  },
+  "v2_operation": {
+    "version": "openfinance-v2",
+    "path": "/accounts/{accountId}/transactions",
+    "method": "GET",
+    "operation_id": "getTransactionList",
+    "summary": "Read transaction list of an account",
+    "description": "Reads the transaction list of the account addressed by accountId, with pagination.",
+    "tags": [
+      "Account Information Service (AIS)"
+    ],
+    "deprecated": false,
+    "parameters": [
+      {
+        "name": "accountId",
+        "location": "path",
+        "required": true,
+        "deprecated": false,
+        "description": "Resource identification of the addressed account.",
+        "schema": {
+          "schema": {
+            "type": "string"
+          }
+        },
+        "component": "#/components/parameters/AccountId"
+      },
+      {
+        "name": "X-Request-ID",
+        "location": "header",
+        "required": true,
+        "deprecated": false,
+        "schema": {
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "component": "#/components/parameters/X-Request-ID"
+      },
+      {
+        "name": "dateFrom",
+        "location": "query",
+        "required": true,
+        "deprecated": false,
+        "description": "Mandatory unless deltaList is used.",
+        "schema": {
+          "schema": {
+            "type": "string",
+            "format": "date"
+          }
+        }
+      },
+      {
+        "name": "dateTo",
+        "location": "query",
+        "required": false,
+        "deprecated": false,
+        "schema": {
+          "schema": {
+            "type": "string",
+            "format": "date"
+          }
+        }
+      },
+      {
+        "name": "bookingStatus",
+        "location": "query",
+        "required": true,
+        "deprecated": false,
+        "schema": {
+          "schema_ref": "BookingStatus",
+          "schema": {
+            "$ref": "#/components/schemas/BookingStatus"
+          }
+        }
+      },
+      {
+        "name": "withBalance",
+        "location": "query",
+        "required": false,
+        "deprecated": false,
+        "schema": {
+          "schema": {
+            "type": "boolean"
+          }
+        }
+      },
+      {
+        "name": "pageSize",
+        "location": "query",
+        "required": false,
+        "deprecated": false,
+        "description": "Maximum number of entries per page.",
+        "schema": {
+          "schema": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 1,
+            "maximum": 500
+          }
+        }
+      }
+    ],
+    "responses": [
+      {
+        "status": "200",
+        "description": "OK",
+        "headers": [
+          "X-Request-ID"
+        ],
+        "content": [
+          {
+            "media_type": "application/json",
+            "schema": {
+              "schema_ref": "TransactionsResponse200Json",
+              "schema": {
+                "$ref": "#/components/schemas/TransactionsResponse200Json"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "status": "400",
+        "description": "Bad request",
+        "headers": [],
+        "content": [
+          {
+            "media_type": "application/json",
+            "schema": {
+              "schema_ref": "Error400",
+              "schema": {
+                "$ref": "#/components/schemas/Error400"
+              }
+            }
+          }
+        ],
+        "component": "#/components/responses/400_AIS"
+      },
+      {
+        "status": "401",
+        "description": "Unauthorized",
+        "headers": [],
+        "content": []
+      },
+      {
+        "status": "403",
+        "description": "Forbidden",
+        "headers": [],
+        "content": []
+      },
+      {
+        "status": "404",
+        "description": "Not found",
+        "headers": [],
+        "content": []
+      },
+      {
+        "status": "429",
+        "description": "Too many requests (ACCESS_EXCEEDED)",
+        "headers": [],
+        "content": []
+      }
+    ],
+    "security": [
+      {
+        "BearerAuthOAuth": []
+      }
+    ],
+    "security_origin": "global",
+    "referenced_schemas": [
+      "BookingStatus",
+      "Error400",
+      "TransactionsResponse200Json"
+    ],
+    "json_pointer": "/paths/~1accounts~1{accountId}~1transactions/get",
+    "provenance": {
+      "source_id": "bg-openfinance-v2-openapi",
+      "document_id": "bg-openfinance-v2-openapi@edd99f6e0265",
+      "version": "openfinance-v2",
+      "kind": "openapi",
+      "authority": "technical",
+      "precedence": 90,
+      "locator": "op:GET /accounts/{accountId}/transactions",
+      "sha256": "2935fd27adbb313d52dc8f4b04cee4dc74f1693bf8671549bc9c917adf8f45f5",
+      "document_sha256": "edd99f6e026537a45d3e95f33a35918e0f338914c70879234c5dc3c1e799fdfb"
+    }
+  },
+  "changes": [
+    {
+      "area": "endpoint",
+      "side": "endpoint",
+      "change": "unchanged",
+      "subject": "GET /accounts/{accountId}/transactions"
+    },
+    {
+      "area": "path",
+      "side": "endpoint",
+      "change": "modified",
+      "subject": "path",
+      "before": "/v1/accounts/{account-id}/transactions",
+      "after": "/accounts/{accountId}/transactions"
+    },
+    {
+      "area": "operation_id",
+      "side": "endpoint",
+      "change": "unchanged",
+      "subject": "operationId"
+    },
+    {
+      "area": "parameter",
+      "side": "request",
+      "change": "removed",
+      "subject": "header:Consent-ID",
+      "before": {
+        "name": "Consent-ID",
+        "in": "header",
+        "required": true,
+        "deprecated": false,
+        "schema": {
+          "type": "string"
+        }
+      }
+    },
+    {
+      "area": "parameter",
+      "side": "request",
+      "change": "unchanged",
+      "subject": "header:X-Request-ID"
+    },
+    {
+      "area": "parameter",
+      "side": "request",
+      "change": "modified",
+      "subject": "path:accountId",
+      "before": {
+        "name": "account-id",
+        "required": true,
+        "deprecated": false
+      },
+      "after": {
+        "name": "accountId",
+        "required": true,
+        "deprecated": false
+      }
+    },
+    {
+      "area": "parameter",
+      "side": "request",
+      "change": "modified",
+      "subject": "query:bookingStatus",
+      "schema_changes": [
+        {
+          "pointer": "/enum",
+          "kind": "enum_values_added",
+          "change": "added",
+          "after": [
+            "information",
+            "all"
+          ],
+          "schema_name": "BookingStatus"
+        }
+      ]
+    },
+    {
+      "area": "parameter",
+      "side": "request",
+      "change": "modified",
+      "subject": "query:dateFrom",
+      "before": {
+        "name": "dateFrom",
+        "required": false,
+        "deprecated": false
+      },
+      "after": {
+        "name": "dateFrom",
+        "required": true,
+        "deprecated": false
+      }
+    },
+    {
+      "area": "parameter",
+      "side": "request",
+      "change": "unchanged",
+      "subject": "query:dateTo"
+    },
+    {
+      "area": "parameter",
+      "side": "request",
+      "change": "added",
+      "subject": "query:pageSize",
+      "after": {
+        "name": "pageSize",
+        "in": "query",
+        "required": false,
+        "deprecated": false,
+        "schema": {
+          "type": "integer",
+          "format": "int32",
+          "minimum": 1,
+          "maximum": 500
+        }
+      }
+    },
+    {
+      "area": "parameter",
+      "side": "request",
+      "change": "unchanged",
+      "subject": "query:withBalance"
+    },
+    {
+      "area": "media_type",
+      "side": "response",
+      "change": "modified",
+      "subject": "response:200 application/json",
+      "schema_changes": [
+        {
+          "pointer": "/properties/transactions/properties/_links",
+          "kind": "property_added",
+          "change": "added",
+          "after": {
+            "required": false,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "next": {
+                  "type": "string",
+                  "format": "uri"
+                }
+              }
+            }
+          },
+          "schema_name": "AccountReport"
+        },
+        {
+          "pointer": "/properties/transactions/properties/booked/items/properties/bookingDate/format",
+          "kind": "format_changed",
+          "change": "modified",
+          "before": "date",
+          "after": "date-time",
+          "schema_name": "Transactions"
+        },
+        {
+          "pointer": "/properties/transactions/properties/booked/items/properties/creditor",
+          "kind": "property_added",
+          "change": "added",
+          "after": {
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/PartyIdentification"
+            }
+          },
+          "schema_name": "Transactions"
+        },
+        {
+          "pointer": "/properties/transactions/properties/booked/items/properties/creditorName",
+          "kind": "property_removed",
+          "change": "removed",
+          "before": {
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 70
+            }
+          },
+          "schema_name": "Transactions"
+        },
+        {
+          "pointer": "/properties/transactions/properties/booked/items/properties/merchantCategoryCode",
+          "kind": "property_added",
+          "change": "added",
+          "after": {
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "[0-9]{4}"
+            }
+          },
+          "schema_name": "Transactions"
+        },
+        {
+          "pointer": "/properties/transactions/properties/booked/items/properties/valueDate",
+          "kind": "nullable_changed",
+          "change": "modified",
+          "before": false,
+          "after": true,
+          "schema_name": "Transactions"
+        },
+        {
+          "pointer": "/properties/transactions/properties/booked/items/properties/bookingDate",
+          "kind": "required_added",
+          "change": "modified",
+          "before": false,
+          "after": true,
+          "schema_name": "Transactions"
+        }
+      ]
+    },
+    {
+      "area": "media_type",
+      "side": "response",
+      "change": "modified",
+      "subject": "response:400 application/json",
+      "schema_changes": [
+        {
+          "pointer": "/properties/tppMessages/items/properties/code/enum",
+          "kind": "enum_values_added",
+          "change": "added",
+          "after": [
+            "ACCESS_EXCEEDED"
+          ],
+          "schema_name": "Error400"
+        }
+      ]
+    },
+    {
+      "area": "response",
+      "side": "response",
+      "change": "unchanged",
+      "subject": "response:401"
+    },
+    {
+      "area": "response",
+      "side": "response",
+      "change": "unchanged",
+      "subject": "response:403"
+    },
+    {
+      "area": "response",
+      "side": "response",
+      "change": "unchanged",
+      "subject": "response:404"
+    },
+    {
+      "area": "response",
+      "side": "response",
+      "change": "added",
+      "subject": "response:429",
+      "after": {
+        "description": "Too many requests (ACCESS_EXCEEDED)",
+        "media_types": []
+      }
+    },
+    {
+      "area": "security",
+      "side": "request",
+      "change": "modified",
+      "subject": "security",
+      "before": [],
+      "after": [
+        {
+          "BearerAuthOAuth": []
+        }
+      ]
+    }
+  ],
+  "schema_changes": [
+    {
+      "pointer": "/enum",
+      "kind": "enum_values_added",
+      "change": "added",
+      "after": [
+        "information",
+        "all"
+      ],
+      "schema_name": "BookingStatus"
+    },
+    {
+      "pointer": "/properties/transactions/properties/_links",
+      "kind": "property_added",
+      "change": "added",
+      "after": {
+        "required": false,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "next": {
+              "type": "string",
+              "format": "uri"
+            }
+          }
+        }
+      },
+      "schema_name": "AccountReport"
+    },
+    {
+      "pointer": "/properties/transactions/properties/booked/items/properties/bookingDate/format",
+      "kind": "format_changed",
+      "change": "modified",
+      "before": "date",
+      "after": "date-time",
+      "schema_name": "Transactions"
+    },
+    {
+      "pointer": "/properties/transactions/properties/booked/items/properties/creditor",
+      "kind": "property_added",
+      "change": "added",
+      "after": {
+        "required": false,
+        "schema": {
+          "$ref": "#/components/schemas/PartyIdentification"
+        }
+      },
+      "schema_name": "Transactions"
+    },
+    {
+      "pointer": "/properties/transactions/properties/booked/items/properties/creditorName",
+      "kind": "property_removed",
+      "change": "removed",
+      "before": {
+        "required": false,
+        "schema": {
+          "type": "string",
+          "maxLength": 70
+        }
+      },
+      "schema_name": "Transactions"
+    },
+    {
+      "pointer": "/properties/transactions/properties/booked/items/properties/merchantCategoryCode",
+      "kind": "property_added",
+      "change": "added",
+      "after": {
+        "required": false,
+        "schema": {
+          "type": "string",
+          "pattern": "[0-9]{4}"
+        }
+      },
+      "schema_name": "Transactions"
+    },
+    {
+      "pointer": "/properties/transactions/properties/booked/items/properties/valueDate",
+      "kind": "nullable_changed",
+      "change": "modified",
+      "before": false,
+      "after": true,
+      "schema_name": "Transactions"
+    },
+    {
+      "pointer": "/properties/transactions/properties/booked/items/properties/bookingDate",
+      "kind": "required_added",
+      "change": "modified",
+      "before": false,
+      "after": true,
+      "schema_name": "Transactions"
+    },
+    {
+      "pointer": "/properties/tppMessages/items/properties/code/enum",
+      "kind": "enum_values_added",
+      "change": "added",
+      "after": [
+        "ACCESS_EXCEEDED"
+      ],
+      "schema_name": "Error400"
+    }
+  ],
+  "counts": {
+    "added": 2,
+    "removed": 1,
+    "modified": 7,
+    "unchanged": 8,
+    "schema_changes": 9
+  },
+  "compatibility_relevant_facts": [
+    {
+      "side": "endpoint",
+      "subject": "path",
+      "statement": "Path 'path' changed from \"/v1/accounts/{account-id}/transactions\" (nextgenpsd2-v1.3) to \"/accounts/{accountId}/transactions\" (openfinance-v2)."
+    },
+    {
+      "side": "request",
+      "subject": "header:Consent-ID",
+      "statement": "Parameter 'header:Consent-ID' exists in nextgenpsd2-v1.3 but not in openfinance-v2."
+    },
+    {
+      "side": "request",
+      "subject": "path:accountId",
+      "statement": "Parameter 'path:accountId' changed from {\"name\":\"account-id\",\"required\":true,\"deprecated\":false} (nextgenpsd2-v1.3) to {\"name\":\"accountId\",\"required\":true,\"deprecated\":false} (openfinance-v2)."
+    },
+    {
+      "side": "request",
+      "subject": "query:bookingStatus",
+      "statement": "request schema of 'query:bookingStatus' at /enum (schema BookingStatus): enum values added; nextgenpsd2-v1.3=- openfinance-v2=[\"information\",\"all\"]."
+    },
+    {
+      "side": "request",
+      "subject": "query:dateFrom",
+      "statement": "Parameter 'query:dateFrom' changed from {\"name\":\"dateFrom\",\"required\":false,\"deprecated\":false} (nextgenpsd2-v1.3) to {\"name\":\"dateFrom\",\"required\":true,\"deprecated\":false} (openfinance-v2)."
+    },
+    {
+      "side": "request",
+      "subject": "query:pageSize",
+      "statement": "Optional request parameter 'query:pageSize' exists in openfinance-v2 but not in nextgenpsd2-v1.3."
+    },
+    {
+      "side": "response",
+      "subject": "response:200 application/json",
+      "statement": "response schema of 'response:200 application/json' at /properties/transactions/properties/_links (schema AccountReport): property added; nextgenpsd2-v1.3=- openfinance-v2={\"required\":false,\"schema\":{\"type\":\"object\",\"properties\":{\"next\":{\"type\":\"string\",\"format\":\"uri\"}}}}."
+    },
+    {
+      "side": "response",
+      "subject": "response:200 application/json",
+      "statement": "response schema of 'response:200 application/json' at /properties/transactions/properties/booked/items/properties/bookingDate/format (schema Transactions): format changed; nextgenpsd2-v1.3=\"date\" openfinance-v2=\"date-time\"."
+    },
+    {
+      "side": "response",
+      "subject": "response:200 application/json",
+      "statement": "response schema of 'response:200 application/json' at /properties/transactions/properties/booked/items/properties/creditor (schema Transactions): property added; nextgenpsd2-v1.3=- openfinance-v2={\"required\":false,\"schema\":{\"$ref\":\"#/components/schemas/PartyIdentification\"}}."
+    },
+    {
+      "side": "response",
+      "subject": "response:200 application/json",
+      "statement": "response schema of 'response:200 application/json' at /properties/transactions/properties/booked/items/properties/creditorName (schema Transactions): property removed; nextgenpsd2-v1.3={\"required\":false,\"schema\":{\"type\":\"string\",\"maxLength\":70}} openfinance-v2=-."
+    },
+    {
+      "side": "response",
+      "subject": "response:200 application/json",
+      "statement": "response schema of 'response:200 application/json' at /properties/transactions/properties/booked/items/properties/merchantCategoryCode (schema Transactions): property added; nextgenpsd2-v1.3=- openfinance-v2={\"required\":false,\"schema\":{\"type\":\"string\",\"pattern\":\"[0-9]{4}\"}}."
+    },
+    {
+      "side": "response",
+      "subject": "response:200 application/json",
+      "statement": "response schema of 'response:200 application/json' at /properties/transactions/properties/booked/items/properties/valueDate (schema Transactions): nullable changed; nextgenpsd2-v1.3=false openfinance-v2=true."
+    },
+    {
+      "side": "response",
+      "subject": "response:200 application/json",
+      "statement": "response schema of 'response:200 application/json' at /properties/transactions/properties/booked/items/properties/bookingDate (schema Transactions): property became required; nextgenpsd2-v1.3=false openfinance-v2=true."
+    },
+    {
+      "side": "response",
+      "subject": "response:400 application/json",
+      "statement": "response schema of 'response:400 application/json' at /properties/tppMessages/items/properties/code/enum (schema Error400): enum values added; nextgenpsd2-v1.3=- openfinance-v2=[\"ACCESS_EXCEEDED\"]."
+    },
+    {
+      "side": "response",
+      "subject": "response:429",
+      "statement": "Response 'response:429' exists in openfinance-v2 but not in nextgenpsd2-v1.3."
+    },
+    {
+      "side": "request",
+      "subject": "security",
+      "statement": "Security 'security' changed from [] (nextgenpsd2-v1.3) to [{\"BearerAuthOAuth\":[]}] (openfinance-v2)."
+    }
+  ],
+  "sources": [
+    {
+      "source_id": "bg-nextgenpsd2-v1.3-openapi",
+      "document_id": "bg-nextgenpsd2-v1.3-openapi@45501c5076b9",
+      "version": "nextgenpsd2-v1.3",
+      "kind": "openapi",
+      "authority": "technical",
+      "precedence": 90,
+      "locator": "op:GET /v1/accounts/{account-id}/transactions",
+      "sha256": "4442846ccabe17fa690f0765a827ed5d849672c36671585687253555df68985d",
+      "document_sha256": "45501c5076b98ccd3f755581d51a3a32e9c82710d2ef18b9f574dc93fee014b2"
+    },
+    {
+      "source_id": "bg-nextgenpsd2-v1.3-openapi",
+      "document_id": "bg-nextgenpsd2-v1.3-openapi@45501c5076b9",
+      "version": "nextgenpsd2-v1.3",
+      "kind": "openapi",
+      "authority": "technical",
+      "precedence": 90,
+      "locator": "schema:AccountReport",
+      "sha256": "776204af517f0f2bf3702e83cd50b7385695c159ee269a7ede8aede2f6505b20",
+      "document_sha256": "45501c5076b98ccd3f755581d51a3a32e9c82710d2ef18b9f574dc93fee014b2"
+    },
+    {
+      "source_id": "bg-nextgenpsd2-v1.3-openapi",
+      "document_id": "bg-nextgenpsd2-v1.3-openapi@45501c5076b9",
+      "version": "nextgenpsd2-v1.3",
+      "kind": "openapi",
+      "authority": "technical",
+      "precedence": 90,
+      "locator": "schema:Amount",
+      "sha256": "516ad2819374af39b1f04bd69f80cbb0d0c8db76d6b74bff9f7b301b90413643",
+      "document_sha256": "45501c5076b98ccd3f755581d51a3a32e9c82710d2ef18b9f574dc93fee014b2"
+    },
+    {
+      "source_id": "bg-nextgenpsd2-v1.3-openapi",
+      "document_id": "bg-nextgenpsd2-v1.3-openapi@45501c5076b9",
+      "version": "nextgenpsd2-v1.3",
+      "kind": "openapi",
+      "authority": "technical",
+      "precedence": 90,
+      "locator": "schema:BookingStatus",
+      "sha256": "4edeffcc7ca16246066563dbb1e017ecb69b9d2f575b806be399c1aee247ba64",
+      "document_sha256": "45501c5076b98ccd3f755581d51a3a32e9c82710d2ef18b9f574dc93fee014b2"
+    },
+    {
+      "source_id": "bg-nextgenpsd2-v1.3-openapi",
+      "document_id": "bg-nextgenpsd2-v1.3-openapi@45501c5076b9",
+      "version": "nextgenpsd2-v1.3",
+      "kind": "openapi",
+      "authority": "technical",
+      "precedence": 90,
+      "locator": "schema:Error400",
+      "sha256": "cd55d0239faafed833e6e6525ef3180dc7cc05e70a4408aad94179e9914fe6ad",
+      "document_sha256": "45501c5076b98ccd3f755581d51a3a32e9c82710d2ef18b9f574dc93fee014b2"
+    },
+    {
+      "source_id": "bg-nextgenpsd2-v1.3-openapi",
+      "document_id": "bg-nextgenpsd2-v1.3-openapi@45501c5076b9",
+      "version": "nextgenpsd2-v1.3",
+      "kind": "openapi",
+      "authority": "technical",
+      "precedence": 90,
+      "locator": "schema:Transactions",
+      "sha256": "2c2d485b4e7672901fa740a7fad2637ab7881ef2d00d640ecf0750ce85ab6b3e",
+      "document_sha256": "45501c5076b98ccd3f755581d51a3a32e9c82710d2ef18b9f574dc93fee014b2"
+    },
+    {
+      "source_id": "bg-nextgenpsd2-v1.3-openapi",
+      "document_id": "bg-nextgenpsd2-v1.3-openapi@45501c5076b9",
+      "version": "nextgenpsd2-v1.3",
+      "kind": "openapi",
+      "authority": "technical",
+      "precedence": 90,
+      "locator": "schema:TransactionsResponse200Json",
+      "sha256": "570a3ed1d4cd773e1c62f4f9559ee1b5360d5e2291f52c033a5c653ec65fafbf",
+      "document_sha256": "45501c5076b98ccd3f755581d51a3a32e9c82710d2ef18b9f574dc93fee014b2"
+    },
+    {
+      "source_id": "bg-openfinance-v2-openapi",
+      "document_id": "bg-openfinance-v2-openapi@edd99f6e0265",
+      "version": "openfinance-v2",
+      "kind": "openapi",
+      "authority": "technical",
+      "precedence": 90,
+      "locator": "op:GET /accounts/{accountId}/transactions",
+      "sha256": "2935fd27adbb313d52dc8f4b04cee4dc74f1693bf8671549bc9c917adf8f45f5",
+      "document_sha256": "edd99f6e026537a45d3e95f33a35918e0f338914c70879234c5dc3c1e799fdfb"
+    },
+    {
+      "source_id": "bg-openfinance-v2-openapi",
+      "document_id": "bg-openfinance-v2-openapi@edd99f6e0265",
+      "version": "openfinance-v2",
+      "kind": "openapi",
+      "authority": "technical",
+      "precedence": 90,
+      "locator": "schema:AccountReport",
+      "sha256": "b8721b53771ae3838aa068e85fef440eac58cdaf08d877403218c6c4a4e92931",
+      "document_sha256": "edd99f6e026537a45d3e95f33a35918e0f338914c70879234c5dc3c1e799fdfb"
+    },
+    {
+      "source_id": "bg-openfinance-v2-openapi",
+      "document_id": "bg-openfinance-v2-openapi@edd99f6e0265",
+      "version": "openfinance-v2",
+      "kind": "openapi",
+      "authority": "technical",
+      "precedence": 90,
+      "locator": "schema:Amount",
+      "sha256": "516ad2819374af39b1f04bd69f80cbb0d0c8db76d6b74bff9f7b301b90413643",
+      "document_sha256": "edd99f6e026537a45d3e95f33a35918e0f338914c70879234c5dc3c1e799fdfb"
+    },
+    {
+      "source_id": "bg-openfinance-v2-openapi",
+      "document_id": "bg-openfinance-v2-openapi@edd99f6e0265",
+      "version": "openfinance-v2",
+      "kind": "openapi",
+      "authority": "technical",
+      "precedence": 90,
+      "locator": "schema:BookingStatus",
+      "sha256": "135c445e43a83060bb57dd851a9d23c96b1ee6e9d6218e57f315d32475a8f6ef",
+      "document_sha256": "edd99f6e026537a45d3e95f33a35918e0f338914c70879234c5dc3c1e799fdfb"
+    },
+    {
+      "source_id": "bg-openfinance-v2-openapi",
+      "document_id": "bg-openfinance-v2-openapi@edd99f6e0265",
+      "version": "openfinance-v2",
+      "kind": "openapi",
+      "authority": "technical",
+      "precedence": 90,
+      "locator": "schema:Error400",
+      "sha256": "1a39bd25253f9f4b7d097adc731e34f40347ebbbc385b68f4c5a642e8ab09221",
+      "document_sha256": "edd99f6e026537a45d3e95f33a35918e0f338914c70879234c5dc3c1e799fdfb"
+    },
+    {
+      "source_id": "bg-openfinance-v2-openapi",
+      "document_id": "bg-openfinance-v2-openapi@edd99f6e0265",
+      "version": "openfinance-v2",
+      "kind": "openapi",
+      "authority": "technical",
+      "precedence": 90,
+      "locator": "schema:PartyIdentification",
+      "sha256": "4faa87ec1820bf0dd561b2b2feee8900864eca6afa8c1d14a7850de07d89df99",
+      "document_sha256": "edd99f6e026537a45d3e95f33a35918e0f338914c70879234c5dc3c1e799fdfb"
+    },
+    {
+      "source_id": "bg-openfinance-v2-openapi",
+      "document_id": "bg-openfinance-v2-openapi@edd99f6e0265",
+      "version": "openfinance-v2",
+      "kind": "openapi",
+      "authority": "technical",
+      "precedence": 90,
+      "locator": "schema:Transactions",
+      "sha256": "3e0fd453f446a53f019806fb665d35ddc229a944547c37b2e0b37e8657967330",
+      "document_sha256": "edd99f6e026537a45d3e95f33a35918e0f338914c70879234c5dc3c1e799fdfb"
+    },
+    {
+      "source_id": "bg-openfinance-v2-openapi",
+      "document_id": "bg-openfinance-v2-openapi@edd99f6e0265",
+      "version": "openfinance-v2",
+      "kind": "openapi",
+      "authority": "technical",
+      "precedence": 90,
+      "locator": "schema:TransactionsResponse200Json",
+      "sha256": "570a3ed1d4cd773e1c62f4f9559ee1b5360d5e2291f52c033a5c653ec65fafbf",
+      "document_sha256": "edd99f6e026537a45d3e95f33a35918e0f338914c70879234c5dc3c1e799fdfb"
+    }
+  ]
+}

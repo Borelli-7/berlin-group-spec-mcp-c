@@ -39,7 +39,11 @@ pub trait CatalogRepository: Send + Sync {
     async fn get_chunk(&self, chunk_id: &str) -> Result<Option<EvidenceChunk>>;
     async fn chunks_for_page(&self, source_id: &str, page: u32) -> Result<Vec<EvidenceChunk>>;
     /// Chunks whose section equals `section` or starts with `section` + separator.
-    async fn chunks_for_section(&self, source_id: &str, section: &str) -> Result<Vec<EvidenceChunk>>;
+    async fn chunks_for_section(
+        &self,
+        source_id: &str,
+        section: &str,
+    ) -> Result<Vec<EvidenceChunk>>;
     /// Operations of a version matching method + canonical path key, highest precedence first.
     async fn find_operations(
         &self,
@@ -53,10 +57,19 @@ pub trait CatalogRepository: Send + Sync {
         method: &str,
         path: &str,
     ) -> Result<Option<OpenApiOperation>>;
-    async fn source_operations_by_path(&self, source_id: &str, path: &str) -> Result<Vec<OpenApiOperation>>;
+    async fn source_operations_by_path(
+        &self,
+        source_id: &str,
+        path: &str,
+    ) -> Result<Vec<OpenApiOperation>>;
     /// Schemas of a version with this name, highest precedence first.
-    async fn find_schemas(&self, version: &SpecificationVersion, name: &str) -> Result<Vec<OpenApiSchema>>;
-    async fn get_source_schema(&self, source_id: &str, name: &str) -> Result<Option<OpenApiSchema>>;
+    async fn find_schemas(
+        &self,
+        version: &SpecificationVersion,
+        name: &str,
+    ) -> Result<Vec<OpenApiSchema>>;
+    async fn get_source_schema(&self, source_id: &str, name: &str)
+    -> Result<Option<OpenApiSchema>>;
     async fn list_requirements(&self) -> Result<Vec<RequirementRecord>>;
     async fn get_requirement(&self, id: &str) -> Result<Option<RequirementRecord>>;
     async fn stats(&self) -> Result<CatalogStats>;

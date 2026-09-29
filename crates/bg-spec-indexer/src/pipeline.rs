@@ -15,15 +15,17 @@ use bg_spec_core::{
     CoreError, Result,
     config::Config,
     domain::{
-        Diagnostic, Document, DocumentKind, DocumentStatus, EvidenceChunk, PageRecord, PageStatus, Provenance,
-        RecordType, Severity,
+        Diagnostic, Document, DocumentKind, DocumentStatus, EvidenceChunk, PageRecord, PageStatus,
+        Provenance, RecordType, Severity,
     },
     hash::{sha256_hex, sha256_reader},
     manifest::{Manifest, ManifestSource},
     openapi_path,
     requirements::RequirementsFile,
 };
-use bg_spec_store::{DocumentBundle, SearchDocument, SqliteCatalog, StoredOperation, TantivyWriter};
+use bg_spec_store::{
+    DocumentBundle, SearchDocument, SqliteCatalog, StoredOperation, TantivyWriter,
+};
 use serde::Serialize;
 use serde_json::json;
 use std::{
@@ -93,7 +95,10 @@ struct Processed {
 }
 
 fn now_unix() -> i64 {
-    SystemTime::now().duration_since(UNIX_EPOCH).map(|d| d.as_secs() as i64).unwrap_or(0)
+    SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .map(|d| d.as_secs() as i64)
+        .unwrap_or(0)
 }
 
 fn join_err(e: tokio::task::JoinError) -> CoreError {
@@ -112,7 +117,8 @@ impl Indexer {
 
     pub fn load_manifest(config: &Config) -> Result<Manifest> {
         let path = config.manifest_path();
-        let raw = std::fs::read_to_string(&path).map_err(|e| CoreError::io(path.display().to_string(), e))?;
+        let raw = std::fs::read_to_string(&path)
+            .map_err(|e| CoreError::io(path.display().to_string(), e))?;
         Manifest::parse(&raw)
     }
 
@@ -134,9 +140,10 @@ impl Indexer {
         let root = CorpusRoot::open(&self.config.corpus_root)?;
         let catalog = SqliteCatalog::open_read_write(&self.config.catalog_path()).await?;
         let tantivy_dir = self.config.tantivy_dir();
-        let mut writer = tokio::task::spawn_blocking(move || TantivyWriter::open_or_create(&tantivy_dir))
-            .await
-            .map_err(join_err)??;
+        let mut writer =
+            tokio::task::spawn_blocking(move || TantivyWriter::open_or_create(&tantivy_dir))
+                .await
+                .map_err(join_err)??;
 
         let meta = bg_spec_core::ports::CatalogRepository::index_meta(&catalog).await?;
         let interrupted = sqlx_meta_flag(&catalog).await?;
@@ -167,19 +174,35 @@ impl Indexer {
         }
 
         for source in &manifest.sources {
-            let report = self.index_source(&root, source, &catalog, &writer, full_rebuild).await?;
+            let report = self
+                .index_source(&root, source, &catalog, &writer, full_rebuild)
+                .await?;
             info!(source_id = %report.source_id, action = ?report.action, records = report.records, "document processed");
             reports.push(report);
         }
 
         let generation = meta.index_generation.unwrap_or(0) + 1;
-        tokio::task::spawn_blocking(move || writer.commit()).await.map_err(join_err)??;
+        tokio::task::spawn_blocking(move || writer.commit())
+            .await
+            .map_err(join_err)??;
 
-        let (requirements, requirements_diagnostics, req_sha) = self.index_requirements(&manifest, &catalog).await?;
-        catalog.set_meta("last_indexed_at_unix", &now_unix().to_string()).await?;
-        catalog.set_meta("index_generation", &generation.to_string()).await?;
-        catalog.set_meta("requirements_file_sha256", req_sha.as_deref().unwrap_or("")).await?;
-        catalog.set_meta("indexer_format_version", &INDEXER_FORMAT_VERSION.to_string()).await?;
+        let (requirements, requirements_diagnostics, req_sha) =
+            self.index_requirements(&manifest, &catalog).await?;
+        catalog
+            .set_meta("last_indexed_at_unix", &now_unix().to_string())
+            .await?;
+        catalog
+            .set_meta("index_generation", &generation.to_string())
+            .await?;
+        catalog
+            .set_meta("requirements_file_sha256", req_sha.as_deref().unwrap_or(""))
+            .await?;
+        catalog
+            .set_meta(
+                "indexer_format_version",
+                &INDEXER_FORMAT_VERSION.to_string(),
+            )
+            .await?;
         catalog.set_meta(META_IN_PROGRESS, "0").await?;
         catalog.checkpoint().await?;
         catalog.close().await;
@@ -195,7 +218,13 @@ impl Indexer {
         })
     }
 
-    fn base_document(&self, source: &ManifestSource, sha256: Option<String>, size: Option<u64>, status: DocumentStatus) -> Document {
+    fn base_document(
+        &self,
+        source: &ManifestSource,
+        sha256: Option<String>,
+        size: Option<u64>,
+        status: DocumentStatus,
+    ) -> Document {
         Document {
             document_id: Document::document_id_for(&source.id, sha256.as_deref()),
             source_id: source.id.clone(),
@@ -224,7 +253,9 @@ impl Indexer {
         document: Document,
         action: IndexAction,
     ) -> Result<DocumentReport> {
-        catalog.replace_document(&document, &DocumentBundle::default()).await?;
+        catalog
+            .replace_document(&document, &DocumentBundle::default())
+            .await?;
         writer.delete_source(&document.source_id);
         Ok(DocumentReport {
             source_id: document.source_id.clone(),
@@ -251,20 +282,32 @@ impl Indexer {
                 doc.diagnostics.push(Diagnostic::new(
                     Severity::Error,
                     "file_missing",
-                    format!("file '{}' declared in the manifest does not exist", source.path),
+                    format!(
+                        "file '{}' declared in the manifest does not exist",
+                        source.path
+                    ),
                 ));
-                return self.store_empty(catalog, writer, doc, IndexAction::Missing).await;
+                return self
+                    .store_empty(catalog, writer, doc, IndexAction::Missing)
+                    .await;
             }
             Err(e) => {
                 let mut doc = self.base_document(source, None, None, DocumentStatus::Failed);
-                doc.diagnostics.push(Diagnostic::new(Severity::Error, "path_rejected", e.to_string()));
-                return self.store_empty(catalog, writer, doc, IndexAction::Failed).await;
+                doc.diagnostics.push(Diagnostic::new(
+                    Severity::Error,
+                    "path_rejected",
+                    e.to_string(),
+                ));
+                return self
+                    .store_empty(catalog, writer, doc, IndexAction::Failed)
+                    .await;
             }
         };
 
         let hash_path = path.clone();
         let (sha, size) = tokio::task::spawn_blocking(move || -> Result<(String, u64)> {
-            let file = std::fs::File::open(&hash_path).map_err(|e| CoreError::io(hash_path.display().to_string(), e))?;
+            let file = std::fs::File::open(&hash_path)
+                .map_err(|e| CoreError::io(hash_path.display().to_string(), e))?;
             let size = file.metadata().map(|m| m.len()).unwrap_or(0);
             let sha = sha256_reader(std::io::BufReader::new(file))
                 .map_err(|e| CoreError::io(hash_path.display().to_string(), e))?;
@@ -275,7 +318,8 @@ impl Indexer {
 
         let fingerprint = self.fingerprint(source);
         if !full_rebuild
-            && let Some((Some(old_sha), old_fp, status)) = catalog.document_state(&source.id).await?
+            && let Some((Some(old_sha), old_fp, status)) =
+                catalog.document_state(&source.id).await?
             && old_sha == sha
             && old_fp == fingerprint
             && matches!(status, DocumentStatus::Indexed | DocumentStatus::Partial)
@@ -296,11 +340,19 @@ impl Indexer {
             Err(e) => {
                 let mut doc = document;
                 doc.status = DocumentStatus::Failed;
-                doc.diagnostics.push(Diagnostic::new(Severity::Error, "processing_failed", e.to_string()));
-                return self.store_empty(catalog, writer, doc, IndexAction::Failed).await;
+                doc.diagnostics.push(Diagnostic::new(
+                    Severity::Error,
+                    "processing_failed",
+                    e.to_string(),
+                ));
+                return self
+                    .store_empty(catalog, writer, doc, IndexAction::Failed)
+                    .await;
             }
         };
-        catalog.replace_document(&processed.document, &processed.bundle).await?;
+        catalog
+            .replace_document(&processed.document, &processed.bundle)
+            .await?;
         writer.delete_source(&source.id);
         for d in &processed.search_docs {
             writer.add(d)?;
@@ -321,21 +373,34 @@ impl Indexer {
             overlap_chars: self.config.chunking.overlap_chars,
         };
         let min_chars = self.config.pdf.min_chars_per_page;
-        let prefix = self.config.versions.prefix_for(&document.version).map(str::to_owned);
+        let prefix = self
+            .config
+            .versions
+            .prefix_for(&document.version)
+            .map(str::to_owned);
         let extractor = Arc::clone(&self.extractor);
         tokio::task::spawn_blocking(move || match document.kind {
             DocumentKind::Pdf => {
                 let extracted = extractor.extract(&path)?;
                 let mut document = document;
                 document.extractor = Some(extractor.name().to_owned());
-                Ok(process_paged(document, extracted.pages, settings, min_chars))
+                Ok(process_paged(
+                    document,
+                    extracted.pages,
+                    settings,
+                    min_chars,
+                ))
             }
             DocumentKind::Text => {
                 let raw = read_text(&path)?;
                 let pages = raw
                     .split('\u{c}')
                     .enumerate()
-                    .map(|(i, text)| ExtractedPage { number: i as u32 + 1, text: text.to_owned(), error: None })
+                    .map(|(i, text)| ExtractedPage {
+                        number: i as u32 + 1,
+                        text: text.to_owned(),
+                        error: None,
+                    })
                     .collect();
                 let mut document = document;
                 document.extractor = Some("text".into());
@@ -358,7 +423,10 @@ impl Indexer {
             diagnostics.push(Diagnostic::new(
                 Severity::Warning,
                 "requirements_missing",
-                format!("requirements mapping {} not found; no curated requirements available", path.display()),
+                format!(
+                    "requirements mapping {} not found; no curated requirements available",
+                    path.display()
+                ),
             ));
             catalog.replace_requirements(&[]).await?;
             return Ok((0, diagnostics, None));
@@ -373,7 +441,10 @@ impl Indexer {
                         Diagnostic::new(
                             Severity::Warning,
                             "dangling_source",
-                            format!("requirement {} cites unknown source '{}'", r.id, s.source_id),
+                            format!(
+                                "requirement {} cites unknown source '{}'",
+                                r.id, s.source_id
+                            ),
                         )
                         .at(format!("requirement:{}", r.id)),
                     );
@@ -394,20 +465,39 @@ async fn sqlx_meta_flag(catalog: &SqliteCatalog) -> Result<bool> {
 fn relative_display(path: &Path, base: &Path) -> String {
     let (p, b) = (path.canonicalize().ok(), base.canonicalize().ok());
     match (p, b) {
-        (Some(p), Some(b)) => p.strip_prefix(&b).map(|r| r.to_string_lossy().replace('\\', "/")).ok(),
+        (Some(p), Some(b)) => p
+            .strip_prefix(&b)
+            .map(|r| r.to_string_lossy().replace('\\', "/"))
+            .ok(),
         _ => None,
     }
-    .unwrap_or_else(|| path.file_name().map(|f| f.to_string_lossy().into_owned()).unwrap_or_default())
+    .unwrap_or_else(|| {
+        path.file_name()
+            .map(|f| f.to_string_lossy().into_owned())
+            .unwrap_or_default()
+    })
 }
 
 fn read_text(path: &Path) -> Result<String> {
     std::fs::read_to_string(path).map_err(|e| CoreError::io(path.display().to_string(), e))
 }
 
-fn process_paged(mut document: Document, pages: Vec<ExtractedPage>, settings: ChunkSettings, min_chars: usize) -> Processed {
+fn process_paged(
+    mut document: Document,
+    pages: Vec<ExtractedPage>,
+    settings: ChunkSettings,
+    min_chars: usize,
+) -> Processed {
     let mut records = Vec::with_capacity(pages.len());
     for page in pages {
-        let text = page.text.lines().map(str::trim_end).collect::<Vec<_>>().join("\n").trim().to_owned();
+        let text = page
+            .text
+            .lines()
+            .map(str::trim_end)
+            .collect::<Vec<_>>()
+            .join("\n")
+            .trim()
+            .to_owned();
         let significant = text.chars().filter(|c| !c.is_whitespace()).count();
         let status = if page.error.is_some() {
             PageStatus::ExtractionFailed
@@ -447,13 +537,20 @@ fn process_paged(mut document: Document, pages: Vec<ExtractedPage>, settings: Ch
     let extracted: Vec<PageText<'_>> = records
         .iter()
         .filter(|p| p.status == PageStatus::Extracted)
-        .map(|p| PageText { number: p.page, text: &p.text })
+        .map(|p| PageText {
+            number: p.page,
+            text: &p.text,
+        })
         .collect();
     let raw_chunks = chunk_pages(&extracted, settings);
     let extracted_count = extracted.len();
     let total = records.len();
     document.page_count = Some(total as u32);
-    document.status = if extracted_count == total && total > 0 { DocumentStatus::Indexed } else { DocumentStatus::Partial };
+    document.status = if extracted_count == total && total > 0 {
+        DocumentStatus::Indexed
+    } else {
+        DocumentStatus::Partial
+    };
     if extracted_count == 0 {
         document.diagnostics.push(Diagnostic::new(
             Severity::Error,
@@ -466,8 +563,19 @@ fn process_paged(mut document: Document, pages: Vec<ExtractedPage>, settings: Ch
         .into_iter()
         .map(|c| {
             let chunk_id = format!("{}:p{}:c{}", document.source_id, c.page, c.ordinal);
-            let provenance = Provenance::for_document(&document, format!("chunk:{chunk_id}"), sha256_hex(c.text.as_bytes()));
-            EvidenceChunk { chunk_id, page: Some(c.page), section: c.section, ordinal: c.ordinal, text: c.text, provenance }
+            let provenance = Provenance::for_document(
+                &document,
+                format!("chunk:{chunk_id}"),
+                sha256_hex(c.text.as_bytes()),
+            );
+            EvidenceChunk {
+                chunk_id,
+                page: Some(c.page),
+                section: c.section,
+                ordinal: c.ordinal,
+                text: c.text,
+                provenance,
+            }
         })
         .collect();
     let search_docs = chunks
@@ -490,31 +598,55 @@ fn process_paged(mut document: Document, pages: Vec<ExtractedPage>, settings: Ch
             sha256: c.provenance.sha256.clone(),
         })
         .collect();
-    let ocr = records.iter().filter(|p| p.status == PageStatus::OcrRequired).count();
+    let ocr = records
+        .iter()
+        .filter(|p| p.status == PageStatus::OcrRequired)
+        .count();
     if let Some(m) = document.metadata.as_object_mut() {
         m.insert("pages".into(), json!(total));
         m.insert("extracted_pages".into(), json!(extracted_count));
         m.insert("ocr_required_pages".into(), json!(ocr));
         m.insert("chunks".into(), json!(chunks.len()));
     }
-    Processed { document, bundle: DocumentBundle { pages: records, chunks, ..Default::default() }, search_docs }
+    Processed {
+        document,
+        bundle: DocumentBundle {
+            pages: records,
+            chunks,
+            ..Default::default()
+        },
+        search_docs,
+    }
 }
 
 fn process_openapi(mut document: Document, path: &Path, prefix: Option<&str>) -> Result<Processed> {
     let raw = read_text(path)?;
-    let name = path.file_name().map(|f| f.to_string_lossy().into_owned()).unwrap_or_default();
+    let name = path
+        .file_name()
+        .map(|f| f.to_string_lossy().into_owned())
+        .unwrap_or_default();
     let root = parse_document(&raw, &name)?;
     let api = normalize(&root, &document)?;
     document.diagnostics.extend(api.diagnostics);
-    if document.diagnostics.iter().any(|d| d.severity != Severity::Info) {
+    if document
+        .diagnostics
+        .iter()
+        .any(|d| d.severity != Severity::Info)
+    {
         document.status = DocumentStatus::Partial;
     }
-    if let (Some(m), Some(api_meta)) = (document.metadata.as_object_mut(), api.metadata.as_object()) {
+    if let (Some(m), Some(api_meta)) = (document.metadata.as_object_mut(), api.metadata.as_object())
+    {
         m.extend(api_meta.clone());
     }
 
     let mut search_docs = Vec::with_capacity(api.operations.len() + api.schemas.len());
-    let base = |record_id: String, record_type, locator: String, title: String, content: String, sha256: String| SearchDocument {
+    let base = |record_id: String,
+                record_type,
+                locator: String,
+                title: String,
+                content: String,
+                sha256: String| SearchDocument {
         record_id,
         record_type,
         source_id: document.source_id.clone(),
@@ -553,11 +685,18 @@ fn process_openapi(mut document: Document, path: &Path, prefix: Option<&str>) ->
     let operations = api
         .operations
         .into_iter()
-        .map(|operation| StoredOperation { path_key: openapi_path::path_key(&operation.path, prefix), operation })
+        .map(|operation| StoredOperation {
+            path_key: openapi_path::path_key(&operation.path, prefix),
+            operation,
+        })
         .collect();
     Ok(Processed {
         document,
-        bundle: DocumentBundle { operations, schemas: api.schemas, ..Default::default() },
+        bundle: DocumentBundle {
+            operations,
+            schemas: api.schemas,
+            ..Default::default()
+        },
         search_docs,
     })
 }

@@ -5,7 +5,9 @@ use serde::{Deserialize, Serialize};
 use std::fmt;
 
 /// Endpoint reference `METHOD /path` used in curated mappings.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize, JsonSchema)]
+#[derive(
+    Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize, JsonSchema,
+)]
 #[serde(try_from = "String", into = "String")]
 #[schemars(with = "String")]
 pub struct EndpointRef {

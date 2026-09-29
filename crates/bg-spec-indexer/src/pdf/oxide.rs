@@ -16,15 +16,23 @@ impl PdfExtractor for PdfOxideExtractor {
         let display = path.display().to_string();
         let doc = PdfDocument::open(path)
             .map_err(|e| CoreError::Integrity(format!("cannot open PDF {display}: {e}")))?;
-        let count = doc
-            .page_count()
-            .map_err(|e| CoreError::Integrity(format!("cannot read page tree of {display}: {e}")))?;
+        let count = doc.page_count().map_err(|e| {
+            CoreError::Integrity(format!("cannot read page tree of {display}: {e}"))
+        })?;
         let pages = (0..count)
             .map(|index| {
                 let number = u32::try_from(index + 1).unwrap_or(u32::MAX);
                 match doc.extract_text(index) {
-                    Ok(text) => ExtractedPage { number, text, error: None },
-                    Err(e) => ExtractedPage { number, text: String::new(), error: Some(e.to_string()) },
+                    Ok(text) => ExtractedPage {
+                        number,
+                        text,
+                        error: None,
+                    },
+                    Err(e) => ExtractedPage {
+                        number,
+                        text: String::new(),
+                        error: Some(e.to_string()),
+                    },
                 }
             })
             .collect();

@@ -51,7 +51,8 @@ pub fn is_valid_source_id(id: &str) -> bool {
     let mut chars = id.chars();
     matches!(chars.next(), Some(c) if c.is_ascii_lowercase() || c.is_ascii_digit())
         && id.len() <= 128
-        && chars.all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || matches!(c, '.' | '_' | '-'))
+        && chars
+            .all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || matches!(c, '.' | '_' | '-'))
 }
 
 /// Validates that `path` is relative and cannot escape its root lexically.
@@ -94,7 +95,10 @@ impl Manifest {
                 )));
             }
             if !ids.insert(s.id.as_str()) {
-                return Err(CoreError::Manifest(format!("duplicate source id '{}'", s.id)));
+                return Err(CoreError::Manifest(format!(
+                    "duplicate source id '{}'",
+                    s.id
+                )));
             }
             validate_relative_path(&s.path)?;
             if !paths.insert(s.path.as_str()) {
@@ -162,12 +166,21 @@ sources:
     #[test]
     fn rejects_unknown_authority_and_fields() {
         assert!(Manifest::parse(&YAML.replace("normative", "official")).is_err());
-        assert!(Manifest::parse(&YAML.replace("precedence: 90", "precedence: 90\n    color: red")).is_err());
+        assert!(
+            Manifest::parse(&YAML.replace("precedence: 90", "precedence: 90\n    color: red"))
+                .is_err()
+        );
     }
 
     #[test]
     fn rejects_escaping_paths() {
-        for p in ["../secret.pdf", "/etc/passwd", "a/../../b", "./a.pdf", "a\\b.pdf"] {
+        for p in [
+            "../secret.pdf",
+            "/etc/passwd",
+            "a/../../b",
+            "./a.pdf",
+            "a\\b.pdf",
+        ] {
             let y = YAML.replace("pdf/v2/implementation-guidelines.pdf", p);
             assert!(Manifest::parse(&y).is_err(), "{p}");
         }
@@ -175,7 +188,10 @@ sources:
 
     #[test]
     fn rejects_duplicates_and_bad_ids() {
-        let dup = YAML.replace("bg-openfinance-v2-openapi", "bg-openfinance-v2-implementation-guidelines");
+        let dup = YAML.replace(
+            "bg-openfinance-v2-openapi",
+            "bg-openfinance-v2-implementation-guidelines",
+        );
         assert!(Manifest::parse(&dup).is_err());
         assert!(Manifest::parse(&YAML.replace("bg-openfinance-v2-openapi", "Bad ID")).is_err());
         assert!(Manifest::parse(&YAML.replace("precedence: 90", "precedence: 5000")).is_err());

@@ -109,10 +109,18 @@ pub struct PageOverview {
 #[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum SourceContent {
-    Pages { pages: Vec<PageContent> },
-    Chunks { chunks: Vec<EvidenceChunk> },
-    Operations { operations: Vec<OpenApiOperation> },
-    Schema { schema: Box<OpenApiSchema> },
+    Pages {
+        pages: Vec<PageContent>,
+    },
+    Chunks {
+        chunks: Vec<EvidenceChunk>,
+    },
+    Operations {
+        operations: Vec<OpenApiOperation>,
+    },
+    Schema {
+        schema: Box<OpenApiSchema>,
+    },
     Document {
         metadata: serde_json::Value,
         diagnostics: Vec<crate::domain::Diagnostic>,
@@ -182,7 +190,10 @@ pub struct SchemaClosure {
 
 impl SchemaClosure {
     pub fn schema_set(&self) -> crate::diff::SchemaSet {
-        self.schemas.iter().map(|(k, v)| (k.clone(), v.schema.clone())).collect()
+        self.schemas
+            .iter()
+            .map(|(k, v)| (k.clone(), v.schema.clone()))
+            .collect()
     }
 }
 
@@ -218,7 +229,11 @@ impl SpecificationService {
         search: Arc<dyn SearchRepository>,
         settings: Arc<ServiceSettings>,
     ) -> Self {
-        Self { catalog, search, settings }
+        Self {
+            catalog,
+            search,
+            settings,
+        }
     }
 
     pub fn settings(&self) -> &ServiceSettings {
@@ -337,7 +352,11 @@ impl SpecificationService {
             .chars()
             .map(|c| if c.is_alphanumeric() { c } else { ' ' })
             .collect();
-        let words: Vec<&str> = cleaned.split_whitespace().filter(|w| w.len() > 2).take(40).collect();
+        let words: Vec<&str> = cleaned
+            .split_whitespace()
+            .filter(|w| w.len() > 2)
+            .take(40)
+            .collect();
         if words.is_empty() || limit == 0 {
             return Ok(Vec::new());
         }
@@ -352,9 +371,21 @@ impl SpecificationService {
             .await
     }
 
-    pub async fn list_sources(&self, version: Option<&str>, kind: Option<&str>) -> Result<ListSourcesResponse> {
-        let version = version.map(str::trim).filter(|s| !s.is_empty()).map(SpecificationVersion::new).transpose()?;
-        let kind = kind.map(str::trim).filter(|s| !s.is_empty()).map(str::parse::<DocumentKind>).transpose()?;
+    pub async fn list_sources(
+        &self,
+        version: Option<&str>,
+        kind: Option<&str>,
+    ) -> Result<ListSourcesResponse> {
+        let version = version
+            .map(str::trim)
+            .filter(|s| !s.is_empty())
+            .map(SpecificationVersion::new)
+            .transpose()?;
+        let kind = kind
+            .map(str::trim)
+            .filter(|s| !s.is_empty())
+            .map(str::parse::<DocumentKind>)
+            .transpose()?;
         let sources: Vec<SourceListing> = self
             .catalog
             .list_documents()
@@ -364,7 +395,10 @@ impl SpecificationService {
             .filter(|d| kind.is_none_or(|k| d.kind == k))
             .map(SourceListing::from)
             .collect();
-        Ok(ListSourcesResponse { total: sources.len(), sources })
+        Ok(ListSourcesResponse {
+            total: sources.len(),
+            sources,
+        })
     }
 
     async fn indexed_document(&self, source_id: &str) -> Result<Document> {
@@ -406,10 +440,18 @@ impl SpecificationService {
                     diagnostics: doc.diagnostics.clone(),
                     pages: pages
                         .iter()
-                        .map(|p| PageOverview { page: p.page, status: p.status, char_count: p.char_count })
+                        .map(|p| PageOverview {
+                            page: p.page,
+                            status: p.status,
+                            char_count: p.char_count,
+                        })
                         .collect(),
                 };
-                let prov = provenance(&doc, "document".into(), doc.sha256.clone().unwrap_or_default());
+                let prov = provenance(
+                    &doc,
+                    "document".into(),
+                    doc.sha256.clone().unwrap_or_default(),
+                );
                 (content, vec![prov])
             }
             SourceLocator::Page(a) | SourceLocator::PageRange(a, _) => {
@@ -427,7 +469,10 @@ impl SpecificationService {
                         doc.source_id
                     )));
                 }
-                let pages = self.catalog.get_pages(&doc.source_id, *a, b.min(max)).await?;
+                let pages = self
+                    .catalog
+                    .get_pages(&doc.source_id, *a, b.min(max))
+                    .await?;
                 let prov = pages
                     .iter()
                     .map(|p| provenance(&doc, format!("page:{}", p.page), p.sha256.clone()))
@@ -436,7 +481,10 @@ impl SpecificationService {
                     .into_iter()
                     .map(|p| PageContent {
                         warning: (p.status != PageStatus::Extracted).then(|| {
-                            format!("page {} has status '{}'; no extractable text is available", p.page, p.status)
+                            format!(
+                                "page {} has status '{}'; no extractable text is available",
+                                p.page, p.status
+                            )
                         }),
                         page: p.page,
                         status: p.status,
@@ -452,7 +500,10 @@ impl SpecificationService {
                 }
                 let chunks = self.catalog.chunks_for_section(&doc.source_id, s).await?;
                 if chunks.is_empty() {
-                    return Err(CoreError::NotFound(format!("section '{s}' not found in '{}'", doc.source_id)));
+                    return Err(CoreError::NotFound(format!(
+                        "section '{s}' not found in '{}'",
+                        doc.source_id
+                    )));
                 }
                 let prov = chunks.iter().map(|c| c.provenance.clone()).collect();
                 (SourceContent::Chunks { chunks }, prov)
@@ -463,9 +514,19 @@ impl SpecificationService {
                     .get_chunk(id)
                     .await?
                     .filter(|c| c.provenance.source_id == doc.source_id)
-                    .ok_or_else(|| CoreError::NotFound(format!("chunk '{id}' not found in '{}'", doc.source_id)))?;
+                    .ok_or_else(|| {
+                        CoreError::NotFound(format!(
+                            "chunk '{id}' not found in '{}'",
+                            doc.source_id
+                        ))
+                    })?;
                 let prov = vec![chunk.provenance.clone()];
-                (SourceContent::Chunks { chunks: vec![chunk] }, prov)
+                (
+                    SourceContent::Chunks {
+                        chunks: vec![chunk],
+                    },
+                    prov,
+                )
             }
             SourceLocator::Operation { method, path } => {
                 if doc.kind != DocumentKind::Openapi {
@@ -475,17 +536,33 @@ impl SpecificationService {
                     .catalog
                     .get_source_operation(&doc.source_id, method, path)
                     .await?
-                    .ok_or_else(|| CoreError::NotFound(format!("operation {method} {path} not found in '{}'", doc.source_id)))?;
+                    .ok_or_else(|| {
+                        CoreError::NotFound(format!(
+                            "operation {method} {path} not found in '{}'",
+                            doc.source_id
+                        ))
+                    })?;
                 let prov = vec![op.provenance.clone()];
-                (SourceContent::Operations { operations: vec![op] }, prov)
+                (
+                    SourceContent::Operations {
+                        operations: vec![op],
+                    },
+                    prov,
+                )
             }
             SourceLocator::Path(path) => {
                 if doc.kind != DocumentKind::Openapi {
                     return Err(wrong_kind("an OpenAPI path"));
                 }
-                let ops = self.catalog.source_operations_by_path(&doc.source_id, path).await?;
+                let ops = self
+                    .catalog
+                    .source_operations_by_path(&doc.source_id, path)
+                    .await?;
                 if ops.is_empty() {
-                    return Err(CoreError::NotFound(format!("path {path} not found in '{}'", doc.source_id)));
+                    return Err(CoreError::NotFound(format!(
+                        "path {path} not found in '{}'",
+                        doc.source_id
+                    )));
                 }
                 let prov = ops.iter().map(|o| o.provenance.clone()).collect();
                 (SourceContent::Operations { operations: ops }, prov)
@@ -498,9 +575,19 @@ impl SpecificationService {
                     .catalog
                     .get_source_schema(&doc.source_id, name)
                     .await?
-                    .ok_or_else(|| CoreError::NotFound(format!("schema '{name}' not found in '{}'", doc.source_id)))?;
+                    .ok_or_else(|| {
+                        CoreError::NotFound(format!(
+                            "schema '{name}' not found in '{}'",
+                            doc.source_id
+                        ))
+                    })?;
                 let prov = vec![schema.provenance.clone()];
-                (SourceContent::Schema { schema: Box::new(schema) }, prov)
+                (
+                    SourceContent::Schema {
+                        schema: Box::new(schema),
+                    },
+                    prov,
+                )
             }
         };
         Ok(ReadSourceResponse {
@@ -531,10 +618,19 @@ impl SpecificationService {
             None => (0, MatchedBy::Canonical),
         };
         let primary = ops.remove(idx);
-        Ok(Some(OperationLookup { primary, matched_by, others: ops }))
+        Ok(Some(OperationLookup {
+            primary,
+            matched_by,
+            others: ops,
+        }))
     }
 
-    pub async fn read_endpoint(&self, version: Option<&str>, path: &str, method: &str) -> Result<EndpointResponse> {
+    pub async fn read_endpoint(
+        &self,
+        version: Option<&str>,
+        path: &str,
+        method: &str,
+    ) -> Result<EndpointResponse> {
         let version = self.version_or_target(version)?;
         self.ensure_known_version(&version).await?;
         let lookup = self
@@ -560,22 +656,35 @@ impl SpecificationService {
         let version = self.version_or_target(version)?;
         let name = name.trim();
         if name.is_empty() || name.len() > 256 {
-            return Err(CoreError::InvalidInput("schema name must be 1-256 characters".into()));
+            return Err(CoreError::InvalidInput(
+                "schema name must be 1-256 characters".into(),
+            ));
         }
         self.ensure_known_version(&version).await?;
         let mut found = self.catalog.find_schemas(&version, name).await?;
         if found.is_empty() {
-            return Err(CoreError::NotFound(format!("no schema '{name}' in version '{version}'")));
+            return Err(CoreError::NotFound(format!(
+                "no schema '{name}' in version '{version}'"
+            )));
         }
         let schema = found.remove(0);
         let closure = self
-            .schema_closure(&schema.provenance.source_id, &version, schema.referenced_schemas.iter().cloned())
+            .schema_closure(
+                &schema.provenance.source_id,
+                &version,
+                schema.referenced_schemas.iter().cloned(),
+            )
             .await?;
         Ok(SchemaResponse {
             version,
             name: schema.name.clone(),
             referenced_schemas: schema.referenced_schemas.clone(),
-            transitive_referenced_schemas: closure.schemas.keys().filter(|k| *k != &schema.name).cloned().collect(),
+            transitive_referenced_schemas: closure
+                .schemas
+                .keys()
+                .filter(|k| *k != &schema.name)
+                .cloned()
+                .collect(),
             unresolved_references: closure.unresolved.into_iter().collect(),
             alternatives: found.iter().map(|s| s.provenance.clone()).collect(),
             schema,
@@ -601,7 +710,12 @@ impl SpecificationService {
             }
             let schema = match self.catalog.get_source_schema(source_id, &name).await? {
                 Some(s) => Some(s),
-                None => self.catalog.find_schemas(version, &name).await?.into_iter().next(),
+                None => self
+                    .catalog
+                    .find_schemas(version, &name)
+                    .await?
+                    .into_iter()
+                    .next(),
             };
             match schema {
                 Some(s) => {
@@ -627,19 +741,35 @@ impl SpecificationService {
         }
         for d in &docs {
             if matches!(d.status, DocumentStatus::Missing | DocumentStatus::Failed) {
-                problems.push(format!("source '{}' has status '{}'", d.source_id, d.status));
+                problems.push(format!(
+                    "source '{}' has status '{}'",
+                    d.source_id, d.status
+                ));
             }
         }
         if catalog.ocr_required_pages > 0 {
-            problems.push(format!("{} page(s) require OCR (no extractable text)", catalog.ocr_required_pages));
+            problems.push(format!(
+                "{} page(s) require OCR (no extractable text)",
+                catalog.ocr_required_pages
+            ));
         }
         Ok(HealthReport {
-            status: if problems.is_empty() { "ok" } else { "degraded" }.to_owned(),
+            status: if problems.is_empty() {
+                "ok"
+            } else {
+                "degraded"
+            }
+            .to_owned(),
             read_only: true,
             server_version: env!("CARGO_PKG_VERSION").to_owned(),
             baseline_version: self.settings.baseline.clone(),
             target_version: self.settings.target.clone(),
-            versions: docs.iter().map(|d| d.version.to_string()).collect::<BTreeSet<_>>().into_iter().collect(),
+            versions: docs
+                .iter()
+                .map(|d| d.version.to_string())
+                .collect::<BTreeSet<_>>()
+                .into_iter()
+                .collect(),
             catalog,
             index,
             search_documents,

@@ -3,7 +3,10 @@
 use async_trait::async_trait;
 use bg_spec_core::{
     CoreError, Result,
-    domain::{DocumentAuthority, DocumentKind, EvidenceClass, RecordType, SearchQuery, SearchResult, SpecificationVersion},
+    domain::{
+        DocumentAuthority, DocumentKind, EvidenceClass, RecordType, SearchQuery, SearchResult,
+        SpecificationVersion,
+    },
     ports::SearchRepository,
 };
 use std::{
@@ -15,7 +18,8 @@ use tantivy::{
     collector::TopDocs,
     query::{BooleanQuery, Occur, Query, QueryParser, TermQuery},
     schema::{
-        Field, INDEXED, IndexRecordOption, STORED, STRING, Schema, TextFieldIndexing, TextOptions, Value,
+        Field, INDEXED, IndexRecordOption, STORED, STRING, Schema, TextFieldIndexing, TextOptions,
+        Value,
     },
     snippet::SnippetGenerator,
 };
@@ -130,9 +134,11 @@ impl TantivyWriter {
             (Index::open_in_dir(dir).map_err(search_err)?, false)
         } else {
             if dir.exists() {
-                std::fs::remove_dir_all(dir).map_err(|e| CoreError::io(dir.display().to_string(), e))?;
+                std::fs::remove_dir_all(dir)
+                    .map_err(|e| CoreError::io(dir.display().to_string(), e))?;
             }
-            std::fs::create_dir_all(dir).map_err(|e| CoreError::io(dir.display().to_string(), e))?;
+            std::fs::create_dir_all(dir)
+                .map_err(|e| CoreError::io(dir.display().to_string(), e))?;
             let (schema, _) = build_schema();
             let index = Index::create_in_dir(dir, schema).map_err(search_err)?;
             std::fs::write(dir.join(MARKER_FILE), SEARCH_SCHEMA_VERSION.to_string())
@@ -143,7 +149,11 @@ impl TantivyWriter {
         let writer = index
             .writer_with_num_threads(1, WRITER_HEAP_BYTES)
             .map_err(search_err)?;
-        Ok(Self { writer, fields, rebuilt })
+        Ok(Self {
+            writer,
+            fields,
+            rebuilt,
+        })
     }
 
     /// True if the index was (re)created, meaning every document must be re-added.
@@ -220,7 +230,12 @@ impl TantivySearch {
             .reload_policy(ReloadPolicy::OnCommitWithDelay)
             .try_into()
             .map_err(search_err)?;
-        Ok(Self { index, reader, fields, dir: dir.to_path_buf() })
+        Ok(Self {
+            index,
+            reader,
+            fields,
+            dir: dir.to_path_buf(),
+        })
     }
 
     pub fn dir(&self) -> &Path {
@@ -234,7 +249,10 @@ impl TantivySearch {
         let (text_query, _errors) = parser.parse_query_lenient(&q.text);
         let mut clauses: Vec<(Occur, Box<dyn Query>)> = vec![(Occur::Must, text_query)];
         let term = |field: Field, value: &str| -> Box<dyn Query> {
-            Box::new(TermQuery::new(Term::from_field_text(field, value), IndexRecordOption::Basic))
+            Box::new(TermQuery::new(
+                Term::from_field_text(field, value),
+                IndexRecordOption::Basic,
+            ))
         };
         if let Some(v) = &q.version {
             clauses.push((Occur::Must, term(f.version, v.as_str())));
@@ -243,7 +261,11 @@ impl TantivySearch {
             clauses.push((Occur::Must, term(f.source_id, s)));
         }
         if !q.kinds.is_empty() {
-            let kinds = q.kinds.iter().map(|k| (Occur::Should, term(f.kind, k.as_str()))).collect();
+            let kinds = q
+                .kinds
+                .iter()
+                .map(|k| (Occur::Should, term(f.kind, k.as_str())))
+                .collect();
             clauses.push((Occur::Must, Box::new(BooleanQuery::new(kinds))));
         }
         Ok(Box::new(BooleanQuery::new(clauses)))
@@ -260,7 +282,8 @@ impl TantivySearch {
         let top = searcher
             .search(&query, &TopDocs::with_limit(fetch).order_by_score())
             .map_err(search_err)?;
-        let mut snippets = SnippetGenerator::create(&searcher, &*query, self.fields.content).map_err(search_err)?;
+        let mut snippets = SnippetGenerator::create(&searcher, &*query, self.fields.content)
+            .map_err(search_err)?;
         snippets.set_max_num_chars(SNIPPET_CHARS);
 
         let f = &self.fields;
@@ -268,7 +291,10 @@ impl TantivySearch {
         for (score, addr) in top {
             let doc: TantivyDocument = searcher.doc(addr).map_err(search_err)?;
             let text = |field: Field| -> String {
-                doc.get_first(field).and_then(|v| v.as_str()).unwrap_or_default().to_owned()
+                doc.get_first(field)
+                    .and_then(|v| v.as_str())
+                    .unwrap_or_default()
+                    .to_owned()
             };
             let snippet = snippets.snippet_from_doc(&doc);
             let evidence = if snippet.fragment().trim().is_empty() {
@@ -290,7 +316,10 @@ impl TantivySearch {
                 authority: text(f.authority).parse().map_err(search_err)?,
                 title: text(f.title),
                 locator: text(f.locator),
-                page: doc.get_first(f.page).and_then(|v| v.as_u64()).map(|p| p as u32),
+                page: doc
+                    .get_first(f.page)
+                    .and_then(|v| v.as_u64())
+                    .map(|p| p as u32),
                 evidence,
                 relevance: (score * 1000.0).round() / 1000.0,
                 sha256: text(f.sha256),

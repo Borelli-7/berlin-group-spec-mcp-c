@@ -4,7 +4,9 @@ use serde::{Deserialize, Serialize};
 use std::fmt;
 
 /// Identifier of a specification version, e.g. `nextgenpsd2-v1.3` or `openfinance-v2`.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize, JsonSchema)]
+#[derive(
+    Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize, JsonSchema,
+)]
 #[serde(try_from = "String", into = "String")]
 pub struct SpecificationVersion(String);
 

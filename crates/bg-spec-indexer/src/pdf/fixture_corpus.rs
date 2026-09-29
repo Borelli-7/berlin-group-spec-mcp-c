@@ -107,7 +107,11 @@ fn v2_operational_rules() -> FixturePdf {
         path: "pdf/v2/operational-rules.pdf",
         title: "Open Finance Framework v2 - Operational Rules (synthetic fixture)",
         pages: vec![
-            page(&["Open Finance Framework Version 2", "Operational Rules (synthetic fixture)", DISCLAIMER]),
+            page(&[
+                "Open Finance Framework Version 2",
+                "Operational Rules (synthetic fixture)",
+                DISCLAIMER,
+            ]),
             page(&[
                 "3 Transaction History Access",
                 "The ASPSP SHALL make at least 90 days of transaction history available through the \
@@ -124,7 +128,11 @@ fn v13_implementation_guidelines() -> FixturePdf {
         path: "pdf/v1/implementation-guidelines-v1.3.pdf",
         title: "NextGenPSD2 v1.3 - Implementation Guidelines (synthetic fixture)",
         pages: vec![
-            page(&["NextGenPSD2 Framework Version 1.3", "Implementation Guidelines (synthetic fixture)", DISCLAIMER]),
+            page(&[
+                "NextGenPSD2 Framework Version 1.3",
+                "Implementation Guidelines (synthetic fixture)",
+                DISCLAIMER,
+            ]),
             page(&[
                 "6.3 Read Transaction List",
                 "Call GET /v1/accounts/{account-id}/transactions reads the transaction list of an account.",
@@ -139,5 +147,9 @@ fn v13_implementation_guidelines() -> FixturePdf {
 
 /// All fixture PDFs of the example corpus.
 pub fn fixture_pdfs() -> Vec<FixturePdf> {
-    vec![v2_implementation_guidelines(), v2_operational_rules(), v13_implementation_guidelines()]
+    vec![
+        v2_implementation_guidelines(),
+        v2_operational_rules(),
+        v13_implementation_guidelines(),
+    ]
 }

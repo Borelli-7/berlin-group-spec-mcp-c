@@ -9,7 +9,11 @@ pub use compatibility::*;
 pub use requirement::*;
 pub use specification::*;
 
-use crate::{config::Config, domain::SpecificationVersion, ports::{CatalogRepository, SearchRepository}};
+use crate::{
+    config::Config,
+    domain::SpecificationVersion,
+    ports::{CatalogRepository, SearchRepository},
+};
 use std::{collections::BTreeMap, sync::Arc};
 
 /// Notice attached to search output: search hits are evidence, not requirements.

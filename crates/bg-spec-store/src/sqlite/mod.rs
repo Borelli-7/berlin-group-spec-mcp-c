@@ -32,7 +32,8 @@ impl SqliteCatalog {
     /// Opens (creating if needed) and migrates the catalog for indexing.
     pub async fn open_read_write(path: &Path) -> Result<Self> {
         if let Some(dir) = path.parent() {
-            std::fs::create_dir_all(dir).map_err(|e| CoreError::io(dir.display().to_string(), e))?;
+            std::fs::create_dir_all(dir)
+                .map_err(|e| CoreError::io(dir.display().to_string(), e))?;
         }
         let opts = SqliteConnectOptions::new()
             .filename(path)
@@ -47,8 +48,13 @@ impl SqliteCatalog {
             .await
             .map_err(storage)?;
         MIGRATOR.run(&pool).await.map_err(storage)?;
-        let catalog = Self { pool, read_only: false };
-        catalog.set_meta("schema_version", &CATALOG_SCHEMA_VERSION.to_string()).await?;
+        let catalog = Self {
+            pool,
+            read_only: false,
+        };
+        catalog
+            .set_meta("schema_version", &CATALOG_SCHEMA_VERSION.to_string())
+            .await?;
         Ok(catalog)
     }
 
@@ -72,11 +78,19 @@ impl SqliteCatalog {
             .connect_with(opts)
             .await
             .map_err(storage)?;
-        let catalog = Self { pool, read_only: true };
-        let version: Option<String> = sqlx::query_scalar("SELECT value FROM index_meta WHERE key = 'schema_version'")
-            .fetch_optional(&catalog.pool)
-            .await
-            .map_err(|e| CoreError::Config(format!("catalog is not initialized ({e}); run `bg-spec index`")))?;
+        let catalog = Self {
+            pool,
+            read_only: true,
+        };
+        let version: Option<String> =
+            sqlx::query_scalar("SELECT value FROM index_meta WHERE key = 'schema_version'")
+                .fetch_optional(&catalog.pool)
+                .await
+                .map_err(|e| {
+                    CoreError::Config(format!(
+                        "catalog is not initialized ({e}); run `bg-spec index`"
+                    ))
+                })?;
         match version.as_deref().and_then(|v| v.parse::<u32>().ok()) {
             Some(CATALOG_SCHEMA_VERSION) => Ok(catalog),
             other => Err(CoreError::Config(format!(

@@ -34,7 +34,9 @@ macro_rules! string_enum {
 }
 
 /// Physical/semantic kind of a corpus document.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize, JsonSchema)]
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize, JsonSchema,
+)]
 #[serde(rename_all = "snake_case")]
 pub enum DocumentKind {
     /// PDF specification (Implementation Guidelines, Operational Rules, ...).
@@ -47,7 +49,9 @@ pub enum DocumentKind {
 string_enum!(DocumentKind { Pdf => "pdf", Openapi => "openapi", Text => "text" });
 
 /// Authority class declared explicitly in the manifest. Never inferred from file names.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize, JsonSchema)]
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize, JsonSchema,
+)]
 #[serde(rename_all = "snake_case")]
 pub enum DocumentAuthority {
     Normative,

@@ -44,41 +44,96 @@ fn compact(v: &Option<serde_json::Value>) -> String {
     match v {
         Some(v) => {
             let s = v.to_string();
-            if s.len() > 160 { format!("{}...", &s[..s.floor_char_boundary(157)]) } else { s }
+            if s.len() > 160 {
+                format!("{}...", &s[..s.floor_char_boundary(157)])
+            } else {
+                s
+            }
         }
         None => "-".to_owned(),
     }
 }
 
 /// Derives factual statements from every non-`unchanged` change (and nested schema change).
-pub fn derive_facts(changes: &[CompatibilityChange], from: &str, to: &str) -> Vec<CompatibilityFact> {
+pub fn derive_facts(
+    changes: &[CompatibilityChange],
+    from: &str,
+    to: &str,
+) -> Vec<CompatibilityFact> {
     let mut facts = Vec::new();
     for c in changes {
         let side = side_text(c.side);
         match c.change {
             ChangeType::Unchanged => continue,
             ChangeType::Added if c.area == ChangeArea::Parameter => {
-                let req = c.after.as_ref().and_then(|v| v.get("required")).and_then(|v| v.as_bool()).unwrap_or(false);
-                facts.push(CompatibilityFact { side: c.side, subject: c.subject.clone(),
-                    statement: format!("{} {} parameter '{}' exists in {to} but not in {from}.",
-                        if req { "Required" } else { "Optional" }, side, c.subject) });
+                let req = c
+                    .after
+                    .as_ref()
+                    .and_then(|v| v.get("required"))
+                    .and_then(|v| v.as_bool())
+                    .unwrap_or(false);
+                facts.push(CompatibilityFact {
+                    side: c.side,
+                    subject: c.subject.clone(),
+                    statement: format!(
+                        "{} {} parameter '{}' exists in {to} but not in {from}.",
+                        if req { "Required" } else { "Optional" },
+                        side,
+                        c.subject
+                    ),
+                });
             }
-            ChangeType::Added => facts.push(CompatibilityFact { side: c.side, subject: c.subject.clone(),
-                statement: format!("{:?} '{}' exists in {to} but not in {from}.", c.area, c.subject) }),
-            ChangeType::Removed => facts.push(CompatibilityFact { side: c.side, subject: c.subject.clone(),
-                statement: format!("{:?} '{}' exists in {from} but not in {to}.", c.area, c.subject) }),
+            ChangeType::Added => facts.push(CompatibilityFact {
+                side: c.side,
+                subject: c.subject.clone(),
+                statement: format!(
+                    "{:?} '{}' exists in {to} but not in {from}.",
+                    c.area, c.subject
+                ),
+            }),
+            ChangeType::Removed => facts.push(CompatibilityFact {
+                side: c.side,
+                subject: c.subject.clone(),
+                statement: format!(
+                    "{:?} '{}' exists in {from} but not in {to}.",
+                    c.area, c.subject
+                ),
+            }),
             ChangeType::Modified if c.before.is_some() || c.after.is_some() => {
-                facts.push(CompatibilityFact { side: c.side, subject: c.subject.clone(),
-                    statement: format!("{:?} '{}' changed from {} ({from}) to {} ({to}).",
-                        c.area, c.subject, compact(&c.before), compact(&c.after)) });
+                facts.push(CompatibilityFact {
+                    side: c.side,
+                    subject: c.subject.clone(),
+                    statement: format!(
+                        "{:?} '{}' changed from {} ({from}) to {} ({to}).",
+                        c.area,
+                        c.subject,
+                        compact(&c.before),
+                        compact(&c.after)
+                    ),
+                });
             }
             ChangeType::Modified => {}
         }
         for s in &c.schema_changes {
-            let within = s.schema_name.as_deref().map(|n| format!(" (schema {n})")).unwrap_or_default();
-            facts.push(CompatibilityFact { side: c.side, subject: c.subject.clone(),
-                statement: format!("{} schema of '{}' at {}{}: {}; {from}={} {to}={}.",
-                    side, c.subject, s.pointer, within, kind_text(s.kind), compact(&s.before), compact(&s.after)) });
+            let within = s
+                .schema_name
+                .as_deref()
+                .map(|n| format!(" (schema {n})"))
+                .unwrap_or_default();
+            facts.push(CompatibilityFact {
+                side: c.side,
+                subject: c.subject.clone(),
+                statement: format!(
+                    "{} schema of '{}' at {}{}: {}; {from}={} {to}={}.",
+                    side,
+                    c.subject,
+                    s.pointer,
+                    within,
+                    kind_text(s.kind),
+                    compact(&s.before),
+                    compact(&s.after)
+                ),
+            });
         }
     }
     facts

@@ -2,7 +2,10 @@ use super::{COMPARISON_NOTICE, MatchedBy, SpecificationService};
 use crate::{
     CoreError, Result,
     diff::{CompatibilityFact, derive_facts, diff_operations},
-    domain::{ChangeType, CompatibilityChange, OpenApiOperation, Provenance, SchemaChange, SpecificationVersion},
+    domain::{
+        ChangeType, CompatibilityChange, OpenApiOperation, Provenance, SchemaChange,
+        SpecificationVersion,
+    },
     openapi_path::{normalize_method, validate_path},
 };
 use schemars::JsonSchema;
@@ -79,11 +82,27 @@ impl CompatibilityService {
             )));
         }
         let closure_a = match &a {
-            Some(l) => self.spec.schema_closure(&l.primary.provenance.source_id, &from, l.primary.referenced_schemas.iter().cloned()).await?,
+            Some(l) => {
+                self.spec
+                    .schema_closure(
+                        &l.primary.provenance.source_id,
+                        &from,
+                        l.primary.referenced_schemas.iter().cloned(),
+                    )
+                    .await?
+            }
             None => Default::default(),
         };
         let closure_b = match &b {
-            Some(l) => self.spec.schema_closure(&l.primary.provenance.source_id, &to, l.primary.referenced_schemas.iter().cloned()).await?,
+            Some(l) => {
+                self.spec
+                    .schema_closure(
+                        &l.primary.provenance.source_id,
+                        &to,
+                        l.primary.referenced_schemas.iter().cloned(),
+                    )
+                    .await?
+            }
             None => Default::default(),
         };
         let (set_a, set_b) = (closure_a.schema_set(), closure_b.schema_set());
@@ -91,8 +110,14 @@ impl CompatibilityService {
             a.as_ref().map(|l| (&l.primary, &set_a)),
             b.as_ref().map(|l| (&l.primary, &set_b)),
         );
-        let schema_changes: Vec<SchemaChange> = changes.iter().flat_map(|c| c.schema_changes.iter().cloned()).collect();
-        let mut counts = ChangeCounts { schema_changes: schema_changes.len(), ..Default::default() };
+        let schema_changes: Vec<SchemaChange> = changes
+            .iter()
+            .flat_map(|c| c.schema_changes.iter().cloned())
+            .collect();
+        let mut counts = ChangeCounts {
+            schema_changes: schema_changes.len(),
+            ..Default::default()
+        };
         for c in &changes {
             match c.change {
                 ChangeType::Added => counts.added += 1,

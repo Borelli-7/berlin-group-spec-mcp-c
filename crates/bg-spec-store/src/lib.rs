@@ -6,7 +6,7 @@ pub mod search;
 pub mod sqlite;
 
 pub use search::{SearchDocument, TantivySearch, TantivyWriter};
-pub use sqlite::{DocumentBundle, SqliteCatalog, StoredOperation, CATALOG_SCHEMA_VERSION};
+pub use sqlite::{CATALOG_SCHEMA_VERSION, DocumentBundle, SqliteCatalog, StoredOperation};
 
 use bg_spec_core::{Result, config::Config};
 use std::sync::Arc;

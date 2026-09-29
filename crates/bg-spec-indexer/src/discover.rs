@@ -13,11 +13,17 @@ pub struct CorpusRoot(PathBuf);
 
 impl CorpusRoot {
     pub fn open(path: &Path) -> Result<Self> {
-        let canonical = path
-            .canonicalize()
-            .map_err(|e| CoreError::Config(format!("corpus root {} is not accessible: {e}", path.display())))?;
+        let canonical = path.canonicalize().map_err(|e| {
+            CoreError::Config(format!(
+                "corpus root {} is not accessible: {e}",
+                path.display()
+            ))
+        })?;
         if !canonical.is_dir() {
-            return Err(CoreError::Config(format!("corpus root {} is not a directory", canonical.display())));
+            return Err(CoreError::Config(format!(
+                "corpus root {} is not a directory",
+                canonical.display()
+            )));
         }
         Ok(Self(canonical))
     }
@@ -38,10 +44,14 @@ impl CorpusRoot {
             .canonicalize()
             .map_err(|e| CoreError::io(relative.to_owned(), e))?;
         if !canonical.starts_with(&self.0) {
-            return Err(CoreError::Integrity(format!("path '{relative}' resolves outside the corpus root")));
+            return Err(CoreError::Integrity(format!(
+                "path '{relative}' resolves outside the corpus root"
+            )));
         }
         if !canonical.is_file() {
-            return Err(CoreError::Integrity(format!("path '{relative}' is not a regular file")));
+            return Err(CoreError::Integrity(format!(
+                "path '{relative}' is not a regular file"
+            )));
         }
         Ok(Some(canonical))
     }
@@ -53,8 +63,14 @@ pub fn orphan_files(root: &CorpusRoot, manifest: &Manifest) -> Vec<String> {
     let mut out = Vec::new();
     for dir in ["openapi", "pdf", "text"] {
         let base = root.path().join(dir);
-        for entry in WalkDir::new(&base).follow_links(false).sort_by_file_name().into_iter().flatten() {
-            if !entry.file_type().is_file() || entry.file_name().to_string_lossy().starts_with('.') {
+        for entry in WalkDir::new(&base)
+            .follow_links(false)
+            .sort_by_file_name()
+            .into_iter()
+            .flatten()
+        {
+            if !entry.file_type().is_file() || entry.file_name().to_string_lossy().starts_with('.')
+            {
                 continue;
             }
             if let Ok(rel) = entry.path().strip_prefix(root.path()) {
@@ -85,7 +101,11 @@ mod tests {
         assert!(root.resolve("/etc/passwd").is_err());
         #[cfg(unix)]
         {
-            std::os::unix::fs::symlink(dir.path().join("secret.txt"), dir.path().join("corpus/pdf/link.pdf")).unwrap();
+            std::os::unix::fs::symlink(
+                dir.path().join("secret.txt"),
+                dir.path().join("corpus/pdf/link.pdf"),
+            )
+            .unwrap();
             assert!(root.resolve("pdf/link.pdf").is_err());
         }
     }

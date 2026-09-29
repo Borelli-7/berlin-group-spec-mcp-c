@@ -15,7 +15,9 @@ impl FixturePage {
         I: IntoIterator<Item = S>,
         S: Into<String>,
     {
-        Self { lines: lines.into_iter().map(Into::into).collect() }
+        Self {
+            lines: lines.into_iter().map(Into::into).collect(),
+        }
     }
 
     pub fn blank() -> Self {
@@ -60,16 +62,29 @@ pub fn render_pdf(title: &str, pages: &[FixturePage]) -> Vec<u8> {
     let mut objects: Vec<String> = Vec::with_capacity(4 + 2 * n);
     objects.push("<< /Type /Catalog /Pages 2 0 R >>".into());
     let kids: Vec<String> = (0..n).map(|i| format!("{} 0 R", page_obj(i))).collect();
-    objects.push(format!("<< /Type /Pages /Kids [{}] /Count {} >>", kids.join(" "), n));
-    objects.push("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>".into());
-    objects.push(format!("<< /Title ({}) /Producer (bg-spec fixture writer) >>", escape_pdf_text(title)));
+    objects.push(format!(
+        "<< /Type /Pages /Kids [{}] /Count {} >>",
+        kids.join(" "),
+        n
+    ));
+    objects.push(
+        "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>".into(),
+    );
+    objects.push(format!(
+        "<< /Title ({}) /Producer (bg-spec fixture writer) >>",
+        escape_pdf_text(title)
+    ));
     for (i, page) in pages.iter().enumerate() {
         objects.push(format!(
             "<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R >> >> /Contents {} 0 R >>",
             page_obj(i) + 1
         ));
         let stream = content_stream(page);
-        objects.push(format!("<< /Length {} >>\nstream\n{}endstream", stream.len(), stream));
+        objects.push(format!(
+            "<< /Length {} >>\nstream\n{}endstream",
+            stream.len(),
+            stream
+        ));
     }
 
     let mut out = Vec::new();

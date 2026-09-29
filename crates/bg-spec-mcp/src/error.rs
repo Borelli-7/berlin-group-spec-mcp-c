@@ -24,7 +24,8 @@ impl IntoCallToolResult for ToolError {
         let err = self.0;
         if err.is_client_error() {
             tracing::debug!(code = err.code(), error = %err, "tool rejected request");
-            let body = serde_json::json!({ "error": { "code": err.code(), "message": err.to_string() } });
+            let body =
+                serde_json::json!({ "error": { "code": err.code(), "message": err.to_string() } });
             Ok(CallToolResult::error(vec![ContentBlock::text(body.to_string())]).into())
         } else {
             tracing::error!(code = err.code(), error = %err, "tool failed");

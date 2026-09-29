@@ -5,10 +5,19 @@ use serde_json::Value;
 use std::fmt::Write;
 
 pub fn operation_search_text(op: &OpenApiOperation) -> (String, String) {
-    let label = op.summary.as_deref().or(op.operation_id.as_deref()).unwrap_or_default();
-    let title = format!("{} {} {label}", op.method, op.path).trim_end().to_owned();
+    let label = op
+        .summary
+        .as_deref()
+        .or(op.operation_id.as_deref())
+        .unwrap_or_default();
+    let title = format!("{} {} {label}", op.method, op.path)
+        .trim_end()
+        .to_owned();
     let mut s = format!("{} {}\n", op.method, op.path);
-    for v in [&op.operation_id, &op.summary, &op.description].into_iter().flatten() {
+    for v in [&op.operation_id, &op.summary, &op.description]
+        .into_iter()
+        .flatten()
+    {
         let _ = writeln!(s, "{v}");
     }
     if !op.tags.is_empty() {
@@ -21,15 +30,32 @@ pub fn operation_search_text(op: &OpenApiOperation) -> (String, String) {
             p.name,
             p.location,
             if p.required { "required" } else { "optional" },
-            p.description.as_deref().map(|d| format!(": {d}")).unwrap_or_default()
+            p.description
+                .as_deref()
+                .map(|d| format!(": {d}"))
+                .unwrap_or_default()
         );
     }
     if let Some(body) = &op.request_body {
         let media: Vec<_> = body.content.iter().map(|m| m.media_type.as_str()).collect();
-        let _ = writeln!(s, "Request body ({}): {}", if body.required { "required" } else { "optional" }, media.join(", "));
+        let _ = writeln!(
+            s,
+            "Request body ({}): {}",
+            if body.required {
+                "required"
+            } else {
+                "optional"
+            },
+            media.join(", ")
+        );
     }
     for r in &op.responses {
-        let _ = writeln!(s, "Response {}: {}", r.status, r.description.as_deref().unwrap_or_default());
+        let _ = writeln!(
+            s,
+            "Response {}: {}",
+            r.status,
+            r.description.as_deref().unwrap_or_default()
+        );
     }
     if !op.referenced_schemas.is_empty() {
         let _ = writeln!(s, "Schemas: {}", op.referenced_schemas.join(", "));
@@ -54,7 +80,12 @@ fn collect_text(v: &Value, key: Option<&str>, out: &mut String) {
             }
         }
         Value::Array(items) => items.iter().for_each(|i| collect_text(i, key, out)),
-        Value::String(s) if matches!(key, Some("description" | "title" | "enum" | "format" | "type" | "pattern" | "$ref")) => {
+        Value::String(s)
+            if matches!(
+                key,
+                Some("description" | "title" | "enum" | "format" | "type" | "pattern" | "$ref")
+            ) =>
+        {
             let _ = writeln!(out, "{s}");
         }
         _ => {}

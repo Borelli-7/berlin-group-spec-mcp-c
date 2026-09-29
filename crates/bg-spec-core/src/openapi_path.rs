@@ -42,7 +42,9 @@ pub fn validate_path(path: &str) -> Result<String> {
 /// * removes a trailing slash.
 pub fn path_key(path: &str, prefix: Option<&str>) -> String {
     let mut p = path.trim();
-    if let Some(prefix) = prefix.map(|x| x.trim_end_matches('/')).filter(|x| !x.is_empty())
+    if let Some(prefix) = prefix
+        .map(|x| x.trim_end_matches('/'))
+        .filter(|x| !x.is_empty())
         && let Some(rest) = p.strip_prefix(prefix)
         && (rest.is_empty() || rest.starts_with('/'))
     {

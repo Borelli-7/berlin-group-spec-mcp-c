@@ -120,14 +120,14 @@ fn default_requirements() -> PathBuf {
 
 impl Config {
     pub fn load(path: &Path) -> Result<Self> {
-        let raw = std::fs::read_to_string(path).map_err(|e| CoreError::io(path.display().to_string(), e))?;
+        let raw = std::fs::read_to_string(path)
+            .map_err(|e| CoreError::io(path.display().to_string(), e))?;
         let base = path.parent().unwrap_or_else(|| Path::new("."));
         Self::parse(&raw, base)
     }
 
     pub fn parse(raw: &str, base_dir: &Path) -> Result<Self> {
-        let mut cfg: Config =
-            toml::from_str(raw).map_err(|e| CoreError::Config(e.to_string()))?;
+        let mut cfg: Config = toml::from_str(raw).map_err(|e| CoreError::Config(e.to_string()))?;
         if cfg.corpus_root.is_relative() {
             cfg.corpus_root = base_dir.join(&cfg.corpus_root);
         }
@@ -139,15 +139,23 @@ impl Config {
     }
 
     fn validate(&self) -> Result<()> {
-        for (label, p) in [("manifest", &self.manifest), ("requirements", &self.requirements)] {
-            if p.is_absolute() || p.components().any(|c| matches!(c, std::path::Component::ParentDir)) {
+        for (label, p) in [
+            ("manifest", &self.manifest),
+            ("requirements", &self.requirements),
+        ] {
+            if p.is_absolute()
+                || p.components()
+                    .any(|c| matches!(c, std::path::Component::ParentDir))
+            {
                 return Err(CoreError::Config(format!(
                     "{label} path must be relative to corpus_root without '..'"
                 )));
             }
         }
         if self.chunking.max_chars < 500 {
-            return Err(CoreError::Config("chunking.max_chars must be >= 500".into()));
+            return Err(CoreError::Config(
+                "chunking.max_chars must be >= 500".into(),
+            ));
         }
         if self.chunking.overlap_chars >= self.chunking.max_chars / 2 {
             return Err(CoreError::Config(
@@ -207,11 +215,11 @@ target = "openfinance-v2"
         assert_eq!(cfg.corpus_root, PathBuf::from("/opt/bg/config/../corpus"));
         assert_eq!(cfg.chunking.max_chars, 6000);
         assert_eq!(cfg.chunking.overlap_chars, 500);
+        assert_eq!(cfg.versions.prefix_for(&cfg.versions.baseline), Some("/v1"));
         assert_eq!(
-            cfg.versions.prefix_for(&cfg.versions.baseline),
-            Some("/v1")
+            cfg.catalog_path(),
+            PathBuf::from("/opt/bg/config/../data/catalog.db")
         );
-        assert_eq!(cfg.catalog_path(), PathBuf::from("/opt/bg/config/../data/catalog.db"));
     }
 
     #[test]

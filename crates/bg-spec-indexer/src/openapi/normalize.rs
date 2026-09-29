@@ -2,9 +2,9 @@ use super::{Dialect, detect_dialect};
 use bg_spec_core::{
     Result,
     domain::{
-        Diagnostic, Document, MediaTypeSchema, NormalizedParameter, NormalizedRequestBody, NormalizedResponse,
-        OpenApiOperation, OpenApiSchema, Provenance, SchemaSlot, SecurityOrigin, SecurityRequirement, Severity,
-        collect_schema_refs, schema_ref_name,
+        Diagnostic, Document, MediaTypeSchema, NormalizedParameter, NormalizedRequestBody,
+        NormalizedResponse, OpenApiOperation, OpenApiSchema, Provenance, SchemaSlot,
+        SecurityOrigin, SecurityRequirement, Severity, collect_schema_refs, schema_ref_name,
     },
     hash::sha256_hex,
     openapi_path,
@@ -12,7 +12,9 @@ use bg_spec_core::{
 use serde_json::{Map, Value, json};
 use std::collections::BTreeSet;
 
-const METHODS: [&str; 8] = ["get", "put", "post", "delete", "options", "head", "patch", "trace"];
+const METHODS: [&str; 8] = [
+    "get", "put", "post", "delete", "options", "head", "patch", "trace",
+];
 const MAX_REF_DEPTH: usize = 16;
 
 /// Normalized content of one OpenAPI document.
@@ -42,7 +44,10 @@ struct Resolver<'a> {
 
 impl<'a> Resolver<'a> {
     /// Follows local `$ref`s. Returns the target and the first reference seen.
-    fn resolve(&self, value: &'a Value) -> std::result::Result<(&'a Value, Option<String>), String> {
+    fn resolve(
+        &self,
+        value: &'a Value,
+    ) -> std::result::Result<(&'a Value, Option<String>), String> {
         let mut current = value;
         let mut first_ref = None;
         for _ in 0..MAX_REF_DEPTH {
@@ -53,7 +58,10 @@ impl<'a> Resolver<'a> {
                 .strip_prefix('#')
                 .ok_or_else(|| format!("external reference '{r}' is not supported"))?;
             first_ref.get_or_insert_with(|| r.to_owned());
-            current = self.root.pointer(pointer).ok_or_else(|| format!("unresolved reference '{r}'"))?;
+            current = self
+                .root
+                .pointer(pointer)
+                .ok_or_else(|| format!("unresolved reference '{r}'"))?;
         }
         Err("reference chain too deep".into())
     }
@@ -61,7 +69,11 @@ impl<'a> Resolver<'a> {
 
 fn schema_slot(schema: &Value) -> SchemaSlot {
     SchemaSlot {
-        schema_ref: schema.get("$ref").and_then(Value::as_str).and_then(schema_ref_name).map(str::to_owned),
+        schema_ref: schema
+            .get("$ref")
+            .and_then(Value::as_str)
+            .and_then(schema_ref_name)
+            .map(str::to_owned),
         schema: schema.clone(),
     }
 }
@@ -90,7 +102,12 @@ fn security_list(v: &Value) -> Vec<SecurityRequirement> {
                         .map(|(scheme, scopes)| {
                             let scopes = scopes
                                 .as_array()
-                                .map(|s| s.iter().filter_map(Value::as_str).map(str::to_owned).collect())
+                                .map(|s| {
+                                    s.iter()
+                                        .filter_map(Value::as_str)
+                                        .map(str::to_owned)
+                                        .collect()
+                                })
                                 .unwrap_or_default();
                             (scheme.clone(), scopes)
                         })
@@ -109,7 +126,8 @@ struct Projector<'a> {
 
 impl Projector<'_> {
     fn warn(&mut self, code: &str, msg: String, locator: String) {
-        self.diagnostics.push(Diagnostic::new(Severity::Warning, code, msg).at(locator));
+        self.diagnostics
+            .push(Diagnostic::new(Severity::Warning, code, msg).at(locator));
     }
 
     fn parameter(&mut self, raw: &Value, locator: &str) -> Option<NormalizedParameter> {
@@ -123,11 +141,20 @@ impl Projector<'_> {
         let name = str_field(p, "name")?;
         let location = str_field(p, "in")?;
         let schema = p.get("schema").map(schema_slot).or_else(|| {
-            media_types(p.get("content")).into_iter().next().and_then(|m| m.schema)
+            media_types(p.get("content"))
+                .into_iter()
+                .next()
+                .and_then(|m| m.schema)
         });
         Some(NormalizedParameter {
-            required: p.get("required").and_then(Value::as_bool).unwrap_or(location == "path"),
-            deprecated: p.get("deprecated").and_then(Value::as_bool).unwrap_or(false),
+            required: p
+                .get("required")
+                .and_then(Value::as_bool)
+                .unwrap_or(location == "path"),
+            deprecated: p
+                .get("deprecated")
+                .and_then(Value::as_bool)
+                .unwrap_or(false),
             description: str_field(p, "description"),
             name,
             location,
@@ -136,12 +163,20 @@ impl Projector<'_> {
         })
     }
 
-    fn parameters(&mut self, path_level: Option<&Value>, op_level: Option<&Value>, locator: &str) -> Vec<NormalizedParameter> {
+    fn parameters(
+        &mut self,
+        path_level: Option<&Value>,
+        op_level: Option<&Value>,
+        locator: &str,
+    ) -> Vec<NormalizedParameter> {
         let mut merged: Vec<NormalizedParameter> = Vec::new();
         for list in [path_level, op_level].into_iter().flatten() {
             for raw in list.as_array().into_iter().flatten() {
                 if let Some(p) = self.parameter(raw, locator) {
-                    match merged.iter_mut().find(|q| q.name == p.name && q.location == p.location) {
+                    match merged
+                        .iter_mut()
+                        .find(|q| q.name == p.name && q.location == p.location)
+                    {
                         Some(existing) => *existing = p,
                         None => merged.push(p),
                     }
@@ -151,7 +186,11 @@ impl Projector<'_> {
         merged
     }
 
-    fn request_body(&mut self, raw: Option<&Value>, locator: &str) -> Option<NormalizedRequestBody> {
+    fn request_body(
+        &mut self,
+        raw: Option<&Value>,
+        locator: &str,
+    ) -> Option<NormalizedRequestBody> {
         let (body, component) = match self.resolver.resolve(raw?) {
             Ok(r) => r,
             Err(e) => {
@@ -160,7 +199,10 @@ impl Projector<'_> {
             }
         };
         Some(NormalizedRequestBody {
-            required: body.get("required").and_then(Value::as_bool).unwrap_or(false),
+            required: body
+                .get("required")
+                .and_then(Value::as_bool)
+                .unwrap_or(false),
             description: str_field(body, "description"),
             content: media_types(body.get("content")),
             component,
@@ -197,10 +239,18 @@ impl Projector<'_> {
         out
     }
 
-    fn operation(&mut self, path: &str, method: &str, path_item: &Value, raw: &Value, global_security: Option<&Value>) -> OpenApiOperation {
+    fn operation(
+        &mut self,
+        path: &str,
+        method: &str,
+        path_item: &Value,
+        raw: &Value,
+        global_security: Option<&Value>,
+    ) -> OpenApiOperation {
         let method_upper = method.to_ascii_uppercase();
         let locator = format!("op:{method_upper} {path}");
-        let parameters = self.parameters(path_item.get("parameters"), raw.get("parameters"), &locator);
+        let parameters =
+            self.parameters(path_item.get("parameters"), raw.get("parameters"), &locator);
         let request_body = self.request_body(raw.get("requestBody"), &locator);
         let responses = self.responses(raw.get("responses"), &locator);
         let (security, security_origin) = match (raw.get("security"), global_security) {
@@ -227,9 +277,17 @@ impl Projector<'_> {
             tags: raw
                 .get("tags")
                 .and_then(Value::as_array)
-                .map(|t| t.iter().filter_map(Value::as_str).map(str::to_owned).collect())
+                .map(|t| {
+                    t.iter()
+                        .filter_map(Value::as_str)
+                        .map(str::to_owned)
+                        .collect()
+                })
                 .unwrap_or_default(),
-            deprecated: raw.get("deprecated").and_then(Value::as_bool).unwrap_or(false),
+            deprecated: raw
+                .get("deprecated")
+                .and_then(Value::as_bool)
+                .unwrap_or(false),
             parameters,
             request_body,
             responses,
@@ -237,12 +295,24 @@ impl Projector<'_> {
             security_origin,
             referenced_schemas: refs.into_iter().collect(),
             json_pointer: format!("/paths/{}/{method}", pointer_escape(path)),
-            provenance: Provenance::for_document(self.doc, locator, canonical_sha(&json!({"path_item_parameters": path_item.get("parameters"), "operation": raw}))),
+            provenance: Provenance::for_document(
+                self.doc,
+                locator,
+                canonical_sha(
+                    &json!({"path_item_parameters": path_item.get("parameters"), "operation": raw}),
+                ),
+            ),
         }
     }
 }
 
-fn metadata(root: &Value, dialect: &Dialect, parser: &str, operations: usize, schemas: usize) -> Value {
+fn metadata(
+    root: &Value,
+    dialect: &Dialect,
+    parser: &str,
+    operations: usize,
+    schemas: usize,
+) -> Value {
     let info = root.get("info").cloned().unwrap_or(Value::Null);
     let servers: Vec<Value> = root
         .get("servers")
@@ -265,7 +335,8 @@ fn metadata(root: &Value, dialect: &Dialect, parser: &str, operations: usize, sc
         }
         if let Some(schemes) = c.get("securitySchemes").and_then(Value::as_object) {
             for (name, s) in schemes {
-                security_schemes.insert(name.clone(), s.get("type").cloned().unwrap_or(Value::Null));
+                security_schemes
+                    .insert(name.clone(), s.get("type").cloned().unwrap_or(Value::Null));
             }
         }
     }
@@ -296,20 +367,22 @@ pub fn normalize(root: &Value, doc: &Document) -> Result<NormalizedApi> {
     let mut diagnostics = Vec::new();
     let mut typed: Option<openapiv3::OpenAPI> = None;
     let parser = match &dialect {
-        Dialect::V30(_) => match serde_json::from_value::<openapiv3::OpenAPI>(root.clone()) {
-            Ok(api) => {
-                typed = Some(api);
-                "openapiv3"
-            }
-            Err(e) => {
-                diagnostics.push(Diagnostic::new(
+        Dialect::V30(_) => {
+            match serde_json::from_value::<openapiv3::OpenAPI>(root.clone()) {
+                Ok(api) => {
+                    typed = Some(api);
+                    "openapiv3"
+                }
+                Err(e) => {
+                    diagnostics.push(Diagnostic::new(
                     Severity::Warning,
                     "openapi_typed_parse_failed",
                     format!("strict OpenAPI 3.0 parse failed ({e}); using generic JSON normalization"),
                 ));
-                "generic-json"
+                    "generic-json"
+                }
             }
-        },
+        }
         Dialect::V31(v) => {
             diagnostics.push(Diagnostic::new(
                 Severity::Info,
@@ -320,10 +393,19 @@ pub fn normalize(root: &Value, doc: &Document) -> Result<NormalizedApi> {
         }
     };
 
-    let mut projector = Projector { doc, resolver: Resolver { root }, diagnostics };
+    let mut projector = Projector {
+        doc,
+        resolver: Resolver { root },
+        diagnostics,
+    };
     let global_security = root.get("security");
     let mut operations = Vec::new();
-    for (path, item) in root.get("paths").and_then(Value::as_object).into_iter().flatten() {
+    for (path, item) in root
+        .get("paths")
+        .and_then(Value::as_object)
+        .into_iter()
+        .flatten()
+    {
         if path.starts_with("x-") {
             continue;
         }
@@ -346,7 +428,9 @@ pub fn normalize(root: &Value, doc: &Document) -> Result<NormalizedApi> {
     }
 
     let mut schemas = Vec::new();
-    let components = root.pointer("/components/schemas").and_then(Value::as_object);
+    let components = root
+        .pointer("/components/schemas")
+        .and_then(Value::as_object);
     for (name, schema) in components.into_iter().flatten() {
         let mut refs = BTreeSet::new();
         collect_schema_refs(schema, &mut refs);
@@ -356,30 +440,49 @@ pub fn normalize(root: &Value, doc: &Document) -> Result<NormalizedApi> {
             schema: schema.clone(),
             referenced_schemas: refs.into_iter().collect(),
             json_pointer: format!("/components/schemas/{}", pointer_escape(name)),
-            provenance: Provenance::for_document(doc, format!("schema:{name}"), canonical_sha(schema)),
+            provenance: Provenance::for_document(
+                doc,
+                format!("schema:{name}"),
+                canonical_sha(schema),
+            ),
         });
     }
 
     if let Some(api) = &typed {
-        let typed_ops: usize = api.paths.iter().filter_map(|(_, p)| p.as_item()).map(|p| p.iter().count()).sum();
+        let typed_ops: usize = api
+            .paths
+            .iter()
+            .filter_map(|(_, p)| p.as_item())
+            .map(|p| p.iter().count())
+            .sum();
         if typed_ops != operations.len() {
             projector.diagnostics.push(Diagnostic::new(
                 Severity::Warning,
                 "openapi_operation_count_mismatch",
-                format!("typed parser found {typed_ops} operations, projector {}", operations.len()),
+                format!(
+                    "typed parser found {typed_ops} operations, projector {}",
+                    operations.len()
+                ),
             ));
         }
     }
 
     let metadata = metadata(root, &dialect, parser, operations.len(), schemas.len());
-    Ok(NormalizedApi { operations, schemas, metadata, diagnostics: projector.diagnostics })
+    Ok(NormalizedApi {
+        operations,
+        schemas,
+        metadata,
+        diagnostics: projector.diagnostics,
+    })
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
     use crate::openapi::parse_document;
-    use bg_spec_core::domain::{DocumentAuthority, DocumentKind, DocumentStatus, SpecificationVersion};
+    use bg_spec_core::domain::{
+        DocumentAuthority, DocumentKind, DocumentStatus, SpecificationVersion,
+    };
 
     pub(crate) fn test_doc() -> Document {
         Document {
@@ -471,16 +574,38 @@ components:
         let get = &api.operations[0];
         assert_eq!(get.method, "GET");
         assert_eq!(get.operation_id.as_deref(), Some("getTransactionList"));
-        assert_eq!(get.provenance.locator, "op:GET /accounts/{accountId}/transactions");
-        assert_eq!(get.json_pointer, "/paths/~1accounts~1{accountId}~1transactions/get");
-        let names: Vec<_> = get.parameters.iter().map(|p| (p.name.as_str(), p.location.as_str(), p.required)).collect();
-        assert_eq!(names, vec![("accountId", "path", true), ("bookingStatus", "query", true)]);
-        assert_eq!(get.parameters[0].component.as_deref(), Some("#/components/parameters/AccountId"));
+        assert_eq!(
+            get.provenance.locator,
+            "op:GET /accounts/{accountId}/transactions"
+        );
+        assert_eq!(
+            get.json_pointer,
+            "/paths/~1accounts~1{accountId}~1transactions/get"
+        );
+        let names: Vec<_> = get
+            .parameters
+            .iter()
+            .map(|p| (p.name.as_str(), p.location.as_str(), p.required))
+            .collect();
+        assert_eq!(
+            names,
+            vec![
+                ("accountId", "path", true),
+                ("bookingStatus", "query", true)
+            ]
+        );
+        assert_eq!(
+            get.parameters[0].component.as_deref(),
+            Some("#/components/parameters/AccountId")
+        );
         let statuses: Vec<_> = get.responses.iter().map(|r| r.status.as_str()).collect();
         assert_eq!(statuses, vec!["200", "400"]);
         assert_eq!(get.responses[0].headers, vec!["X-Request-ID"]);
         assert_eq!(get.responses[1].description.as_deref(), Some("Bad request"));
-        assert_eq!(get.referenced_schemas, vec!["BookingStatus", "Error", "TransactionsResponse"]);
+        assert_eq!(
+            get.referenced_schemas,
+            vec!["BookingStatus", "Error", "TransactionsResponse"]
+        );
         assert_eq!(get.security_origin, SecurityOrigin::Global);
         assert_eq!(get.security.len(), 1);
         let post = &api.operations[1];
@@ -488,7 +613,11 @@ components:
         assert!(post.security.is_empty());
         assert!(post.request_body.as_ref().unwrap().required);
         assert_eq!(api.schemas.len(), 4);
-        let resp = api.schemas.iter().find(|s| s.name == "TransactionsResponse").unwrap();
+        let resp = api
+            .schemas
+            .iter()
+            .find(|s| s.name == "TransactionsResponse")
+            .unwrap();
         assert_eq!(resp.referenced_schemas, vec!["Transaction"]);
         assert_eq!(resp.provenance.locator, "schema:TransactionsResponse");
     }
@@ -499,13 +628,20 @@ components:
         let root = parse_document(&yaml, "api.yaml").unwrap();
         let api = normalize(&root, &test_doc()).unwrap();
         assert_eq!(api.metadata["parser"], "generic-json");
-        assert!(api.diagnostics.iter().any(|d| d.code == "openapi_31_fallback"));
+        assert!(
+            api.diagnostics
+                .iter()
+                .any(|d| d.code == "openapi_31_fallback")
+        );
         assert_eq!(api.operations.len(), 2);
     }
 
     #[test]
     fn reports_unresolved_refs() {
-        let yaml = YAML.replace("$ref: '#/components/responses/Error400'", "$ref: '#/components/responses/Missing'");
+        let yaml = YAML.replace(
+            "$ref: '#/components/responses/Error400'",
+            "$ref: '#/components/responses/Missing'",
+        );
         let root = parse_document(&yaml, "api.yaml").unwrap();
         let api = normalize(&root, &test_doc()).unwrap();
         assert!(api.diagnostics.iter().any(|d| d.code == "unresolved_ref"));

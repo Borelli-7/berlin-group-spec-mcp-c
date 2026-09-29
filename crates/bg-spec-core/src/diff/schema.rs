@@ -32,7 +32,12 @@ const CONSTRAINT_KEYS: &[&str] = &[
 const COMPOSITION_KEYS: &[&str] = &["allOf", "oneOf", "anyOf"];
 
 /// Compares two schemas structurally, following `$ref`s into the provided schema sets.
-pub fn diff_schemas(old: &Value, new: &Value, old_set: &SchemaSet, new_set: &SchemaSet) -> Vec<SchemaChange> {
+pub fn diff_schemas(
+    old: &Value,
+    new: &Value,
+    old_set: &SchemaSet,
+    new_set: &SchemaSet,
+) -> Vec<SchemaChange> {
     let mut d = Differ {
         old_set,
         new_set,
@@ -55,7 +60,11 @@ struct Differ<'a> {
 fn resolve<'v>(set: &'v SchemaSet, mut v: &'v Value) -> (Option<&'v str>, &'v Value) {
     let mut name = None;
     for _ in 0..MAX_REF_CHAIN {
-        let Some(n) = v.get("$ref").and_then(Value::as_str).and_then(schema_ref_name) else {
+        let Some(n) = v
+            .get("$ref")
+            .and_then(Value::as_str)
+            .and_then(schema_ref_name)
+        else {
             break;
         };
         match set.get_key_value(n) {
@@ -94,7 +103,12 @@ fn is_nullable(v: &Value) -> bool {
 fn required_set(v: &Value) -> BTreeSet<String> {
     v.get("required")
         .and_then(Value::as_array)
-        .map(|a| a.iter().filter_map(Value::as_str).map(str::to_owned).collect())
+        .map(|a| {
+            a.iter()
+                .filter_map(Value::as_str)
+                .map(str::to_owned)
+                .collect()
+        })
         .unwrap_or_default()
 }
 
@@ -104,7 +118,9 @@ fn empty_map() -> &'static serde_json::Map<String, Value> {
 }
 
 fn properties(v: &Value) -> &serde_json::Map<String, Value> {
-    v.get("properties").and_then(Value::as_object).unwrap_or_else(|| empty_map())
+    v.get("properties")
+        .and_then(Value::as_object)
+        .unwrap_or_else(|| empty_map())
 }
 
 fn ref_label(name: Option<&str>, raw: &Value) -> Value {
@@ -127,7 +143,11 @@ impl Differ<'_> {
         after: Option<Value>,
     ) {
         self.out.push(SchemaChange {
-            pointer: if pointer.is_empty() { "/".to_owned() } else { pointer.to_owned() },
+            pointer: if pointer.is_empty() {
+                "/".to_owned()
+            } else {
+                pointer.to_owned()
+            },
             kind,
             change,
             before,
@@ -136,7 +156,14 @@ impl Differ<'_> {
         });
     }
 
-    fn diff(&mut self, ptr: &str, ctx_name: Option<&str>, a_raw: &Value, b_raw: &Value, depth: usize) {
+    fn diff(
+        &mut self,
+        ptr: &str,
+        ctx_name: Option<&str>,
+        a_raw: &Value,
+        b_raw: &Value,
+        depth: usize,
+    ) {
         if depth > MAX_DEPTH {
             return;
         }
@@ -164,8 +191,14 @@ impl Differ<'_> {
         // type
         let (ta, tb) = (type_set(a), type_set(b));
         if ta != tb {
-            self.push(ptr, name, SchemaChangeKind::TypeChanged, ChangeType::Modified,
-                Some(json!(ta)), Some(json!(tb)));
+            self.push(
+                ptr,
+                name,
+                SchemaChangeKind::TypeChanged,
+                ChangeType::Modified,
+                Some(json!(ta)),
+                Some(json!(tb)),
+            );
         }
         // format
         let (fa, fb) = (a.get("format"), b.get("format"));
@@ -175,14 +208,26 @@ impl Differ<'_> {
                 (Some(_), None) => ChangeType::Removed,
                 _ => ChangeType::Modified,
             };
-            self.push(&format!("{ptr}/format"), name, SchemaChangeKind::FormatChanged, change,
-                fa.cloned(), fb.cloned());
+            self.push(
+                &format!("{ptr}/format"),
+                name,
+                SchemaChangeKind::FormatChanged,
+                change,
+                fa.cloned(),
+                fb.cloned(),
+            );
         }
         // nullable
         let (nla, nlb) = (is_nullable(a), is_nullable(b));
         if nla != nlb {
-            self.push(ptr, name, SchemaChangeKind::NullableChanged, ChangeType::Modified,
-                Some(json!(nla)), Some(json!(nlb)));
+            self.push(
+                ptr,
+                name,
+                SchemaChangeKind::NullableChanged,
+                ChangeType::Modified,
+                Some(json!(nla)),
+                Some(json!(nlb)),
+            );
         }
         self.diff_enum(ptr, name, a, b);
         for key in CONSTRAINT_KEYS {
@@ -193,18 +238,36 @@ impl Differ<'_> {
                     (Some(_), None) => ChangeType::Removed,
                     _ => ChangeType::Modified,
                 };
-                self.push(&format!("{ptr}/{key}"), name, SchemaChangeKind::ConstraintChanged, change,
-                    x.cloned(), y.cloned());
+                self.push(
+                    &format!("{ptr}/{key}"),
+                    name,
+                    SchemaChangeKind::ConstraintChanged,
+                    change,
+                    x.cloned(),
+                    y.cloned(),
+                );
             }
         }
         self.diff_object(ptr, name, a, b, depth);
         // items
         match (a.get("items"), b.get("items")) {
             (Some(x), Some(y)) => self.diff(&format!("{ptr}/items"), name, x, y, depth + 1),
-            (None, Some(y)) => self.push(&format!("{ptr}/items"), name, SchemaChangeKind::ConstraintChanged,
-                ChangeType::Added, None, Some(y.clone())),
-            (Some(x), None) => self.push(&format!("{ptr}/items"), name, SchemaChangeKind::ConstraintChanged,
-                ChangeType::Removed, Some(x.clone()), None),
+            (None, Some(y)) => self.push(
+                &format!("{ptr}/items"),
+                name,
+                SchemaChangeKind::ConstraintChanged,
+                ChangeType::Added,
+                None,
+                Some(y.clone()),
+            ),
+            (Some(x), None) => self.push(
+                &format!("{ptr}/items"),
+                name,
+                SchemaChangeKind::ConstraintChanged,
+                ChangeType::Removed,
+                Some(x.clone()),
+                None,
+            ),
             (None, None) => {}
         }
         self.diff_composition(ptr, name, a, b, depth);
@@ -212,23 +275,50 @@ impl Differ<'_> {
 
     fn diff_enum(&mut self, ptr: &str, name: Option<&str>, a: &Value, b: &Value) {
         let p = format!("{ptr}/enum");
-        match (a.get("enum").and_then(Value::as_array), b.get("enum").and_then(Value::as_array)) {
+        match (
+            a.get("enum").and_then(Value::as_array),
+            b.get("enum").and_then(Value::as_array),
+        ) {
             (Some(x), Some(y)) => {
                 let added: Vec<Value> = y.iter().filter(|v| !x.contains(v)).cloned().collect();
                 let removed: Vec<Value> = x.iter().filter(|v| !y.contains(v)).cloned().collect();
                 if !added.is_empty() {
-                    self.push(&p, name, SchemaChangeKind::EnumValuesAdded, ChangeType::Added,
-                        None, Some(Value::Array(added)));
+                    self.push(
+                        &p,
+                        name,
+                        SchemaChangeKind::EnumValuesAdded,
+                        ChangeType::Added,
+                        None,
+                        Some(Value::Array(added)),
+                    );
                 }
                 if !removed.is_empty() {
-                    self.push(&p, name, SchemaChangeKind::EnumValuesRemoved, ChangeType::Removed,
-                        Some(Value::Array(removed)), None);
+                    self.push(
+                        &p,
+                        name,
+                        SchemaChangeKind::EnumValuesRemoved,
+                        ChangeType::Removed,
+                        Some(Value::Array(removed)),
+                        None,
+                    );
                 }
             }
-            (None, Some(y)) => self.push(&p, name, SchemaChangeKind::EnumConstraintChanged,
-                ChangeType::Added, None, Some(Value::Array(y.clone()))),
-            (Some(x), None) => self.push(&p, name, SchemaChangeKind::EnumConstraintChanged,
-                ChangeType::Removed, Some(Value::Array(x.clone())), None),
+            (None, Some(y)) => self.push(
+                &p,
+                name,
+                SchemaChangeKind::EnumConstraintChanged,
+                ChangeType::Added,
+                None,
+                Some(Value::Array(y.clone())),
+            ),
+            (Some(x), None) => self.push(
+                &p,
+                name,
+                SchemaChangeKind::EnumConstraintChanged,
+                ChangeType::Removed,
+                Some(Value::Array(x.clone())),
+                None,
+            ),
             (None, None) => {}
         }
     }
@@ -240,10 +330,22 @@ impl Differ<'_> {
         for k in keys {
             let p = format!("{ptr}/properties/{}", escape_token(k));
             match (pa.get(k), pb.get(k)) {
-                (None, Some(v)) => self.push(&p, name, SchemaChangeKind::PropertyAdded, ChangeType::Added,
-                    None, Some(json!({"required": rb.contains(k), "schema": v}))),
-                (Some(v), None) => self.push(&p, name, SchemaChangeKind::PropertyRemoved, ChangeType::Removed,
-                    Some(json!({"required": ra.contains(k), "schema": v})), None),
+                (None, Some(v)) => self.push(
+                    &p,
+                    name,
+                    SchemaChangeKind::PropertyAdded,
+                    ChangeType::Added,
+                    None,
+                    Some(json!({"required": rb.contains(k), "schema": v})),
+                ),
+                (Some(v), None) => self.push(
+                    &p,
+                    name,
+                    SchemaChangeKind::PropertyRemoved,
+                    ChangeType::Removed,
+                    Some(json!({"required": ra.contains(k), "schema": v})),
+                    None,
+                ),
                 (Some(x), Some(y)) => self.diff(&p, name, x, y, depth + 1),
                 (None, None) => {}
             }
@@ -251,28 +353,57 @@ impl Differ<'_> {
         // Required-ness changes (including for properties declared only via allOf siblings).
         for k in rb.difference(&ra) {
             if pa.contains_key(k) || !pb.contains_key(k) {
-                self.push(&format!("{ptr}/properties/{}", escape_token(k)), name,
-                    SchemaChangeKind::RequiredAdded, ChangeType::Modified, Some(json!(false)), Some(json!(true)));
+                self.push(
+                    &format!("{ptr}/properties/{}", escape_token(k)),
+                    name,
+                    SchemaChangeKind::RequiredAdded,
+                    ChangeType::Modified,
+                    Some(json!(false)),
+                    Some(json!(true)),
+                );
             }
         }
         for k in ra.difference(&rb) {
             if pb.contains_key(k) || !pa.contains_key(k) {
-                self.push(&format!("{ptr}/properties/{}", escape_token(k)), name,
-                    SchemaChangeKind::RequiredRemoved, ChangeType::Modified, Some(json!(true)), Some(json!(false)));
+                self.push(
+                    &format!("{ptr}/properties/{}", escape_token(k)),
+                    name,
+                    SchemaChangeKind::RequiredRemoved,
+                    ChangeType::Modified,
+                    Some(json!(true)),
+                    Some(json!(false)),
+                );
             }
         }
         let (xa, xb) = (a.get("additionalProperties"), b.get("additionalProperties"));
         match (xa, xb) {
-            (Some(x @ Value::Object(_)), Some(y @ Value::Object(_))) => {
-                self.diff(&format!("{ptr}/additionalProperties"), name, x, y, depth + 1)
-            }
-            _ if xa != xb => self.push(&format!("{ptr}/additionalProperties"), name,
-                SchemaChangeKind::AdditionalPropertiesChanged, ChangeType::Modified, xa.cloned(), xb.cloned()),
+            (Some(x @ Value::Object(_)), Some(y @ Value::Object(_))) => self.diff(
+                &format!("{ptr}/additionalProperties"),
+                name,
+                x,
+                y,
+                depth + 1,
+            ),
+            _ if xa != xb => self.push(
+                &format!("{ptr}/additionalProperties"),
+                name,
+                SchemaChangeKind::AdditionalPropertiesChanged,
+                ChangeType::Modified,
+                xa.cloned(),
+                xb.cloned(),
+            ),
             _ => {}
         }
     }
 
-    fn diff_composition(&mut self, ptr: &str, name: Option<&str>, a: &Value, b: &Value, depth: usize) {
+    fn diff_composition(
+        &mut self,
+        ptr: &str,
+        name: Option<&str>,
+        a: &Value,
+        b: &Value,
+        depth: usize,
+    ) {
         for key in COMPOSITION_KEYS {
             let (xa, xb) = (
                 a.get(*key).and_then(Value::as_array),
@@ -282,17 +413,35 @@ impl Differ<'_> {
             match (xa, xb) {
                 (Some(x), Some(y)) => {
                     if x.len() != y.len() {
-                        self.push(&p, name, SchemaChangeKind::CompositionChanged, ChangeType::Modified,
-                            Some(json!(x.len())), Some(json!(y.len())));
+                        self.push(
+                            &p,
+                            name,
+                            SchemaChangeKind::CompositionChanged,
+                            ChangeType::Modified,
+                            Some(json!(x.len())),
+                            Some(json!(y.len())),
+                        );
                     }
                     for (i, (sx, sy)) in x.iter().zip(y).enumerate() {
                         self.diff(&format!("{p}/{i}"), name, sx, sy, depth + 1);
                     }
                 }
-                (None, Some(y)) => self.push(&p, name, SchemaChangeKind::CompositionChanged, ChangeType::Added,
-                    None, Some(Value::Array(y.clone()))),
-                (Some(x), None) => self.push(&p, name, SchemaChangeKind::CompositionChanged, ChangeType::Removed,
-                    Some(Value::Array(x.clone())), None),
+                (None, Some(y)) => self.push(
+                    &p,
+                    name,
+                    SchemaChangeKind::CompositionChanged,
+                    ChangeType::Added,
+                    None,
+                    Some(Value::Array(y.clone())),
+                ),
+                (Some(x), None) => self.push(
+                    &p,
+                    name,
+                    SchemaChangeKind::CompositionChanged,
+                    ChangeType::Removed,
+                    Some(Value::Array(x.clone())),
+                    None,
+                ),
                 (None, None) => {}
             }
         }
@@ -305,7 +454,10 @@ mod tests {
     use SchemaChangeKind as K;
 
     fn kinds(changes: &[SchemaChange]) -> Vec<(K, String)> {
-        changes.iter().map(|c| (c.kind, c.pointer.clone())).collect()
+        changes
+            .iter()
+            .map(|c| (c.kind, c.pointer.clone()))
+            .collect()
     }
 
     #[test]
@@ -362,7 +514,12 @@ mod tests {
     fn detects_ref_change_and_openapi31_nullable() {
         let old: SchemaSet = [("A".to_owned(), json!({"type":"string"}))].into();
         let new: SchemaSet = [("B".to_owned(), json!({"type":["string","null"]}))].into();
-        let c = diff_schemas(&json!({"$ref":"#/components/schemas/A"}), &json!({"$ref":"#/components/schemas/B"}), &old, &new);
+        let c = diff_schemas(
+            &json!({"$ref":"#/components/schemas/A"}),
+            &json!({"$ref":"#/components/schemas/B"}),
+            &old,
+            &new,
+        );
         let k: Vec<K> = c.iter().map(|c| c.kind).collect();
         assert_eq!(k, vec![K::RefChanged, K::NullableChanged]);
     }
@@ -371,7 +528,10 @@ mod tests {
     fn detects_enum_constraint_and_composition() {
         let a = json!({"oneOf":[{"type":"string"}]});
         let b = json!({"oneOf":[{"type":"string"},{"type":"integer"}], "enum":["x"]});
-        let k: Vec<K> = diff_schemas(&a, &b, &SchemaSet::new(), &SchemaSet::new()).iter().map(|c| c.kind).collect();
+        let k: Vec<K> = diff_schemas(&a, &b, &SchemaSet::new(), &SchemaSet::new())
+            .iter()
+            .map(|c| c.kind)
+            .collect();
         assert_eq!(k, vec![K::EnumConstraintChanged, K::CompositionChanged]);
     }
 }

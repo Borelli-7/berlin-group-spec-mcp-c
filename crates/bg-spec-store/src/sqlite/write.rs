@@ -3,7 +3,10 @@
 use super::{SqliteCatalog, storage};
 use bg_spec_core::{
     Result,
-    domain::{Document, DocumentStatus, EvidenceChunk, OpenApiOperation, OpenApiSchema, PageRecord, RequirementRecord},
+    domain::{
+        Document, DocumentStatus, EvidenceChunk, OpenApiOperation, OpenApiSchema, PageRecord,
+        RequirementRecord,
+    },
 };
 
 /// Operation plus its canonical path key used for cross-version lookup.
@@ -28,7 +31,11 @@ fn to_json<T: serde::Serialize>(value: &T) -> Result<String> {
 
 impl SqliteCatalog {
     /// Atomically replaces a document and all records derived from it.
-    pub async fn replace_document(&self, document: &Document, bundle: &DocumentBundle) -> Result<()> {
+    pub async fn replace_document(
+        &self,
+        document: &Document,
+        bundle: &DocumentBundle,
+    ) -> Result<()> {
         self.ensure_writable()?;
         let mut tx = self.pool().begin().await.map_err(storage)?;
         sqlx::query("DELETE FROM documents WHERE source_id = ?1")
@@ -162,13 +169,17 @@ impl SqliteCatalog {
     }
 
     /// Stored status of a document for incremental indexing decisions.
-    pub async fn document_state(&self, source_id: &str) -> Result<Option<(Option<String>, String, DocumentStatus)>> {
-        let row: Option<(Option<String>, String, String)> =
-            sqlx::query_as("SELECT sha256, fingerprint, status FROM documents WHERE source_id = ?1")
-                .bind(source_id)
-                .fetch_optional(self.pool())
-                .await
-                .map_err(storage)?;
+    pub async fn document_state(
+        &self,
+        source_id: &str,
+    ) -> Result<Option<(Option<String>, String, DocumentStatus)>> {
+        let row: Option<(Option<String>, String, String)> = sqlx::query_as(
+            "SELECT sha256, fingerprint, status FROM documents WHERE source_id = ?1",
+        )
+        .bind(source_id)
+        .fetch_optional(self.pool())
+        .await
+        .map_err(storage)?;
         row.map(|(sha, fp, status)| Ok((sha, fp, status.parse().map_err(storage)?)))
             .transpose()
     }
@@ -184,7 +195,10 @@ impl SqliteCatalog {
     pub async fn replace_requirements(&self, records: &[RequirementRecord]) -> Result<()> {
         self.ensure_writable()?;
         let mut tx = self.pool().begin().await.map_err(storage)?;
-        sqlx::query("DELETE FROM requirements").execute(&mut *tx).await.map_err(storage)?;
+        sqlx::query("DELETE FROM requirements")
+            .execute(&mut *tx)
+            .await
+            .map_err(storage)?;
         for record in records {
             let req = &record.requirement;
             sqlx::query("INSERT INTO requirements (id, version, title, sha256, json) VALUES (?1,?2,?3,?4,?5)")
