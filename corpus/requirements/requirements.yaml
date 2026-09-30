@@ -271,6 +271,1440 @@ requirements:
       - "The ASPSP-SCA-Approach enum contains EMBEDDED, DECOUPLED, REDIRECT and ASPSP-CHANNEL."
     tags: [sca, authorisation, contract]
 
+  # ======================================================== openFinance v2 - Account Information Service
+  - id: OFV2-AIS-ACCOUNTS-001
+    version: openfinance-v2
+    title: Read the list of accessible accounts
+    description: >-
+      GET /v2/accounts reads the list of current accounts covered by the stored account information
+      consent, optionally with booking balances. The API service is optional for an ASPSP.
+    sources:
+      - source_id: bg-openfinance-v2-xs2a-implementation-guidelines
+        locator: section:4.4.1
+        note: Read Account List
+      - source_id: bg-openfinance-v2-xs2a-implementation-guidelines
+        locator: page:85-86
+      - source_id: bg-openfinance-v2-xs2a-operational-rules
+        locator: section:4.7
+        note: API Service Get list of addressable accounts
+      - source_id: bg-openfinance-v2-xs2a-operational-rules
+        locator: page:22
+      - source_id: bg-openfinance-v2-openapi-ais
+        locator: op:GET /v2/accounts
+    endpoints:
+      - GET /v2/accounts
+    acceptance_criteria:
+      - "The API service \"Get list of addressable accounts\" is optional for an ASPSP."
+      - "The request carries the mandatory X-Request-ID and Consent-ID headers."
+      - "The optional withBalance query parameter adds the booking balance if granted in the consent and available; the ASPSP may ignore it."
+      - "A successful response has HTTP 200 and contains the mandatory accounts array."
+      - "If no account is accessible, the ASPSP returns an empty array with HTTP 200."
+      - "The ASPSP rejects the service if the TPP lacks the AISP role or cannot prove a pre-existing account information consent."
+    tags: [ais, accounts]
+
+  - id: OFV2-AIS-ACCOUNT-DETAILS-001
+    version: openfinance-v2
+    title: Read the details of one account
+    description: >-
+      GET /v2/accounts/{account-id} reads the details of one account addressed by its resourceId. The
+      API service "Get account details of a list of accessible accounts" is mandatory.
+    sources:
+      - source_id: bg-openfinance-v2-xs2a-implementation-guidelines
+        locator: section:4.4.2
+        note: Read Account Details
+      - source_id: bg-openfinance-v2-xs2a-implementation-guidelines
+        locator: page:89-91
+      - source_id: bg-openfinance-v2-xs2a-operational-rules
+        locator: section:4.8
+        note: API Service Get account details of a list of accessible accounts
+      - source_id: bg-openfinance-v2-xs2a-operational-rules
+        locator: page:23
+      - source_id: bg-openfinance-v2-openapi-ais
+        locator: op:GET /v2/accounts/{account-id}
+    endpoints:
+      - GET /v2/accounts/{account-id}
+    acceptance_criteria:
+      - "Support of the account details API service is mandatory."
+      - "account-id is the resourceId of the account structure and is constant at least throughout the lifecycle of a consent."
+      - "If account-id addresses a multicurrency account, the currency code is \"XXX\"."
+      - "The request carries a mandatory Consent-ID header and a successful response has HTTP 200."
+      - "The response body contains the mandatory account attribute."
+    tags: [ais, accounts]
+
+  - id: OFV2-AIS-CARD-ACCOUNTS-001
+    version: openfinance-v2
+    title: Read the list of card accounts
+    description: >-
+      GET /v2/card-accounts reads the list of card reconciliation accounts covered by the consent. All
+      card account API services are optional.
+    sources:
+      - source_id: bg-openfinance-v2-xs2a-implementation-guidelines
+        locator: section:4.5.1
+        note: Read Card Account List
+      - source_id: bg-openfinance-v2-xs2a-implementation-guidelines
+        locator: page:107-108
+      - source_id: bg-openfinance-v2-xs2a-operational-rules
+        locator: section:4.11
+        note: API Services with access to card accounts
+      - source_id: bg-openfinance-v2-xs2a-operational-rules
+        locator: page:26
+      - source_id: bg-openfinance-v2-openapi-ais
+        locator: op:GET /v2/card-accounts
+    endpoints:
+      - GET /v2/card-accounts
+    acceptance_criteria:
+      - "The card account API services are optional."
+      - "No query parameter is supported."
+      - "A successful response has HTTP 200."
+      - "If no card account is accessible, the ASPSP returns an empty array and the response code is still 200."
+    tags: [ais, card-accounts]
+
+  - id: OFV2-AIS-CARD-ACCOUNT-DETAILS-001
+    version: openfinance-v2
+    title: Read the details of one card account
+    sources:
+      - source_id: bg-openfinance-v2-xs2a-implementation-guidelines
+        locator: section:4.5.2
+        note: Read Card Account Details
+      - source_id: bg-openfinance-v2-xs2a-implementation-guidelines
+        locator: page:109-111
+      - source_id: bg-openfinance-v2-xs2a-operational-rules
+        locator: section:4.11
+        note: API Services with access to card accounts
+      - source_id: bg-openfinance-v2-openapi-ais
+        locator: op:GET /v2/card-accounts/{account-id}
+    endpoints:
+      - GET /v2/card-accounts/{account-id}
+    acceptance_criteria:
+      - "account-id is the resourceId from the Read Card Account List call and is constant at least throughout the lifecycle of a consent."
+      - "No query parameters are defined; the request carries mandatory X-Request-ID and Consent-ID headers."
+      - "A successful response has HTTP 200."
+      - "The response body contains the mandatory cardAccount attribute."
+    tags: [ais, card-accounts]
+
+  - id: OFV2-AIS-CARD-BALANCES-001
+    version: openfinance-v2
+    title: Read the balances of a card account
+    sources:
+      - source_id: bg-openfinance-v2-xs2a-implementation-guidelines
+        locator: section:4.5.3
+        note: Read Card Account Balance
+      - source_id: bg-openfinance-v2-xs2a-implementation-guidelines
+        locator: page:112-113
+      - source_id: bg-openfinance-v2-xs2a-operational-rules
+        locator: section:4.11
+        note: API Services with access to card accounts
+      - source_id: bg-openfinance-v2-openapi-ais
+        locator: op:GET /v2/card-accounts/{account-id}/balances
+    endpoints:
+      - GET /v2/card-accounts/{account-id}/balances
+    schemas:
+      - balance
+    acceptance_criteria:
+      - "The call reads balance data from the card reconciliation account addressed by account-id."
+      - "A successful response has HTTP 200."
+      - "The response contains the mandatory cardAccount identifier and the mandatory balances list."
+    tags: [ais, card-accounts, balances]
+
+  - id: OFV2-AIS-CARD-TRANSACTIONS-001
+    version: openfinance-v2
+    title: Read the transaction list of a card account
+    description: >-
+      GET /v2/card-accounts/{account-id}/transactions reads card transactions. bookingStatus is
+      mandatory, dateFrom is mandated unless a delta access is used.
+    sources:
+      - source_id: bg-openfinance-v2-xs2a-implementation-guidelines
+        locator: section:4.5.4
+        note: Read Card Account Transaction List
+      - source_id: bg-openfinance-v2-xs2a-implementation-guidelines
+        locator: page:114-116
+      - source_id: bg-openfinance-v2-xs2a-operational-rules
+        locator: section:4.11
+        note: API Services with access to card accounts
+      - source_id: bg-openfinance-v2-openapi-ais
+        locator: op:GET /v2/card-accounts/{account-id}/transactions
+      - source_id: project-openfinance-v2-errata
+        locator: section:E-03
+        note: pageSize is described in the Implementation Guidelines only
+    endpoints:
+      - GET /v2/card-accounts/{account-id}/transactions
+    acceptance_criteria:
+      - "bookingStatus is mandatory with permitted codes \"booked\", \"pending\" and \"both\"; \"booked\" shall be supported."
+      - "dateFrom is mandated if no delta access is required; dateTo defaults to \"today\"."
+      - "pageSize is optional if supported; an unsupported pageSize, or one above maxPageSize, is rejected."
+      - "The optional cardBrand parameter filters transactions by their card brand."
+      - "The request carries a mandatory Consent-ID header; a successful response has HTTP 200 with the mandatory cardAccount reference."
+    tags: [ais, card-accounts, transactions]
+
+  - id: OFV2-AIS-MULTICURRENCY-001
+    version: openfinance-v2
+    title: Multicurrency account specifics for account information
+    sources:
+      - source_id: bg-openfinance-v2-xs2a-implementation-guidelines
+        locator: section:4.3
+        note: Multi-currency Account Specifics for Account Information
+      - source_id: bg-openfinance-v2-xs2a-implementation-guidelines
+        locator: page:83-84
+      - source_id: bg-openfinance-v2-xs2a-operational-rules
+        locator: page:16
+        note: Definition of a multicurrency account
+      - source_id: bg-openfinance-v2-xs2a-operational-rules
+        locator: page:24-25
+      - source_id: bg-openfinance-v2-openapi-ais
+        locator: op:GET /v2/accounts/{account-id}/balances
+      - source_id: bg-openfinance-v2-openapi-ais
+        locator: op:GET /v2/accounts/{account-id}/transactions
+    endpoints:
+      - GET /v2/accounts
+      - GET /v2/accounts/{account-id}/balances
+      - GET /v2/accounts/{account-id}/transactions
+    acceptance_criteria:
+      - "An IBAN (account identifier) together with a currency uniquely addresses a sub-account of a multicurrency account."
+      - "The ASPSP decides whether it grants access on aggregation level, on aggregation and sub-account level, or only on sub-account level."
+      - "Reading balances on aggregation level returns the balances of all sub-accounts."
+      - "Reading transactions on aggregation level returns all transactions of all sub-accounts, possibly with different transaction currencies."
+    tags: [ais, multicurrency]
+
+  # ======================================================== openFinance v2 - Payment Initiation Service
+  - id: OFV2-PIS-ACCESS-METHODS-001
+    version: openfinance-v2
+    title: Mandatory and optional payment endpoints
+    description: >-
+      IG 2.4 section 2.1.1 fixes which payment access methods an ASPSP must support: single payments
+      (POST, GET, GET status) are mandatory, while bulk and periodic initiation, bulk extended status
+      and cancellation are optional.
+    sources:
+      - source_id: bg-openfinance-v2-xs2a-implementation-guidelines
+        locator: section:2.1.1
+        note: Payments Endpoints
+      - source_id: bg-openfinance-v2-xs2a-implementation-guidelines
+        locator: page:10-12
+      - source_id: bg-openfinance-v2-xs2a-operational-rules
+        locator: section:4
+        note: API Services supported for the core services (Table 2)
+      - source_id: bg-openfinance-v2-xs2a-operational-rules
+        locator: page:14-16
+      - source_id: bg-openfinance-v2-openapi-pis
+        locator: op:POST /v2/payments/{payment-product}
+      - source_id: bg-openfinance-v2-openapi-pis
+        locator: op:POST /v2/bulk-payments/{payment-product}
+      - source_id: bg-openfinance-v2-openapi-pis
+        locator: op:POST /v2/periodic-payments/{payment-product}
+      # Linked via op: only; the template shares its canonical key with the authorisation sub-resource list.
+      - source_id: bg-openfinance-v2-openapi-pis
+        locator: op:GET /v2/{payment-service}/{payment-product}/{paymentId}
+    endpoints:
+      - POST /v2/payments/{payment-product}
+      - POST /v2/bulk-payments/{payment-product}
+      - POST /v2/periodic-payments/{payment-product}
+      - GET /v2/{payment-service}/{payment-product}/{paymentId}/status
+    acceptance_criteria:
+      - "POST payments/{payment-product}, GET payments/{payment-product}/{paymentId} and GET .../{paymentId}/status are mandatory."
+      - "The condition of a method applies only if its parent endpoint is supported at all."
+      - "Methods on dynamically created resources may only address resources created by the same TPP."
+      - "Bulk payment initiation, bulk extended status and periodic payment initiation are optional."
+      - "Payment cancellation (DELETE) is optional."
+      - "The ASPSP is free to decide whether to support an API service marked optional, within the applicable regulation."
+    tags: [pis, access-methods]
+
+  - id: OFV2-PIS-STATUS-CODES-001
+    version: openfinance-v2
+    title: Payment transaction status codes
+    description: >-
+      Payment responses carry the ISO 20022 based transactionStatus. The IG names the multilevel SCA
+      status "PACT" once (page 18) and "PATC" elsewhere; the Data Dictionary and every OpenAPI enum use
+      PATC (errata E-09).
+    sources:
+      - source_id: bg-openfinance-v2-xs2a-implementation-guidelines
+        locator: section:2.3.1
+        note: Status Information for PIS
+      - source_id: bg-openfinance-v2-xs2a-implementation-guidelines
+        locator: page:17-20
+      - source_id: bg-openfinance-v2-data-dictionary
+        locator: page:223
+        note: Transaction Status code list
+      - source_id: project-openfinance-v2-errata
+        locator: section:E-09
+      - source_id: bg-openfinance-v2-openapi-pis
+        locator: op:GET /v2/{payment-service}/{payment-product}/{paymentId}/status
+    endpoints:
+      - GET /v2/{payment-service}/{payment-product}/{paymentId}/status
+    schemas:
+      - TransactionStatus
+    acceptance_criteria:
+      - "The ASPSP delivers transactionStatus in all responses once a payment initiation resource exists and no error occurs."
+      - "Typical successful end statuses are ACTC, ACWC, ACCP or ACFC; RJCT and ACSC are final backend statuses."
+      - "The optional fundsAvailable flag is used together with ACTC, ACWC and ACCP in a GET status response."
+      - "A successfully cancelled payment has status CANC while its resource is addressable."
+      - "A payment authorised by some but not all required PSUs has status PATC."
+      - "The Data Dictionary defines PATC (PartiallyAcceptedTechnical Correct) for multi-authentication payments."
+    tags: [pis, status, errata]
+
+  - id: OFV2-PIS-XML-001
+    version: openfinance-v2
+    title: Single payment initiation with a pain.001 XML payment instruction
+    sources:
+      - source_id: bg-openfinance-v2-xs2a-implementation-guidelines
+        locator: section:3.4.2
+        note: Payment Initiation with pain.001 XML message as Payment Instruction
+      - source_id: bg-openfinance-v2-xs2a-implementation-guidelines
+        locator: page:49-50
+      - source_id: bg-openfinance-v2-openapi-pis
+        locator: op:POST /v2/payments/{payment-product}
+    endpoints:
+      - POST /v2/payments/{payment-product}
+    acceptance_criteria:
+      - "The pain.001 body of a single payment initiation may contain only one payment; bulks use section 3.4.3.2."
+      - "Default XML products are pain.001-sepa-credit-transfers, pain.001-instant-sepa-credit-transfers, pain.001-target-2-payments and pain.001-cross-border-credit-transfers."
+      - "For SEPA credit transfer endpoints accepting XML, the EPC pain.001 schemes are supported as a minimum."
+      - "Headers are as for JSON initiation except that the content type is application/xml; the response equals the JSON initiation response."
+    tags: [pis, xml]
+
+  - id: OFV2-PIS-BULK-001
+    version: openfinance-v2
+    title: Bulk payment initiation
+    sources:
+      - source_id: bg-openfinance-v2-xs2a-implementation-guidelines
+        locator: section:3.4.3
+        note: Payment Initiation for Bulk Payments
+      - source_id: bg-openfinance-v2-xs2a-implementation-guidelines
+        locator: page:51-53
+      - source_id: bg-openfinance-v2-xs2a-implementation-guidelines
+        locator: page:18
+        note: PART status
+      - source_id: bg-openfinance-v2-xs2a-operational-rules
+        locator: section:4.3
+        note: API Service Initiation of a bulk payment
+      - source_id: bg-openfinance-v2-openapi-pis
+        locator: op:POST /v2/bulk-payments/{payment-product}
+    endpoints:
+      - POST /v2/bulk-payments/{payment-product}
+    acceptance_criteria:
+      - "Bulk payment endpoints are optional; the ASPSP publishes which bulk payment products it supports."
+      - "The optional batchBookingPreferred flag is ignored if batch booking is not supported."
+      - "If a bulk entry without a reference is rejected, the whole bulk should be rejected."
+      - "The ASPSP may mandate instructionIds or UETR for bulk initiations."
+      - "A partially processed bulk has status PART."
+    tags: [pis, bulk]
+
+  - id: OFV2-PIS-PERIODIC-001
+    version: openfinance-v2
+    title: Standing order initiation for recurring payments
+    sources:
+      - source_id: bg-openfinance-v2-xs2a-implementation-guidelines
+        locator: section:3.4.4
+        note: Initiation for Standing Orders for Recurring/Periodic Payments
+      - source_id: bg-openfinance-v2-xs2a-implementation-guidelines
+        locator: page:54-58
+      - source_id: bg-openfinance-v2-xs2a-operational-rules
+        locator: section:4.4
+        note: API Service Initiation of a recurring payment
+      - source_id: bg-openfinance-v2-openapi-pis
+        locator: op:POST /v2/periodic-payments/{payment-product}
+    endpoints:
+      - POST /v2/periodic-payments/{payment-product}
+    acceptance_criteria:
+      - "startDate and frequency are mandatory."
+      - "dayOfExecution is conditional; \"31\" means ultimo."
+      - "monthsOfExecution is contained if and only if frequency equals \"MonthlyVariable\"."
+      - "The ASPSP always mandates an SCA with dynamic linking for standing orders; exemptions are not permitted."
+      - "With XML payment data the request is a multipart/form-data message."
+    tags: [pis, periodic]
+
+  - id: OFV2-PIS-STATUS-001
+    version: openfinance-v2
+    title: Get the transaction status of a payment
+    sources:
+      - source_id: bg-openfinance-v2-xs2a-implementation-guidelines
+        locator: section:3.5
+        note: Get Transaction Status Request
+      - source_id: bg-openfinance-v2-xs2a-implementation-guidelines
+        locator: page:60-62
+      - source_id: bg-openfinance-v2-openapi-pis
+        locator: op:GET /v2/{payment-service}/{payment-product}/{paymentId}/status
+    endpoints:
+      - GET /v2/{payment-service}/{payment-product}/{paymentId}/status
+    schemas:
+      - TransactionStatus
+    acceptance_criteria:
+      - "The ASPSP checks that payment-product matches the addressed payment initiation."
+      - "A successful response has HTTP 200 and, for JSON endpoints, contains the mandatory transactionStatus."
+      - "If the PSU does not complete a required SCA (or enough multilevel SCAs) in time, the status is set to RJCT."
+      - "fundsAvailable is contained only if supported, a funds check was performed and the status is ACTC, ACWC or ACCP."
+    tags: [pis, status]
+
+  - id: OFV2-PIS-BULK-EXTENDED-STATUS-001
+    version: openfinance-v2
+    title: Get the extended status of a bulk payment
+    sources:
+      - source_id: bg-openfinance-v2-xs2a-implementation-guidelines
+        locator: section:3.6
+        note: Get Bulk Extended Status Request
+      - source_id: bg-openfinance-v2-xs2a-implementation-guidelines
+        locator: page:65-67
+      - source_id: bg-openfinance-v2-xs2a-implementation-guidelines
+        locator: page:11
+      - source_id: bg-openfinance-v2-openapi-pis
+        locator: op:GET /v2/bulk-payments/{payment-product}/{paymentId}/extended-status
+    endpoints:
+      - GET /v2/bulk-payments/{payment-product}/{paymentId}/extended-status
+    acceptance_criteria:
+      - "The endpoint is optional and returns status information for every rejected transaction, analogous to pain.002."
+      - "Covered payment products are sepa-credit-transfers, instant-sepa-credit-transfers and crossborder-payments."
+      - "The report is not supported for XML based bulk payments."
+      - "A successful response has HTTP 200 and contains the mandatory groupStatus."
+    tags: [pis, bulk, status]
+
+  - id: OFV2-PIS-GET-PAYMENT-001
+    version: openfinance-v2
+    title: Get the content of a payment initiation
+    sources:
+      - source_id: bg-openfinance-v2-xs2a-implementation-guidelines
+        locator: section:3.7
+        note: Get Payment Request
+      - source_id: bg-openfinance-v2-xs2a-implementation-guidelines
+        locator: page:69-71
+      # Linked via op: only; the template shares its canonical key with the authorisation sub-resource list.
+      - source_id: bg-openfinance-v2-openapi-pis
+        locator: op:GET /v2/{payment-service}/{payment-product}/{paymentId}
+    acceptance_criteria:
+      - "The call returns the content of the payment object."
+      - "A successful response has HTTP 200."
+      - "The ASPSP checks that payment-product matches the addressed payment."
+      - "After a successful initiation, the payment resource contains debtorAccount even if the TPP did not provide it (EBA-OP2 item 40)."
+      - "Data elements may differ from the submission if the ASPSP reformatted the content."
+    tags: [pis]
+
+  - id: OFV2-PIS-CANCELLATION-001
+    version: openfinance-v2
+    title: Cancel a payment initiation
+    sources:
+      - source_id: bg-openfinance-v2-xs2a-implementation-guidelines
+        locator: section:3.8
+        note: Payment Cancellation Request
+      - source_id: bg-openfinance-v2-xs2a-implementation-guidelines
+        locator: page:71-73
+      - source_id: bg-openfinance-v2-xs2a-implementation-guidelines
+        locator: page:20
+      - source_id: bg-openfinance-v2-xs2a-operational-rules
+        locator: section:4.5
+        note: API Service Cancellation of payments
+      - source_id: bg-openfinance-v2-xs2a-operational-rules
+        locator: page:21
+      - source_id: bg-openfinance-v2-protocol-functions
+        locator: section:9.2
+        note: Transaction Cancellation Endpoints e.g. for Payments
+      - source_id: bg-openfinance-v2-openapi-pis
+        locator: op:DELETE /v2/{payment-service}/{payment-product}/{paymentId}
+    endpoints:
+      - DELETE /v2/{payment-service}/{payment-product}/{paymentId}
+    acceptance_criteria:
+      - "The cancellation API service is optional; only future dated and recurring payments may be cancelled with it."
+      - "Cancelling a bulk payment affects all included payments; a single payment of a bulk cannot be cancelled."
+      - "HTTP 204 is returned if the DELETE alone cancels the payment; HTTP 202 if a PSU authorisation of the cancellation is needed."
+      - "A response with body contains the mandatory transactionStatus."
+      - "After a successful cancellation the transaction status is CANC."
+    tags: [pis, cancellation]
+
+  - id: OFV2-PIS-DEBTOR-ACCOUNT-UPDATE-001
+    version: openfinance-v2
+    title: Update a resource with the debtor account selected by the PSU
+    sources:
+      - source_id: bg-openfinance-v2-protocol-functions
+        locator: section:9.9
+        note: Update Resource with Debtor Account
+      - source_id: bg-openfinance-v2-protocol-functions
+        locator: page:159-161
+      - source_id: bg-openfinance-v2-openapi-pis
+        locator: op:PUT /v2/{resource-path}/{resourceId}
+    endpoints:
+      - PUT /v2/{resource-path}/{resourceId}
+    acceptance_criteria:
+      - "PUT /v2/{resource-path}/{resourceId} updates the addressed resource by an account related to the PSU."
+      - "The procedure may be offered in decoupled or embedded SCA channels to support noManualIbanEntry requirements."
+      - "The request contains the mandatory debtorAccount, referencing the resourceId provided in the section 9.4.3 response."
+      - "Supporting this feature mandates UUIDs in the resourceId attributes of account details."
+      - "A successful response has HTTP 200."
+    tags: [pis, authorisation]
+
+  # ======================================================== openFinance v2 - Consent API
+  - id: OFV2-CONSENT-AIS-GET-001
+    version: openfinance-v2
+    title: Read an account information consent
+    sources:
+      - source_id: bg-openfinance-v2-consent-api
+        locator: section:3.4.2
+        note: Get Consent Request
+      - source_id: bg-openfinance-v2-consent-api
+        locator: page:35-37
+      - source_id: bg-openfinance-v2-openapi-consent
+        locator: op:GET /v2/consents/account-access/{consentId}
+    endpoints:
+      - GET /v2/consents/account-access/{consentId}
+    schemas:
+      - ConsentStatus
+    acceptance_criteria:
+      - "A successful response has HTTP 200."
+      - "The response contains the mandatory frequencyPerDay and consentStatus."
+      - "For account-access consents the ASPSP delivers all detailed account references and consented access rights after positive SCA."
+      - "Hyperlinks to all accounts provided in the consent are added."
+    tags: [consent, ais]
+
+  - id: OFV2-CONSENT-PIIS-001
+    version: openfinance-v2
+    title: Establish a consent on funds confirmation
+    description: >-
+      POST /v2/consents/funds-confirmations creates a confirmation of funds consent. This openFinance
+      endpoint differs from the NextGenPSD2 extended service /v2/consents/confirmation-of-funds (errata
+      E-06).
+    sources:
+      - source_id: bg-openfinance-v2-consent-api
+        locator: section:3.5.1
+        note: Consent on Funds Confirmation Request
+      - source_id: bg-openfinance-v2-consent-api
+        locator: page:38-41
+      - source_id: bg-openfinance-v2-consent-operational-rules
+        locator: section:4.2
+        note: API Service Establish consent for confirmation of funds
+      - source_id: project-openfinance-v2-errata
+        locator: section:E-06
+      - source_id: bg-openfinance-v2-openapi-consent
+        locator: op:POST /v2/consents/funds-confirmations
+    endpoints:
+      - POST /v2/consents/funds-confirmations
+    schemas:
+      - ConsentStatus
+    acceptance_criteria:
+      - "access is mandatory in the request body; PSU-IP-Address is a mandatory header."
+      - "Only the consentTypes \"detailed\" and \"aspspManaged\" may be used."
+      - "recurringIndicator and validTo are mandatory; adapting a far-future validTo to the maximum available date is mandatory for the ASPSP."
+      - "cardNumber, cardExpiryDate and cardInformation are optional."
+      - "The access right \"fundsConfirmations\" is mandated."
+      - "A successful response has HTTP 201 with a mandatory Location header."
+    tags: [consent, piis]
+
+  - id: OFV2-CONSENT-PIIS-GET-001
+    version: openfinance-v2
+    title: Read a funds confirmation consent
+    sources:
+      - source_id: bg-openfinance-v2-consent-api
+        locator: section:3.5.2
+        note: Get Consent Request
+      - source_id: bg-openfinance-v2-consent-api
+        locator: page:46-48
+      - source_id: bg-openfinance-v2-openapi-consent
+        locator: op:GET /v2/consents/funds-confirmations/{consentId}
+    endpoints:
+      - GET /v2/consents/funds-confirmations/{consentId}
+    schemas:
+      - ConsentStatus
+    acceptance_criteria:
+      - "A successful response has HTTP 200 and contains the mandatory consentType."
+      - "cardNumber is optional in the response."
+      - "The response contains the mandatory consentStatus; registrationInformation is optional."
+    tags: [consent, piis]
+
+  - id: OFV2-CONSENT-USER-PARAMETERS-001
+    version: openfinance-v2
+    title: Establish a consent on user parameters access
+    sources:
+      - source_id: bg-openfinance-v2-consent-api
+        locator: section:3.6.1
+        note: Consent on User Parameters Access Request
+      - source_id: bg-openfinance-v2-consent-api
+        locator: page:49-52
+      - source_id: bg-openfinance-v2-consent-operational-rules
+        locator: section:4.3
+        note: API Service Establish consent on user parameter information
+      - source_id: bg-openfinance-v2-openapi-consent
+        locator: op:POST /v2/consents/user-parameters-access
+    endpoints:
+      - POST /v2/consents/user-parameters-access
+    schemas:
+      - ConsentStatus
+    acceptance_criteria:
+      - "An authorised recurring consent lets a former recurring user-parameters consent of the same PSU and API Client expire."
+      - "The ASPSP supports the consentType \"detailed\" and/or \"aspspManaged\"."
+      - "The access right \"userParameters\" is mandated for the generic service and \"ibanChecks\" for the IBAN check service."
+      - "A successful response has HTTP 201."
+    tags: [consent, user-parameters]
+
+  - id: OFV2-CONSENT-USER-PARAMETERS-GET-001
+    version: openfinance-v2
+    title: Read a user parameters access consent
+    sources:
+      - source_id: bg-openfinance-v2-consent-api
+        locator: section:3.6.2
+        note: Get Consent Request
+      - source_id: bg-openfinance-v2-consent-api
+        locator: page:57-58
+      - source_id: bg-openfinance-v2-openapi-consent
+        locator: op:GET /v2/consents/user-parameters-access/{consentId}
+    endpoints:
+      - GET /v2/consents/user-parameters-access/{consentId}
+    schemas:
+      - ConsentStatus
+    acceptance_criteria:
+      - "A successful response has HTTP 200."
+      - "The response contains the mandatory consentType, recurringIndicator, validTo, consentStatus and access."
+    tags: [consent, user-parameters]
+
+  - id: OFV2-CONSENT-DOCUMENT-SERVICES-001
+    version: openfinance-v2
+    title: Establish a consent on document services
+    sources:
+      - source_id: bg-openfinance-v2-consent-api
+        locator: section:3.7.1
+        note: Establish Consent on Document Services Request
+      - source_id: bg-openfinance-v2-consent-api
+        locator: page:59-61
+      - source_id: bg-openfinance-v2-consent-operational-rules
+        locator: section:4.4
+        note: API Service Establish Consent on document service
+      - source_id: bg-openfinance-v2-openapi-consent
+        locator: op:POST /v2/consents/document-services
+    endpoints:
+      - POST /v2/consents/document-services
+    schemas:
+      - ConsentStatus
+    acceptance_criteria:
+      - "documentOriginator is used by the API Client if the consent is on the pair (Originator-RTPSP, RTP-Originator)."
+      - "validTo is inclusive; \"9999-12-31\" requests the maximum available date."
+      - "The ASPSP supports the consentType \"detailed\" and/or \"aspspManaged\"."
+      - "The access rights \"submitRtps\" and/or \"submitDocs\" are used as a minimum."
+      - "A successful response has HTTP 201."
+    tags: [consent, document-services]
+
+  - id: OFV2-CONSENT-DOCUMENT-SERVICES-GET-001
+    version: openfinance-v2
+    title: Read a document services consent
+    sources:
+      - source_id: bg-openfinance-v2-consent-api
+        locator: section:3.7.2
+        note: Get Consent Request
+      - source_id: bg-openfinance-v2-consent-api
+        locator: page:66-68
+      - source_id: bg-openfinance-v2-openapi-consent
+        locator: op:GET /v2/consents/document-services/{consentId}
+    endpoints:
+      - GET /v2/consents/document-services/{consentId}
+    schemas:
+      - ConsentStatus
+    acceptance_criteria:
+      - "A successful response has HTTP 200."
+      - "The response contains the mandatory account access details."
+      - "The response contains the mandatory consentStatus; registrationInformation is optional."
+    tags: [consent, document-services]
+
+  - id: OFV2-CONSENT-DELETE-001
+    version: openfinance-v2
+    title: Terminate a consent
+    sources:
+      - source_id: bg-openfinance-v2-consent-api
+        locator: section:3.9
+        note: Cancellation of a Consent
+      - source_id: bg-openfinance-v2-consent-api
+        locator: page:70-71
+      - source_id: bg-openfinance-v2-consent-operational-rules
+        locator: section:4.5
+        note: API Service Cancellation of a Consent
+      - source_id: bg-openfinance-v2-consent-operational-rules
+        locator: page:24
+      - source_id: bg-openfinance-v2-openapi-consent
+        locator: op:DELETE /v2/consents/{consent-category}/{consentId}
+    endpoints:
+      - DELETE /v2/consents/{consent-category}/{consentId}
+    acceptance_criteria:
+      - "The API Client can cancel a consent with DELETE /v2/consents/{consent-category}/{consentId}."
+      - "consent-category equals one of account-access, funds-confirmations, user-parameters-access, document-services."
+      - "A successful deletion has HTTP 204."
+      - "No SCA or other PSU involvement is necessary to terminate the consent."
+    tags: [consent, lifecycle]
+
+  - id: OFV2-CONSENT-LIFECYCLE-001
+    version: openfinance-v2
+    title: Consent status values in the establish and lifecycle phases
+    sources:
+      - source_id: bg-openfinance-v2-consent-api
+        locator: section:2.3
+        note: Status Information within the Establish Consent Process and Lifecycle
+      - source_id: bg-openfinance-v2-consent-api
+        locator: page:12-13
+      - source_id: bg-openfinance-v2-consent-api
+        locator: page:70
+      - source_id: bg-openfinance-v2-openapi-consent
+        locator: op:GET /v2/consents/{consent-category}/{consentId}/status
+    endpoints:
+      - GET /v2/consents/{consent-category}/{consentId}/status
+    schemas:
+      - ConsentStatus
+    acceptance_criteria:
+      - "During initiation, consentStatus is one of \"received\", \"rejected\", \"partiallyAuthorised\" and \"valid\"."
+      - "Lifecycle statuses include \"expired\", \"revokedByPsu\", \"terminatedByTpp\" and \"replacedByTPP\"."
+      - "One-off consents also become \"expired\" once used or outdated."
+      - "The status response contains the mandatory overall lifecycle consentStatus."
+    tags: [consent, status]
+
+  - id: OFV2-CONSENT-VALIDTO-001
+    version: openfinance-v2
+    title: Consent validity date validTo
+    description: >-
+      openFinance consents use validTo (inclusive ISODate) where NextGenPSD2 1.3 used validUntil (errata
+      E-05).
+    sources:
+      - source_id: bg-openfinance-v2-consent-api
+        locator: section:3.4.1
+        note: Consent Request for Account Information
+      - source_id: bg-openfinance-v2-consent-api
+        locator: page:25
+      - source_id: project-openfinance-v2-errata
+        locator: section:E-05
+      - source_id: bg-openfinance-v2-openapi-consent
+        locator: op:POST /v2/consents/account-access
+    endpoints:
+      - POST /v2/consents/account-access
+    acceptance_criteria:
+      - "validTo is a mandatory ISODate and the date itself is included in the validity."
+      - "\"9999-12-31\" requests the maximum available date."
+      - "Supporting the adaption of the maximum available date is mandatory for the ASPSP."
+    tags: [consent, validity, errata]
+
+  - id: OFV2-CONSENT-OPS-001
+    version: openfinance-v2
+    title: Consent expiry, cancellation and replacement rules
+    sources:
+      - source_id: bg-openfinance-v2-consent-operational-rules
+        locator: section:5.3
+        note: Expiry date for consents
+      - source_id: bg-openfinance-v2-consent-operational-rules
+        locator: page:25-26
+    acceptance_criteria:
+      - "A consent is valid directly after it is successfully authorised by the PSU using SCA."
+      - "The ASPSP may shorten a requested expiry date and must inform the API Client."
+      - "A far-future expiry date is limited to the ASPSP's maximum expiry date."
+      - "The PSU may cancel a consent via an ASPSP channel without involving the API Client."
+      - "For CONS-AIS, CONS-XAIS and CONS-USP, a new authorised recurring consent automatically expires the former one of the same PSU and API Client."
+    tags: [consent, operational-rules]
+
+  - id: OFV2-CONSENT-OPS-002
+    version: openfinance-v2
+    title: PSU involvement and API Client identification for consents
+    sources:
+      - source_id: bg-openfinance-v2-consent-operational-rules
+        locator: section:5.1
+        note: Client Identification and Authorisation
+      - source_id: bg-openfinance-v2-consent-operational-rules
+        locator: section:5.2
+        note: Consent of the PSU
+      - source_id: bg-openfinance-v2-consent-operational-rules
+        locator: section:4.1
+        note: API Service Establish consent on account information
+      - source_id: bg-openfinance-v2-consent-operational-rules
+        locator: page:14
+      - source_id: bg-openfinance-v2-consent-operational-rules
+        locator: page:25
+    acceptance_criteria:
+      - "Establishing an account information consent is mandatory at the XS2A interface and recommended at the openFinance API."
+      - "The ASPSP rejects an API Client whose identification is not completely correct."
+      - "The PSU is always involved in establishing a consent and its verification is obtained by strong customer authentication."
+    tags: [consent, operational-rules, sca]
+
+  # ======================================================== openFinance v2 - Authorisation, signing baskets and push notifications
+  - id: OFV2-AUTH-START-001
+    version: openfinance-v2
+    title: Start an authorisation or cancellation-authorisation sub-resource
+    description: >-
+      POST /v2/{resource-path}/{resourceId}/{authorisation-category} creates an authorisation (or
+      cancellation-authorisation) sub-resource. The operation is published identically in the PIS,
+      Consent and Signing Basket OpenAPI files.
+    sources:
+      - source_id: bg-openfinance-v2-protocol-functions
+        locator: section:9.3
+        note: Access Methods for Authorisations
+      - source_id: bg-openfinance-v2-protocol-functions
+        locator: section:9.4
+        note: Start Authorisation Process
+      - source_id: bg-openfinance-v2-protocol-functions
+        locator: page:108-117
+      - source_id: bg-openfinance-v2-openapi-pis
+        locator: op:POST /v2/{resource-path}/{resourceId}/{authorisation-category}
+      - source_id: bg-openfinance-v2-openapi-consent
+        locator: op:POST /v2/{resource-path}/{resourceId}/{authorisation-category}
+      - source_id: bg-openfinance-v2-openapi-signing-basket
+        locator: op:POST /v2/{resource-path}/{resourceId}/{authorisation-category}
+    endpoints:
+      - POST /v2/{resource-path}/{resourceId}/{authorisation-category}
+    schemas:
+      - SCAStatus
+    acceptance_criteria:
+      - "POST on {resource-path}/{resourceId}/authorisations is mandatory; for n-fold SCA it is iterated n times, one sub-resource per PSU."
+      - "The ASPSP may create the authorisation sub-resource automatically when only one SCA process is needed."
+      - "POST and GET on cancellation-authorisations are optional; if POST is supported, GET must be supported too."
+      - "A successful response has HTTP 201."
+      - "The response contains the mandatory scaStatus and authorisationId."
+    tags: [authorisation, sca, pis, consent, signing-basket]
+
+  - id: OFV2-AUTH-UPDATE-PSU-DATA-001
+    version: openfinance-v2
+    title: Update PSU data on an authorisation sub-resource
+    sources:
+      - source_id: bg-openfinance-v2-protocol-functions
+        locator: section:9.4.1
+        note: Update PSU Data
+      - source_id: bg-openfinance-v2-protocol-functions
+        locator: section:9.4.2
+        note: Update PSU Data (Identification)
+      - source_id: bg-openfinance-v2-protocol-functions
+        locator: page:109
+      - source_id: bg-openfinance-v2-protocol-functions
+        locator: page:123-125
+      - source_id: bg-openfinance-v2-openapi-pis
+        locator: op:PUT /v2/{resource-path}/{resourceId}/{authorisation-category}/{authorisationId}
+      - source_id: bg-openfinance-v2-openapi-consent
+        locator: op:PUT /v2/{resource-path}/{resourceId}/{authorisation-category}/{authorisationId}
+      - source_id: bg-openfinance-v2-openapi-signing-basket
+        locator: op:PUT /v2/{resource-path}/{resourceId}/{authorisation-category}/{authorisationId}
+    endpoints:
+      - PUT /v2/{resource-path}/{resourceId}/{authorisation-category}/{authorisationId}
+    acceptance_criteria:
+      - "PUT on the authorisation resource is mandatory for the Embedded and Signature SCA approaches and conditional for other approaches."
+      - "The call updates the authorisation sub-resource with PSU data if requested by the ASPSP."
+      - "The identification variant is used when the preceding response carried an updatePsuIdentification hyperlink."
+      - "A successful response has HTTP 200."
+    tags: [authorisation, sca, embedded]
+
+  - id: OFV2-AUTH-SUBRESOURCES-001
+    version: openfinance-v2
+    title: List the authorisation sub-resources of a resource
+    sources:
+      - source_id: bg-openfinance-v2-protocol-functions
+        locator: section:9.6
+        note: GET Authorisation Sub-Resources Request
+      - source_id: bg-openfinance-v2-protocol-functions
+        locator: page:108
+      - source_id: bg-openfinance-v2-protocol-functions
+        locator: page:145-146
+      - source_id: bg-openfinance-v2-openapi-pis
+        locator: op:GET /v2/{resource-path}/{resourceId}/{authorisation-category}
+      - source_id: bg-openfinance-v2-openapi-consent
+        locator: op:GET /v2/{resource-path}/{resourceId}/{authorisation-category}
+      # Linked via op: only; the template shares its canonical key with GET /v2/{payment-service}/{payment-product}/{paymentId}.
+      - source_id: bg-openfinance-v2-openapi-signing-basket
+        locator: op:GET /v2/{resource-path}/{resourceId}/{authorisation-category}
+    acceptance_criteria:
+      - "Reading the list of authorisation sub-resource ids is mandatory."
+      - "The call returns the ids of all generated authorisation or cancellation-authorisation sub-resources."
+      - "A successful response has HTTP 200 and contains the mandatory authorisationIds array."
+    tags: [authorisation]
+
+  - id: OFV2-AUTH-STATUS-001
+    version: openfinance-v2
+    title: Read the SCA status of an authorisation sub-resource
+    sources:
+      - source_id: bg-openfinance-v2-protocol-functions
+        locator: section:9.7
+        note: GET Authorisation Status Request
+      - source_id: bg-openfinance-v2-protocol-functions
+        locator: page:109
+      - source_id: bg-openfinance-v2-protocol-functions
+        locator: page:147-149
+      - source_id: bg-openfinance-v2-openapi-pis
+        locator: op:GET /v2/{resource-path}/{resourceId}/{authorisation-category}/{authorisationId}
+      - source_id: bg-openfinance-v2-openapi-consent
+        locator: op:GET /v2/{resource-path}/{resourceId}/{authorisation-category}/{authorisationId}
+      - source_id: bg-openfinance-v2-openapi-signing-basket
+        locator: op:GET /v2/{resource-path}/{resourceId}/{authorisation-category}/{authorisationId}
+    endpoints:
+      - GET /v2/{resource-path}/{resourceId}/{authorisation-category}/{authorisationId}
+    schemas:
+      - SCAStatus
+    acceptance_criteria:
+      - "Reading the SCA status of an authorisation is mandatory."
+      - "The call checks the SCA status of an authorisation or cancellation-authorisation sub-resource."
+      - "A successful response has HTTP 200."
+      - "The response contains the mandatory scaStatus and may contain the optional psuName."
+    tags: [authorisation, sca]
+
+  - id: OFV2-AUTH-CONFIRMATION-001
+    version: openfinance-v2
+    title: Authorisation confirmation request (Redirect and OAuth2 SCA)
+    sources:
+      - source_id: bg-openfinance-v2-protocol-functions
+        locator: section:9.8
+        note: Confirmation Request Procedure
+      - source_id: bg-openfinance-v2-protocol-functions
+        locator: page:109
+      - source_id: bg-openfinance-v2-protocol-functions
+        locator: page:150-158
+      - source_id: bg-openfinance-v2-openapi-pis
+        locator: op:PUT /v2/{resource-path}/{resourceId}/{authorisation-category}/{authorisationId}
+      - source_id: bg-openfinance-v2-openapi-consent
+        locator: op:PUT /v2/{resource-path}/{resourceId}/{authorisation-category}/{authorisationId}
+      - source_id: bg-openfinance-v2-openapi-signing-basket
+        locator: op:PUT /v2/{resource-path}/{resourceId}/{authorisation-category}/{authorisationId}
+    endpoints:
+      - PUT /v2/{resource-path}/{resourceId}/{authorisation-category}/{authorisationId}
+    acceptance_criteria:
+      - "The confirmation request procedure is an optional extension of the authorisation process to prevent Cross-Site-Request-Forgery."
+      - "If the TPP's check fails, the transaction is stopped and the confirmation messages are not used."
+      - "With Redirect SCA the call carries a confirmation code; with OAuth2 SCA it carries the OAuth2 access token; both only when requested by the ASPSP's hyperlink."
+      - "A successful response has HTTP 200."
+      - "The response scaStatus is mandatory, with value \"finalised\" if the transaction authorisation succeeded."
+    tags: [authorisation, sca, redirect, oauth2]
+
+  - id: OFV2-BASK-CREATE-001
+    version: openfinance-v2
+    title: Establish a signing basket
+    sources:
+      - source_id: bg-openfinance-v2-protocol-functions
+        locator: section:11.1
+        note: Access Methods for Signing Baskets
+      - source_id: bg-openfinance-v2-protocol-functions
+        locator: section:11.2
+        note: Establish Signing Basket Request
+      - source_id: bg-openfinance-v2-protocol-functions
+        locator: page:181-183
+      - source_id: bg-openfinance-v2-xs2a-operational-rules
+        locator: section:4.12
+        note: API Service Grouping requested services to signing baskets
+      - source_id: bg-openfinance-v2-xs2a-operational-rules
+        locator: page:26
+      - source_id: bg-openfinance-v2-openapi-signing-basket
+        locator: op:POST /v2/signing-baskets
+    endpoints:
+      - POST /v2/signing-baskets
+    schemas:
+      - TransactionStatus
+    acceptance_criteria:
+      - "The signing basket API service is optional for an ASPSP."
+      - "POST signing-baskets is optional; GET signing-baskets/{basketId} and its status are mandatory; DELETE is optional."
+      - "The request body contains at least one entry."
+      - "A successful response has HTTP 201 and contains the mandatory basketId and transactionStatus."
+    tags: [signing-basket]
+
+  - id: OFV2-BASK-GET-001
+    version: openfinance-v2
+    title: Read the content of a signing basket
+    sources:
+      - source_id: bg-openfinance-v2-protocol-functions
+        locator: section:11.3
+        note: Get Signing Basket Request
+      - source_id: bg-openfinance-v2-protocol-functions
+        locator: page:185-187
+      - source_id: bg-openfinance-v2-openapi-signing-basket
+        locator: op:GET /v2/signing-baskets/{basketId}
+    endpoints:
+      - GET /v2/signing-baskets/{basketId}
+    acceptance_criteria:
+      - "The call returns the content of a signing basket object."
+      - "A successful response has HTTP 200; the resource id arrays are optional and non-empty when present."
+      - "The response contains the mandatory transactionStatus."
+    tags: [signing-basket]
+
+  - id: OFV2-BASK-STATUS-001
+    version: openfinance-v2
+    title: Read the status of a signing basket
+    sources:
+      - source_id: bg-openfinance-v2-protocol-functions
+        locator: section:11.4
+        note: Get Signing Basket Status Request
+      - source_id: bg-openfinance-v2-protocol-functions
+        locator: page:187-188
+      - source_id: bg-openfinance-v2-openapi-signing-basket
+        locator: op:GET /v2/signing-baskets/{basketId}/status
+    endpoints:
+      - GET /v2/signing-baskets/{basketId}/status
+    schemas:
+      - TransactionStatus
+    acceptance_criteria:
+      - "The call returns the status of a signing basket object."
+      - "A successful response has HTTP 200."
+      - "transactionStatus is mandatory and only RCVD, PATC, ACTC, CANC and RJCT are supported for signing baskets."
+    tags: [signing-basket, status]
+
+  - id: OFV2-BASK-DELETE-001
+    version: openfinance-v2
+    title: Delete a signing basket that is not yet authorised
+    sources:
+      - source_id: bg-openfinance-v2-protocol-functions
+        locator: section:11.5
+        note: Cancellation of Signing Baskets
+      - source_id: bg-openfinance-v2-protocol-functions
+        locator: page:181
+      - source_id: bg-openfinance-v2-protocol-functions
+        locator: page:189-190
+      - source_id: bg-openfinance-v2-openapi-signing-basket
+        locator: op:DELETE /v2/signing-baskets/{basketId}
+    endpoints:
+      - DELETE /v2/signing-baskets/{basketId}
+    acceptance_criteria:
+      - "Deleting a signing basket does not impact the transactions contained in it."
+      - "Cancellation is only permitted if no (partial) authorisation has been applied to the basket."
+      - "A successful deletion returns HTTP 204."
+    tags: [signing-basket, cancellation]
+
+  - id: OFV2-PUSH-NOTIFICATION-001
+    version: openfinance-v2
+    title: Resource status push notification to the API Client
+    description: >-
+      The ASPSP may push resource status changes to POST <Client-Notification-URL> of the API Client
+      when the client subscribed with Client-Notification-URI in the resource creation request. The v1
+      lean push used /TPP-notification-URI (errata E-08).
+    sources:
+      - source_id: bg-openfinance-v2-protocol-functions
+        locator: section:12
+        note: Resource Status Notification
+      - source_id: bg-openfinance-v2-protocol-functions
+        locator: page:191-196
+      - source_id: project-openfinance-v2-errata
+        locator: section:E-08
+      - source_id: bg-openfinance-v2-openapi-push
+        locator: op:POST /Client-Notification-URL
+    endpoints:
+      - POST /Client-Notification-URL
+    acceptance_criteria:
+      - "Resource status notification is optional; the ASPSP may ignore a registration."
+      - "The API Client supports the POST notification endpoint if it provided a Client-Notification-URI."
+      - "The API Client acknowledges a notification with HTTP 200."
+      - "Client-Notification-Content-Preferred has the form status=X1, ..., Xn with the constants SCA, PROCESS and LAST."
+      - "If only one of the two notification headers is present, the ASPSP ignores it."
+      - "ASPSP-Notification-Support is returned when the ASPSP generally supports the function (true for the created resource, false otherwise)."
+    tags: [push, notification]
+
+  # ======================================================== openFinance v2 - Protocol functions and security measures (cross-cutting)
+  - id: OFV2-HDR-REQUEST-001
+    version: openfinance-v2
+    title: Request header parameter families
+    sources:
+      - source_id: bg-openfinance-v2-protocol-functions
+        locator: section:3.4
+        note: API Request Header Parameter
+      - source_id: bg-openfinance-v2-protocol-functions
+        locator: page:25-26
+    acceptance_criteria:
+      - "Transaction Initiation Requests carry PSU context data (8.2), PSU identification data (8.3) and SCA approach preferences (8.4)."
+      - "Service Resource Creation Requests carry the Client Brand Logging Information header and API Client notification data."
+      - "Signature related headers apply for message signing (section 6) and signed transaction requests (section 7.1.2)."
+      - "Technical headers such as Date are not specifically addressed by the specification."
+    tags: [headers, protocol]
+
+  - id: OFV2-HDR-IDEMPOTENCY-001
+    version: openfinance-v2
+    title: X-Request-ID and idempotent handling of repeated requests
+    sources:
+      - source_id: bg-openfinance-v2-protocol-functions
+        locator: section:3.5
+        note: Header Parameters for Idempotency
+      - source_id: bg-openfinance-v2-protocol-functions
+        locator: page:27
+    acceptance_criteria:
+      - "Every request and response carries a UUID X-Request-ID; the response value equals the request value."
+      - "A repeated request with the same X-Request-ID and the same business content within an acceptable time should get the same response."
+      - "A repeated X-Request-ID with different business content should be rejected with a 40x response code."
+    tags: [headers, idempotency]
+
+  - id: OFV2-HATEOAS-001
+    version: openfinance-v2
+    title: Steering the API flow with hyperlinks
+    sources:
+      - source_id: bg-openfinance-v2-protocol-functions
+        locator: section:3.6
+        note: API Steering Process by Hyperlinks (HATEOAS)
+      - source_id: bg-openfinance-v2-protocol-functions
+        locator: section:3.7
+        note: Links in dedicated Responses
+      - source_id: bg-openfinance-v2-protocol-functions
+        locator: page:28-30
+    acceptance_criteria:
+      - "Some steering hyperlinks require additional data in the same response body, as listed in the steering hyperlink table."
+      - "Transaction Initiation Responses may contain hyperlinks for the next authorisation steps, defined generically in section 3.7.1."
+    tags: [hateoas, protocol]
+
+  - id: OFV2-HTTP-STATUS-001
+    version: openfinance-v2
+    title: Supported HTTP response codes
+    sources:
+      - source_id: bg-openfinance-v2-protocol-functions
+        locator: section:3.8
+        note: HTTP Response Codes
+      - source_id: bg-openfinance-v2-protocol-functions
+        locator: page:33-34
+    acceptance_criteria:
+      - "4XX codes are only returned if the request cannot be fulfilled; a status request returns 200 even if the transaction failed."
+      - "A POST funds confirmation returns 200 because it creates no resource."
+      - "DELETE returns 202 when a cancellation authorisation is still needed."
+      - "When in doubt whether an id is sensitive, 404 is used instead of 403."
+      - "405 is only sent when the HTTP method is not supported on the endpoint."
+      - "429 is returned when the API Client exceeded the number of requests allowed by the consent or the RTS."
+    tags: [http-status, protocol]
+
+  - id: OFV2-ERR-FORMAT-001
+    version: openfinance-v2
+    title: Error responses and additional error information
+    sources:
+      - source_id: bg-openfinance-v2-protocol-functions
+        locator: section:4.1
+        note: Responses in Error Cases
+      - source_id: bg-openfinance-v2-protocol-functions
+        locator: section:4.2
+        note: Additional Error Information
+      - source_id: bg-openfinance-v2-protocol-functions
+        locator: page:37-38
+    acceptance_criteria:
+      - "Mandated (and applicable conditional) headers are also included in negative responses once functional processing has taken place."
+      - "Body attributes of positive responses are also provided in error responses where possible and applicable."
+      - "Additional error information is sent in apiClientMessages with category ERROR, code and path."
+    tags: [errors, protocol]
+
+  - id: OFV2-SEC-TLS-001
+    version: openfinance-v2
+    title: Mutually authenticated TLS between API Client and ASPSP
+    sources:
+      - source_id: bg-openfinance-v2-protocol-functions
+        locator: section:5.1
+        note: TLS-secured connection established by API Client
+      - source_id: bg-openfinance-v2-protocol-functions
+        locator: section:5.3
+        note: Certificate Requirements on Redirect URIs
+      - source_id: bg-openfinance-v2-protocol-functions
+        locator: page:42-43
+      - source_id: bg-openfinance-v2-xs2a-operational-rules
+        locator: section:6.1
+        note: Identification of the TPP and correct role
+      - source_id: bg-openfinance-v2-xs2a-operational-rules
+        locator: page:31
+    acceptance_criteria:
+      - "Communication is always TLS-secured with mutual authentication, using TLS 1.2 or higher."
+      - "On the XS2A API the API Client authenticates with a QWAC issued by a qualified trust service provider under eIDAS."
+      - "For the openFinance API the ASPSP defines the certificate requirements, and an XS2A QWAC can also be used."
+      - "The ASPSP rejects any XS2A transaction if the TPP cannot be identified correctly or lacks the role needed."
+    tags: [security, tls, certificates]
+
+  - id: OFV2-SEC-SIGNATURE-001
+    version: openfinance-v2
+    title: Application-level signing of HTTP request messages
+    sources:
+      - source_id: bg-openfinance-v2-protocol-functions
+        locator: section:6.1
+        note: Certificates to be used
+      - source_id: bg-openfinance-v2-protocol-functions
+        locator: section:6.2
+        note: Signing HTTP messages based on RFC7515
+      - source_id: bg-openfinance-v2-protocol-functions
+        locator: page:45
+    acceptance_criteria:
+      - "Support of message signing is optional for the ASPSP and mandatory for the API Client; if the ASPSP requests it, the API Client signs the request."
+      - "The API Client signs with a qualified certificate for electronic seals (QSealC)."
+    tags: [security, signing]
+
+  - id: OFV2-SEC-OAUTH2-001
+    version: openfinance-v2
+    title: OAuth2 SCA approach
+    sources:
+      - source_id: bg-openfinance-v2-protocol-functions
+        locator: section:8.8
+        note: OAuth SCA Approach
+      - source_id: bg-openfinance-v2-protocol-functions
+        locator: page:96-101
+    acceptance_criteria:
+      - "The optional OAuth2 protocol follows RFC6749; response type code and grant types authorization_code and refresh_token are recommended."
+      - "The authorization response is an HTTP 302 with the mandatory code and the unchanged state."
+      - "The TPP is authenticated at the token request with OAuth 2.0 Mutual TLS (RFC 8705) and its eIDAS certificate."
+      - "The token response contains the mandatory access_token, token_type Bearer and scope."
+    tags: [security, oauth2, sca]
+
+  - id: OFV2-HDR-PSU-CONTEXT-001
+    version: openfinance-v2
+    title: PSU context and PSU identification headers
+    sources:
+      - source_id: bg-openfinance-v2-protocol-functions
+        locator: section:8.2
+        note: Header Parameter for PSU Context Data
+      - source_id: bg-openfinance-v2-protocol-functions
+        locator: section:8.3
+        note: Header Parameters for PSU Identification Data
+      - source_id: bg-openfinance-v2-protocol-functions
+        locator: page:90-93
+    acceptance_criteria:
+      - "PSU-IP-Address is conditional (conditions set per service); PSU-IP-Port and the PSU-Accept headers are optional."
+      - "API Clients are highly recommended to send all PSU context information; missing information may raise the risk of rejection."
+      - "PSU-ID, PSU-ID-Type, PSU-Corporate-ID and PSU-Corporate-ID-Type are conditional and may be mandated in the ASPSP documentation."
+      - "The recommended character set for PSU identification headers is ISO8859-1; UTF-8 may lead to PSU_CREDENTIALS_INVALID."
+    tags: [headers, psu]
+
+  - id: OFV2-SCA-REQUEST-HEADERS-001
+    version: openfinance-v2
+    title: Request headers steering the SCA approach
+    description: >-
+      Client-SCA-Approach-Preference, Client-Redirect-URI, Client-Nok-Redirect-URI and
+      Client-Explicit-Authorisation-Preferred (section 8.4.1). The change logs use other names for two
+      of them (errata E-10).
+    sources:
+      - source_id: bg-openfinance-v2-protocol-functions
+        locator: section:8.4.1
+        note: Request Header Parameters Steering SCA Approaches
+      - source_id: bg-openfinance-v2-protocol-functions
+        locator: page:93-94
+      - source_id: project-openfinance-v2-errata
+        locator: section:E-10
+    acceptance_criteria:
+      - "Client-SCA-Approach-Preference is an optional prioritised list (e.g. \"decoupled, redirect, embedded, signature\") that the ASPSP may ignore."
+      - "Client-Redirect-URI is mandated for the Redirect SCA approach and recommended always."
+      - "Client-Nok-Redirect-URI is optional and may be ignored by the ASPSP."
+      - "Client-Explicit-Authorisation-Preferred \"true\" asks to start the authorisation separately; the ASPSP may ignore it."
+    tags: [headers, sca, errata]
+
+  - id: OFV2-SCA-TYPES-001
+    version: openfinance-v2
+    title: SCA Approach Type codes of the Data Dictionary
+    description: >-
+      Data Dictionary codes (Decoupled, Embedded, OAauth2, Redirect, Online-Channel) are data structure
+      codes and are not the ASPSP-SCA-Approach header values (errata E-02).
+    sources:
+      - source_id: bg-openfinance-v2-data-dictionary
+        locator: section:3.39
+        note: SCA Approach Type
+      - source_id: bg-openfinance-v2-data-dictionary
+        locator: page:213
+      - source_id: project-openfinance-v2-errata
+        locator: section:E-02
+      - source_id: bg-openfinance-v2-protocol-functions
+        locator: page:95
+        note: ASPSP-SCA-Approach header values (section 8.4.2)
+    acceptance_criteria:
+      - "The SCA Approach Type codes are Decoupled, Embedded, OAauth2 (as published), Redirect and Online-Channel."
+      - "The ASPSP-SCA-Approach header uses a different value set (EMBEDDED, DECOUPLED, REDIRECT, ASPSP-CHANNEL, SIGNATURE), so codes are not mapped 1:1."
+    tags: [sca, data-dictionary, errata]
+
+  - id: OFV2-CLIENT-NAMING-001
+    version: openfinance-v2
+    title: TPP-prefixed header names replaced by Client-prefixed names
+    sources:
+      - source_id: bg-openfinance-v2-protocol-functions
+        locator: page:204-205
+        note: Change log 13.3.1
+      - source_id: bg-openfinance-v2-protocol-functions
+        locator: page:94
+      - source_id: project-openfinance-v2-errata
+        locator: section:E-08
+      - source_id: project-openfinance-v2-errata
+        locator: section:E-10
+    acceptance_criteria:
+      - "TPP-Redirect-URI is renamed to Client-Redirect-URI so that the parameters also serve direct access by corporates."
+      - "The v2 redirect headers are Client-Redirect-URI and Client-Nok-Redirect-URI."
+    tags: [headers, naming, errata]
+
+  # ======================================================== openFinance v2 - Operational rules, administrative services and data dictionary
+  - id: OFV2-ERR-CODES-001
+    version: openfinance-v2
+    title: Message codes and their HTTP response codes
+    sources:
+      - source_id: bg-openfinance-v2-data-dictionary
+        locator: section:3.25
+        note: Message Code
+      - source_id: bg-openfinance-v2-data-dictionary
+        locator: page:198-204
+    acceptance_criteria:
+      - "Only the listed message error codes with their HTTP response codes are permitted; new services may add codes."
+      - "CERTIFICATE_INVALID is returned with HTTP 401."
+      - "FORMAT_ERROR and PARAMETER_NOT_SUPPORTED are returned with HTTP 400; SERVICE_BLOCKED with 403."
+      - "CONSENT_EXPIRED is returned with HTTP 401 and RESOURCE_UNKNOWN with 404."
+      - "PIS: STATUS_INVALID is returned with HTTP 409 and PRODUCT_UNKNOWN with 404."
+      - "CANCELLATION_INVALID is returned with HTTP 405; AIS ACCESS_EXCEEDED with 429."
+    tags: [errors, data-dictionary]
+
+  - id: OFV2-ADMIN-ONBOARDING-001
+    version: openfinance-v2
+    title: Technical onboarding of an API Client (administrative services)
+    description: >-
+      Before accessing extended services, an API Client onboards with POST v2/onboardings and then uses
+      the returned apiContractId. The endpoints are not part of the corpus OpenAPI files.
+    sources:
+      - source_id: bg-openfinance-v2-administrative-services
+        locator: section:1.2
+        note: Administrative Services
+      - source_id: bg-openfinance-v2-administrative-services
+        locator: section:2.4
+        note: Endpoints and API Access Methods
+      - source_id: bg-openfinance-v2-administrative-services
+        locator: section:3.1
+        note: Initiation of the onboarding process
+      - source_id: bg-openfinance-v2-administrative-services
+        locator: page:5-16
+    acceptance_criteria:
+      - "After onboarding the ASPSP assigns a unique apiContractId that the API Client uses for all further accesses to extended services."
+      - "The one step process is used when all access conditions are fixed by contract; the two step process asks for explicit confirmation of special conditions."
+      - "POST onboardings and GET onboardings/{onboardingId} are mandatory; the certificates endpoint and DELETE are optional."
+      - "schemeId (BILATERAL if no scheme) and serviceIds are mandatory in the onboarding request."
+      - "A successful onboarding request has HTTP 201; apiContractId and validTo are only provided when the status is valid."
+      - "An onboarding is valid from the day its status is set to valid; a future-dated onboarding is not possible."
+    tags: [administrative-services, onboarding]
+
+  - id: OFV2-ADMIN-SIGNING-001
+    version: openfinance-v2
+    title: Signed requests and certificate change for administrative services
+    sources:
+      - source_id: bg-openfinance-v2-administrative-services
+        locator: section:2.1
+        note: Signing Messages at Application Layer
+      - source_id: bg-openfinance-v2-administrative-services
+        locator: section:3.7
+        note: Information about a new QSealC of the API Client
+      - source_id: bg-openfinance-v2-administrative-services
+        locator: page:8
+      - source_id: bg-openfinance-v2-administrative-services
+        locator: page:26-27
+    acceptance_criteria:
+      - "The POST requests of sections 3.1, 3.3 and 3.7 are signed HTTP messages."
+      - "The QSealC is included in the JWS Protected Header (x5c) unless it was exchanged before."
+      - "A new certificate is announced with POST .../onboardings/{onboardingId}/certificates, signed with the new certificate."
+      - "A signature failure is answered with HTTP 401 SIGNATURE_INVALID; the old certificate stays valid."
+      - "A successful certificate notification has HTTP 200."
+    tags: [administrative-services, signing, certificates]
+
+  - id: OFV2-OPS-BASIC-CODING-001
+    version: openfinance-v2
+    title: Coding of payment and account data
+    sources:
+      - source_id: bg-openfinance-v2-basic-operational-rules
+        locator: section:5.1
+        note: Coding of business data
+      - source_id: bg-openfinance-v2-basic-operational-rules
+        locator: page:35
+    acceptance_criteria:
+      - "If XML is supported for payments, payment data is a pain.001 message and the status response a pain.002 message."
+      - "Account data is delivered as camt.05x, JSON and/or MT94x; MT94x will be deprecated."
+      - "The ASPSP decides the supported coding and informs the API Client in its documentation."
+    tags: [operational-rules]
+
+  - id: OFV2-OPS-BASIC-SIGNING-001
+    version: openfinance-v2
+    title: Signing of messages and message bodies
+    sources:
+      - source_id: bg-openfinance-v2-basic-operational-rules
+        locator: section:5.3
+        note: Signing messages on the application layer
+      - source_id: bg-openfinance-v2-basic-operational-rules
+        locator: section:5.4
+        note: Signing message bodies
+      - source_id: bg-openfinance-v2-basic-operational-rules
+        locator: page:35-36
+    acceptance_criteria:
+      - "Message signing is optional for the ASPSP and mandatory for the API Client when requested."
+      - "HTTP responses are not signed by the ASPSP unless stated otherwise in its documentation."
+      - "A QSealC usable at the XS2A interface can also sign messages at the openFinance API."
+      - "Supporting signed bodies is an ASPSP decision; an RTS-compliant signed payment request needs no further SCA."
+    tags: [operational-rules, signing]
+
+  - id: OFV2-OPS-BASIC-CONSENT-SCA-001
+    version: openfinance-v2
+    title: PSU consent, resource validity and the ASPSP decision on SCA
+    sources:
+      - source_id: bg-openfinance-v2-basic-operational-rules
+        locator: section:5.5
+        note: Consent of the PSU
+      - source_id: bg-openfinance-v2-basic-operational-rules
+        locator: section:5.6
+        note: Validity of an API service
+      - source_id: bg-openfinance-v2-basic-operational-rules
+        locator: section:5.7
+        note: Decision about Strong Customer Authentication
+      - source_id: bg-openfinance-v2-basic-operational-rules
+        locator: page:36-37
+    acceptance_criteria:
+      - "An API Client may execute a service only with the PSU's consent, authorised by SCA."
+      - "The ASPSP may reject a Transaction Initiation Request if the PSU consent cannot be proven."
+      - "A created resource has a validity time that depends on the resource/API service and the ASPSP."
+      - "The ASPSP decides whether SCA is executed, which method and which approach; the API Client must follow the decision."
+    tags: [operational-rules, consent, sca]
+
+  - id: OFV2-OPS-BASIC-REVOCATION-001
+    version: openfinance-v2
+    title: Revocation of future dated and recurring payments by the PSU
+    sources:
+      - source_id: bg-openfinance-v2-basic-operational-rules
+        locator: section:5.8
+        note: Revocation/cancellation of payment initiations
+      - source_id: bg-openfinance-v2-basic-operational-rules
+        locator: page:37
+      - source_id: bg-openfinance-v2-xs2a-operational-rules
+        locator: section:6.4
+        note: Revocation/cancellation of payment initiations
+      - source_id: bg-openfinance-v2-xs2a-operational-rules
+        locator: page:31-32
+    acceptance_criteria:
+      - "The PSU can revoke all future dated payments directly with the ASPSP."
+      - "The PSU can change or terminate a recurring payment directly at the ASPSP."
+      - "The ASPSP ensures PSU revocation of PIS payment initiations meets article 80 PSD2 and national law."
+    tags: [operational-rules, pis, cancellation]
+
+  - id: OFV2-OPS-XS2A-SERVICES-001
+    version: openfinance-v2
+    title: XS2A API services, TPP roles and non-discrimination
+    sources:
+      - source_id: bg-openfinance-v2-xs2a-operational-rules
+        locator: section:4
+        note: API Services supported for the core services
+      - source_id: bg-openfinance-v2-xs2a-operational-rules
+        locator: section:6.2
+        note: Non-Discrimination
+      - source_id: bg-openfinance-v2-xs2a-operational-rules
+        locator: section:6.5
+        note: Separation and combination of services
+      - source_id: bg-openfinance-v2-xs2a-operational-rules
+        locator: page:15-16
+      - source_id: bg-openfinance-v2-xs2a-operational-rules
+        locator: page:31-32
+      - source_id: bg-openfinance-v2-xs2a-operational-rules
+        locator: page:27
+    acceptance_criteria:
+      - "A TPP may only execute an API service if it holds the role indicated for that service."
+      - "Single payment initiation is mandatory."
+      - "Confirmation of funds is mandatory and answers only YES or NO."
+      - "The ASPSP responds to every correctly identified TPP without discrimination."
+      - "A TPP uses only one role per API service, confirmed by its certificate."
+    tags: [operational-rules, xs2a]
+
+  - id: OFV2-OPS-XS2A-VALIDITY-001
+    version: openfinance-v2
+    title: Default validity of an XS2A resource and withdrawal of TPP authorisation
+    sources:
+      - source_id: bg-openfinance-v2-xs2a-operational-rules
+        locator: section:6.6
+        note: Validity of an service at the XS2A interface
+      - source_id: bg-openfinance-v2-xs2a-operational-rules
+        locator: section:6.7
+        note: Withdrawal of authorisation
+      - source_id: bg-openfinance-v2-xs2a-operational-rules
+        locator: page:32
+    acceptance_criteria:
+      - "A resource created in the first interaction has a default validity of 30 minutes, which the ASPSP may change."
+      - "The TPP stops using its qualified certificate once its PISP/AISP/PIISP authorisation is withdrawn."
+    tags: [operational-rules, xs2a]
+
+  - id: OFV2-VERSIONING-001
+    version: openfinance-v2
+    title: Compare v2 contracts by content, not by document version
+    description: >-
+      The PDFs and OpenAPI files of the corpus carry different version numbers (errata E-04).
+    sources:
+      - source_id: bg-openfinance-v2-xs2a-implementation-guidelines
+        locator: section:7.3
+        note: Changes from Version 2.3 to Version 2.4
+      - source_id: bg-openfinance-v2-xs2a-implementation-guidelines
+        locator: page:127
+      - source_id: bg-openfinance-v2-consent-api
+        locator: section:5.2
+        note: Changes from Version 2.1 to Version 2.2
+      - source_id: bg-openfinance-v2-consent-api
+        locator: page:76
+      - source_id: project-openfinance-v2-errata
+        locator: section:E-04
+    acceptance_criteria:
+      - "The XS2A Implementation Guidelines contain changes up to version 2.4."
+      - "The Consent API contains changes from version 2.1 to 2.2."
+    tags: [versioning, errata]
+
   # ======================================================== NextGenPSD2 v1.3 baseline
   - id: NGPSD2-AIS-TRANSACTIONS-001
     version: nextgenpsd2-v1.3
@@ -336,3 +1770,578 @@ requirements:
       - "A successful response has HTTP 201 and contains consentStatus and consentId."
       - "Accesses beyond the consented frequency without PSU involvement are rejected with HTTP 429 ACCESS_EXCEEDED."
     tags: [consent, ais, baseline]
+
+  # ======================================================== NextGenPSD2 v1.3 baseline - operations with a v2 counterpart
+  - id: NGPSD2-AIS-ACCOUNTS-001
+    version: nextgenpsd2-v1.3
+    title: Read the account list (NextGenPSD2 1.3.16 baseline)
+    sources:
+      - source_id: bg-nextgenpsd2-v1.3-implementation-guidelines
+        locator: section:6.5.1
+        note: Read Account List
+      - source_id: bg-nextgenpsd2-v1.3-implementation-guidelines
+        locator: page:175-176
+      - source_id: bg-nextgenpsd2-v1.3-openapi
+        locator: op:GET /v1/accounts
+    endpoints:
+      - GET /v1/accounts
+    acceptance_criteria:
+      - "withBalance is an optional query parameter."
+      - "The Consent-ID header is mandatory."
+      - "A successful response has HTTP 200; if no account is accessible, an empty array is returned with HTTP 200."
+    tags: [ais, accounts, baseline]
+
+  - id: NGPSD2-AIS-ACCOUNT-DETAILS-001
+    version: nextgenpsd2-v1.3
+    title: Read account details (NextGenPSD2 1.3.16 baseline)
+    sources:
+      - source_id: bg-nextgenpsd2-v1.3-implementation-guidelines
+        locator: section:6.5.2
+        note: Read Account Details
+      - source_id: bg-nextgenpsd2-v1.3-implementation-guidelines
+        locator: page:179-180
+      - source_id: bg-nextgenpsd2-v1.3-openapi
+        locator: op:GET /v1/accounts/{account-id}
+    endpoints:
+      - GET /v1/accounts/{account-id}
+    acceptance_criteria:
+      - "account-id is the resourceId of the account structure, constant at least throughout the consent lifecycle."
+      - "withBalance is an optional query parameter."
+      - "The Consent-ID header is mandatory and a successful response has HTTP 200."
+    tags: [ais, accounts, baseline]
+
+  - id: NGPSD2-AIS-TRANSACTION-DETAILS-001
+    version: nextgenpsd2-v1.3
+    title: Read transaction details (NextGenPSD2 1.3.16 baseline)
+    sources:
+      - source_id: bg-nextgenpsd2-v1.3-implementation-guidelines
+        locator: section:6.5.5
+        note: Read Transaction Details
+      - source_id: bg-nextgenpsd2-v1.3-implementation-guidelines
+        locator: page:194-195
+      - source_id: bg-nextgenpsd2-v1.3-openapi
+        locator: op:GET /v1/accounts/{account-id}/transactions/{transactionId}
+    endpoints:
+      - GET /v1/accounts/{account-id}/transactions/{transactionId}
+    acceptance_criteria:
+      - "The call is only available for transactions reported in JSON format."
+      - "The Consent-ID header is mandatory and a successful response has HTTP 200."
+      - "transactionsDetails is optional in the response."
+    tags: [ais, transactions, baseline]
+
+  - id: NGPSD2-AIS-CARD-ACCOUNTS-001
+    version: nextgenpsd2-v1.3
+    title: Read the card account list (NextGenPSD2 1.3.16 baseline)
+    sources:
+      - source_id: bg-nextgenpsd2-v1.3-implementation-guidelines
+        locator: section:6.6.1
+        note: Read Card Account List
+      - source_id: bg-nextgenpsd2-v1.3-implementation-guidelines
+        locator: page:196-198
+      - source_id: bg-nextgenpsd2-v1.3-openapi
+        locator: op:GET /v1/card-accounts
+    endpoints:
+      - GET /v1/card-accounts
+    acceptance_criteria:
+      - "The Consent-ID header is mandatory and a successful response has HTTP 200."
+      - "If no card account is accessible, an empty array is returned and the response code is still 200."
+    tags: [ais, card-accounts, baseline]
+
+  - id: NGPSD2-AIS-CARD-ACCOUNT-DETAILS-001
+    version: nextgenpsd2-v1.3
+    title: Read card account details (NextGenPSD2 1.3.16 baseline)
+    sources:
+      - source_id: bg-nextgenpsd2-v1.3-implementation-guidelines
+        locator: section:6.6.2
+        note: Read Card Account Details
+      - source_id: bg-nextgenpsd2-v1.3-implementation-guidelines
+        locator: page:199-200
+      - source_id: bg-nextgenpsd2-v1.3-openapi
+        locator: op:GET /v1/card-accounts/{account-id}
+    endpoints:
+      - GET /v1/card-accounts/{account-id}
+    acceptance_criteria:
+      - "account-id is retrieved with the Read Card Account List call and is the resourceId of the account structure."
+      - "The Consent-ID header is mandatory."
+      - "A successful response has HTTP 200."
+    tags: [ais, card-accounts, baseline]
+
+  - id: NGPSD2-AIS-CARD-BALANCES-001
+    version: nextgenpsd2-v1.3
+    title: Read card account balances (NextGenPSD2 1.3.16 baseline)
+    sources:
+      - source_id: bg-nextgenpsd2-v1.3-implementation-guidelines
+        locator: section:6.6.3
+        note: Read Card Account Balance
+      - source_id: bg-nextgenpsd2-v1.3-implementation-guidelines
+        locator: page:201-203
+      - source_id: bg-nextgenpsd2-v1.3-openapi
+        locator: op:GET /v1/card-accounts/{account-id}/balances
+    endpoints:
+      - GET /v1/card-accounts/{account-id}/balances
+    acceptance_criteria:
+      - "The call reads balance data of the card account addressed by account-id; a successful response has HTTP 200."
+      - "The Consent-ID header is mandatory."
+      - "The response contains the mandatory list of balances."
+    tags: [ais, card-accounts, balances, baseline]
+
+  - id: NGPSD2-AIS-CARD-TRANSACTIONS-001
+    version: nextgenpsd2-v1.3
+    title: Read card account transactions (NextGenPSD2 1.3.16 baseline)
+    sources:
+      - source_id: bg-nextgenpsd2-v1.3-implementation-guidelines
+        locator: section:6.6.4
+        note: Read Card Account Transaction List
+      - source_id: bg-nextgenpsd2-v1.3-implementation-guidelines
+        locator: page:203-205
+      - source_id: bg-nextgenpsd2-v1.3-openapi
+        locator: op:GET /v1/card-accounts/{account-id}/transactions
+    endpoints:
+      - GET /v1/card-accounts/{account-id}/transactions
+    acceptance_criteria:
+      - "dateFrom is conditional and mandated if no delta access is required."
+      - "bookingStatus is mandatory; supporting pending and both is optional for the ASPSP."
+      - "The Consent-ID header is mandatory and a successful response has HTTP 200."
+    tags: [ais, card-accounts, transactions, baseline]
+
+  - id: NGPSD2-PIS-INITIATION-001
+    version: nextgenpsd2-v1.3
+    title: Payment initiation with JSON encoding (NextGenPSD2 1.3.16 baseline)
+    description: >-
+      v1 initiates all payment services under POST /v1/{payment-service}/{payment-product}; v2 uses
+      separate /v2/payments, /v2/bulk-payments and /v2/periodic-payments endpoints.
+    sources:
+      - source_id: bg-nextgenpsd2-v1.3-implementation-guidelines
+        locator: section:5.3.1
+        note: Payment Initiation with JSON encoding of the Payment Instruction
+      - source_id: bg-nextgenpsd2-v1.3-implementation-guidelines
+        locator: page:84-89
+      - source_id: bg-nextgenpsd2-v1.3-openapi
+        locator: op:POST /v1/{payment-service}/{payment-product}
+    endpoints:
+      - POST /v1/{payment-service}/{payment-product}
+    acceptance_criteria:
+      - "The request carries Content-Type application/json and the mandatory PSU-IP-Address header."
+      - "TPP-Redirect-URI is mandated for the Redirect SCA approach (header named with the TPP- prefix in v1)."
+      - "A successful response has HTTP 201 with a mandatory Location header."
+      - "ASPSP-SCA-Approach is contained if the SCA approach is already fixed."
+    tags: [pis, baseline]
+
+  - id: NGPSD2-PIS-STATUS-001
+    version: nextgenpsd2-v1.3
+    title: Get payment transaction status (NextGenPSD2 1.3.16 baseline)
+    sources:
+      - source_id: bg-nextgenpsd2-v1.3-implementation-guidelines
+        locator: section:5.4
+        note: Get Transaction Status Request
+      - source_id: bg-nextgenpsd2-v1.3-implementation-guidelines
+        locator: page:111-113
+      - source_id: bg-nextgenpsd2-v1.3-openapi
+        locator: op:GET /v1/{payment-service}/{payment-product}/{paymentId}/status
+    endpoints:
+      - GET /v1/{payment-service}/{payment-product}/{paymentId}/status
+    acceptance_criteria:
+      - "The ASPSP checks that payment-product matches the addressed payment."
+      - "A successful response has HTTP 200; if the PSU does not complete a required SCA in time, the status is RJCT."
+      - "fundsAvailable is conditional."
+    tags: [pis, status, baseline]
+
+  - id: NGPSD2-PIS-BULK-EXTENDED-STATUS-001
+    version: nextgenpsd2-v1.3
+    title: Get bulk payment extended status (NextGenPSD2 1.3.16 baseline)
+    sources:
+      - source_id: bg-nextgenpsd2-v1.3-implementation-guidelines
+        locator: section:5.5
+        note: Get Bulk Extended Status Request
+      - source_id: bg-nextgenpsd2-v1.3-implementation-guidelines
+        locator: page:116-118
+      - source_id: bg-nextgenpsd2-v1.3-openapi
+        locator: op:GET /v1/bulk-payments/{payment-product}/{paymentId}/extended-status
+    endpoints:
+      - GET /v1/bulk-payments/{payment-product}/{paymentId}/extended-status
+    acceptance_criteria:
+      - "The call reports the overall bulk status together with rejected transactions; it is not supported for XML based bulks."
+      - "A successful response has HTTP 200 and contains the mandatory bulk status."
+    tags: [pis, bulk, status, baseline]
+
+  - id: NGPSD2-PIS-GET-PAYMENT-001
+    version: nextgenpsd2-v1.3
+    title: Get payment content (NextGenPSD2 1.3.16 baseline)
+    sources:
+      - source_id: bg-nextgenpsd2-v1.3-implementation-guidelines
+        locator: section:5.6
+        note: Get Payment Request
+      - source_id: bg-nextgenpsd2-v1.3-implementation-guidelines
+        locator: page:120-121
+      - source_id: bg-nextgenpsd2-v1.3-openapi
+        locator: op:GET /v1/{payment-service}/{payment-product}/{paymentId}
+    endpoints:
+      - GET /v1/{payment-service}/{payment-product}/{paymentId}
+    acceptance_criteria:
+      - "A successful response has HTTP 200."
+      - "After a successful initiation the payment resource contains the debtorAccount (EBA-OP2 item 40)."
+    tags: [pis, baseline]
+
+  - id: NGPSD2-PIS-CANCELLATION-001
+    version: nextgenpsd2-v1.3
+    title: Cancel a payment (NextGenPSD2 1.3.16 baseline)
+    sources:
+      - source_id: bg-nextgenpsd2-v1.3-implementation-guidelines
+        locator: section:5.7
+        note: Payment Cancellation Request
+      - source_id: bg-nextgenpsd2-v1.3-implementation-guidelines
+        locator: page:121-125
+      - source_id: bg-nextgenpsd2-v1.3-openapi
+        locator: op:DELETE /v1/{payment-service}/{payment-product}/{paymentId}
+    endpoints:
+      - DELETE /v1/{payment-service}/{payment-product}/{paymentId}
+    acceptance_criteria:
+      - "The ASPSP checks that payment-product matches the addressed payment."
+      - "HTTP 204 is returned if the DELETE alone cancels the payment."
+      - "HTTP 202 is returned if a PSU authorisation of the cancellation is needed."
+    tags: [pis, cancellation, baseline]
+
+  - id: NGPSD2-AUTH-PAYMENT-001
+    version: nextgenpsd2-v1.3
+    title: Payment authorisation sub-resources (NextGenPSD2 1.3.16 baseline)
+    description: >-
+      v1 publishes one authorisation endpoint family per resource type; v2 generalises them to
+      /v2/{resource-path}/{resourceId}/{authorisation-category}.
+    sources:
+      - source_id: bg-nextgenpsd2-v1.3-implementation-guidelines
+        locator: section:7.1
+        note: Start Authorisation Process
+      - source_id: bg-nextgenpsd2-v1.3-implementation-guidelines
+        locator: section:7.4
+        note: Get Authorisation Sub-Resources Request
+      - source_id: bg-nextgenpsd2-v1.3-implementation-guidelines
+        locator: section:7.5
+        note: Get SCA Status Request
+      - source_id: bg-nextgenpsd2-v1.3-implementation-guidelines
+        locator: page:209-246
+      - source_id: bg-nextgenpsd2-v1.3-openapi
+        locator: op:POST /v1/{payment-service}/{payment-product}/{paymentId}/authorisations
+      - source_id: bg-nextgenpsd2-v1.3-openapi
+        locator: op:GET /v1/{payment-service}/{payment-product}/{paymentId}/authorisations
+      - source_id: bg-nextgenpsd2-v1.3-openapi
+        locator: op:GET /v1/{payment-service}/{payment-product}/{paymentId}/authorisations/{authorisationId}
+      - source_id: bg-nextgenpsd2-v1.3-openapi
+        locator: op:PUT /v1/{payment-service}/{payment-product}/{paymentId}/authorisations/{authorisationId}
+    endpoints:
+      - POST /v1/{payment-service}/{payment-product}/{paymentId}/authorisations
+      - GET /v1/{payment-service}/{payment-product}/{paymentId}/authorisations
+      - GET /v1/{payment-service}/{payment-product}/{paymentId}/authorisations/{authorisationId}
+      - PUT /v1/{payment-service}/{payment-product}/{paymentId}/authorisations/{authorisationId}
+    acceptance_criteria:
+      - "POST .../{paymentId}/authorisations starts the authorisation of a payment initiation."
+      - "A successful start has HTTP 201 and returns the mandatory scaStatus and authorisationId."
+      - "A successful Update PSU Data has HTTP 200."
+      - "GET .../authorisations returns HTTP 200 with the mandatory array of authorisationIds."
+      - "GET .../authorisations/{authorisationId} returns the mandatory scaStatus."
+    tags: [authorisation, pis, baseline]
+
+  - id: NGPSD2-AUTH-PAYMENT-CANCELLATION-001
+    version: nextgenpsd2-v1.3
+    title: Payment cancellation authorisation sub-resources (NextGenPSD2 1.3.16 baseline)
+    sources:
+      - source_id: bg-nextgenpsd2-v1.3-implementation-guidelines
+        locator: section:5.8
+        note: Get Cancellation Authorisation Sub-Resources Request
+      - source_id: bg-nextgenpsd2-v1.3-implementation-guidelines
+        locator: section:7.1
+        note: Start Authorisation Process
+      - source_id: bg-nextgenpsd2-v1.3-implementation-guidelines
+        locator: page:128
+      - source_id: bg-nextgenpsd2-v1.3-implementation-guidelines
+        locator: page:209-246
+      - source_id: bg-nextgenpsd2-v1.3-openapi
+        locator: op:POST /v1/{payment-service}/{payment-product}/{paymentId}/cancellation-authorisations
+      - source_id: bg-nextgenpsd2-v1.3-openapi
+        locator: op:GET /v1/{payment-service}/{payment-product}/{paymentId}/cancellation-authorisations
+      - source_id: bg-nextgenpsd2-v1.3-openapi
+        locator: op:GET /v1/{payment-service}/{payment-product}/{paymentId}/cancellation-authorisations/{authorisationId}
+      - source_id: bg-nextgenpsd2-v1.3-openapi
+        locator: op:PUT /v1/{payment-service}/{payment-product}/{paymentId}/cancellation-authorisations/{authorisationId}
+    endpoints:
+      - POST /v1/{payment-service}/{payment-product}/{paymentId}/cancellation-authorisations
+      - GET /v1/{payment-service}/{payment-product}/{paymentId}/cancellation-authorisations
+      - GET /v1/{payment-service}/{payment-product}/{paymentId}/cancellation-authorisations/{authorisationId}
+      - PUT /v1/{payment-service}/{payment-product}/{paymentId}/cancellation-authorisations/{authorisationId}
+    acceptance_criteria:
+      - "POST .../cancellation-authorisations starts the authorisation of a payment cancellation."
+      - "GET .../cancellation-authorisations lists the cancellation authorisation sub-resources."
+      - "GET .../cancellation-authorisations/{authorisationId} reads the SCA status of the cancellation authorisation."
+    tags: [authorisation, pis, cancellation, baseline]
+
+  - id: NGPSD2-AUTH-CONSENT-001
+    version: nextgenpsd2-v1.3
+    title: Consent authorisation sub-resources (NextGenPSD2 1.3.16 baseline)
+    sources:
+      - source_id: bg-nextgenpsd2-v1.3-implementation-guidelines
+        locator: section:7.1
+        note: Start Authorisation Process
+      - source_id: bg-nextgenpsd2-v1.3-implementation-guidelines
+        locator: section:7.4
+        note: Get Authorisation Sub-Resources Request
+      - source_id: bg-nextgenpsd2-v1.3-implementation-guidelines
+        locator: page:210-246
+      - source_id: bg-nextgenpsd2-v1.3-openapi
+        locator: op:POST /v1/consents/{consentId}/authorisations
+      - source_id: bg-nextgenpsd2-v1.3-openapi
+        locator: op:GET /v1/consents/{consentId}/authorisations
+      - source_id: bg-nextgenpsd2-v1.3-openapi
+        locator: op:GET /v1/consents/{consentId}/authorisations/{authorisationId}
+      - source_id: bg-nextgenpsd2-v1.3-openapi
+        locator: op:PUT /v1/consents/{consentId}/authorisations/{authorisationId}
+    endpoints:
+      - POST /v1/consents/{consentId}/authorisations
+      - GET /v1/consents/{consentId}/authorisations
+      - GET /v1/consents/{consentId}/authorisations/{authorisationId}
+      - PUT /v1/consents/{consentId}/authorisations/{authorisationId}
+    acceptance_criteria:
+      - "POST /v1/consents/{consentId}/authorisations starts the authorisation of an account information consent."
+      - "GET /v1/consents/{consentId}/authorisations lists the consent authorisation sub-resources with HTTP 200."
+      - "GET /v1/consents/{consentId}/authorisations/{authorisationId} reads the SCA status."
+    tags: [authorisation, consent, baseline]
+
+  - id: NGPSD2-AUTH-BASKET-001
+    version: nextgenpsd2-v1.3
+    title: Signing basket authorisation sub-resources (NextGenPSD2 1.3.16 baseline)
+    sources:
+      - source_id: bg-nextgenpsd2-v1.3-implementation-guidelines
+        locator: section:7.1
+        note: Start Authorisation Process
+      - source_id: bg-nextgenpsd2-v1.3-implementation-guidelines
+        locator: section:7.5
+        note: Get SCA Status Request
+      - source_id: bg-nextgenpsd2-v1.3-implementation-guidelines
+        locator: page:210-244
+      - source_id: bg-nextgenpsd2-v1.3-openapi
+        locator: op:POST /v1/signing-baskets/{basketId}/authorisations
+      - source_id: bg-nextgenpsd2-v1.3-openapi
+        locator: op:GET /v1/signing-baskets/{basketId}/authorisations
+      - source_id: bg-nextgenpsd2-v1.3-openapi
+        locator: op:GET /v1/signing-baskets/{basketId}/authorisations/{authorisationId}
+      - source_id: bg-nextgenpsd2-v1.3-openapi
+        locator: op:PUT /v1/signing-baskets/{basketId}/authorisations/{authorisationId}
+    endpoints:
+      - POST /v1/signing-baskets/{basketId}/authorisations
+      - GET /v1/signing-baskets/{basketId}/authorisations
+      - GET /v1/signing-baskets/{basketId}/authorisations/{authorisationId}
+      - PUT /v1/signing-baskets/{basketId}/authorisations/{authorisationId}
+    acceptance_criteria:
+      - "POST /v1/signing-baskets/{basketId}/authorisations starts the authorisation of a signing basket."
+      - "GET /v1/signing-baskets/{basketId}/authorisations lists the basket authorisation sub-resources."
+      - "GET /v1/signing-baskets/{basketId}/authorisations/{authorisationId} reads the SCA status."
+    tags: [authorisation, signing-basket, baseline]
+
+  - id: NGPSD2-CONSENT-STATUS-001
+    version: nextgenpsd2-v1.3
+    title: Get consent status (NextGenPSD2 1.3.16 baseline)
+    sources:
+      - source_id: bg-nextgenpsd2-v1.3-implementation-guidelines
+        locator: section:6.3.2
+        note: Get Consent Status Request
+      - source_id: bg-nextgenpsd2-v1.3-implementation-guidelines
+        locator: page:167-168
+      - source_id: bg-nextgenpsd2-v1.3-openapi
+        locator: op:GET /v1/consents/{consentId}/status
+    endpoints:
+      - GET /v1/consents/{consentId}/status
+    acceptance_criteria:
+      - "A successful response has HTTP 200 and contains the mandatory overall lifecycle consentStatus."
+      - "psuMessage is optional."
+    tags: [consent, status, baseline]
+
+  - id: NGPSD2-CONSENT-GET-001
+    version: nextgenpsd2-v1.3
+    title: Get consent content (NextGenPSD2 1.3.16 baseline)
+    sources:
+      - source_id: bg-nextgenpsd2-v1.3-implementation-guidelines
+        locator: section:6.3.3
+        note: Get Consent Request
+      - source_id: bg-nextgenpsd2-v1.3-implementation-guidelines
+        locator: page:169-170
+      - source_id: bg-nextgenpsd2-v1.3-openapi
+        locator: op:GET /v1/consents/{consentId}
+    endpoints:
+      - GET /v1/consents/{consentId}
+    acceptance_criteria:
+      - "A successful response has HTTP 200."
+      - "The response contains the mandatory recurringIndicator, validUntil, frequencyPerDay and lastActionDate."
+    tags: [consent, baseline]
+
+  - id: NGPSD2-CONSENT-DELETE-001
+    version: nextgenpsd2-v1.3
+    title: Delete an account information consent (NextGenPSD2 1.3.16 baseline)
+    sources:
+      - source_id: bg-nextgenpsd2-v1.3-implementation-guidelines
+        locator: section:6.4
+        note: Delete an Account Information Consent Object
+      - source_id: bg-nextgenpsd2-v1.3-implementation-guidelines
+        locator: page:173-174
+      - source_id: bg-nextgenpsd2-v1.3-openapi
+        locator: op:DELETE /v1/consents/{consentId}
+    endpoints:
+      - DELETE /v1/consents/{consentId}
+    acceptance_criteria:
+      - "The TPP deletes a consent with DELETE /v1/consents/{consentId}."
+      - "The response has no body; the example response is HTTP 204 No Content."
+    tags: [consent, baseline]
+
+  - id: NGPSD2-PIIS-FUNDS-001
+    version: nextgenpsd2-v1.3
+    title: Confirmation of funds (NextGenPSD2 1.3.16 baseline)
+    sources:
+      - source_id: bg-nextgenpsd2-v1.3-implementation-guidelines
+        locator: section:10.2
+        note: Confirmation of Funds Request
+      - source_id: bg-nextgenpsd2-v1.3-implementation-guidelines
+        locator: page:273-275
+      - source_id: bg-nextgenpsd2-v1.3-openapi
+        locator: op:POST /v1/funds-confirmations
+    endpoints:
+      - POST /v1/funds-confirmations
+    acceptance_criteria:
+      - "Consent-ID is provided if the PSU consent was given through the consent process."
+      - "account and instructedAmount are mandatory; cardNumber is optional."
+      - "A successful response has HTTP 200 and contains the mandatory fundsAvailable flag."
+    tags: [piis, baseline]
+
+  - id: NGPSD2-BASK-001
+    version: nextgenpsd2-v1.3
+    title: Signing baskets (NextGenPSD2 1.3.16 baseline)
+    sources:
+      - source_id: bg-nextgenpsd2-v1.3-implementation-guidelines
+        locator: section:8.1
+        note: Establish Signing Basket Request
+      - source_id: bg-nextgenpsd2-v1.3-implementation-guidelines
+        locator: section:8.3
+        note: Get Signing Basket Status Request
+      - source_id: bg-nextgenpsd2-v1.3-implementation-guidelines
+        locator: section:8.5
+        note: Cancellation of Signing Baskets
+      - source_id: bg-nextgenpsd2-v1.3-implementation-guidelines
+        locator: page:253-269
+      - source_id: bg-nextgenpsd2-v1.3-openapi
+        locator: op:POST /v1/signing-baskets
+      - source_id: bg-nextgenpsd2-v1.3-openapi
+        locator: op:GET /v1/signing-baskets/{basketId}
+      - source_id: bg-nextgenpsd2-v1.3-openapi
+        locator: op:GET /v1/signing-baskets/{basketId}/status
+      - source_id: bg-nextgenpsd2-v1.3-openapi
+        locator: op:DELETE /v1/signing-baskets/{basketId}
+    endpoints:
+      - POST /v1/signing-baskets
+      - GET /v1/signing-baskets/{basketId}
+      - GET /v1/signing-baskets/{basketId}/status
+      - DELETE /v1/signing-baskets/{basketId}
+    acceptance_criteria:
+      - "GET /v1/signing-baskets/{basketId} returns HTTP 200."
+      - "GET .../status returns HTTP 200; only RCVD, PATC and the other non-payment codes are used for baskets."
+      - "A basket can only be cancelled before any (partial) authorisation; a successful deletion returns HTTP 204."
+    tags: [signing-basket, baseline]
+
+  - id: NGPSD2-CONSENT-PIIS-001
+    version: nextgenpsd2-v1.3
+    title: Confirmation of funds consent extended service (NextGenPSD2 extended service 2.0)
+    description: >-
+      Extended service published under /v2/consents/confirmation-of-funds for NextGenPSD2 1.3; it is not
+      the openFinance v2 endpoint /v2/consents/funds-confirmations (errata E-06). No PDF of this
+      extended service is part of the corpus, so the OpenAPI contract is the only source.
+    sources:
+      - source_id: bg-nextgenpsd2-v1.3-openapi-cof-consent
+        locator: op:POST /v2/consents/confirmation-of-funds
+      - source_id: bg-nextgenpsd2-v1.3-openapi-cof-consent
+        locator: op:GET /v2/consents/confirmation-of-funds/{consentId}
+      - source_id: bg-nextgenpsd2-v1.3-openapi-cof-consent
+        locator: op:GET /v2/consents/confirmation-of-funds/{consentId}/status
+      - source_id: bg-nextgenpsd2-v1.3-openapi-cof-consent
+        locator: op:DELETE /v2/consents/confirmation-of-funds/{consentId}
+    endpoints:
+      - POST /v2/consents/confirmation-of-funds
+      - GET /v2/consents/confirmation-of-funds/{consentId}
+      - GET /v2/consents/confirmation-of-funds/{consentId}/status
+      - DELETE /v2/consents/confirmation-of-funds/{consentId}
+    acceptance_criteria:
+      - "POST /v2/consents/confirmation-of-funds (createConsentConfirmationOfFunds) answers a successful creation with HTTP 201."
+      - "GET of the consent content and of its status answer with HTTP 200."
+      - "DELETE /v2/consents/confirmation-of-funds/{consentId} answers a successful deletion with HTTP 204."
+    tags: [consent, piis, extended-service, baseline]
+
+  - id: NGPSD2-PUSH-NOTIFICATION-001
+    version: nextgenpsd2-v1.3
+    title: Lean push resource status notification (NextGenPSD2 extended service 1.0)
+    description: >-
+      The ASPSP posts resource status notifications to POST /TPP-notification-URI of the TPP; v2 renamed
+      the target to /Client-Notification-URL (errata E-08).
+    sources:
+      - source_id: bg-nextgenpsd2-v1.3-implementation-guidelines
+        locator: page:88
+        note: TPP-Notification-URI and TPP-Notification-Content-Preferred request headers
+      - source_id: bg-nextgenpsd2-v1.3-openapi-lean-push
+        locator: op:POST /TPP-notification-URI
+    endpoints:
+      - POST /TPP-notification-URI
+    acceptance_criteria:
+      - "The TPP can register a notification endpoint with the optional TPP-Notification-URI header in the initiation request."
+      - "The TPP-Notification-Content-Preferred header has the form status=X1, ..., Xn."
+      - "POST /TPP-notification-URI (resourceStatusNotification) is acknowledged with HTTP 200."
+    tags: [push, notification, extended-service, baseline]
+
+  - id: NGPSD2-OPS-001
+    version: nextgenpsd2-v1.3
+    title: NextGenPSD2 operational rules (NextGenPSD2 1.3 baseline)
+    sources:
+      - source_id: bg-nextgenpsd2-v1.3-operational-rules
+        locator: section:6
+        note: Operational rules
+      - source_id: bg-nextgenpsd2-v1.3-operational-rules
+        locator: page:47-49
+    acceptance_criteria:
+      - "The ASPSP rejects any XS2A transaction if the PSU consent cannot be proven."
+      - "The ASPSP decides on SCA, its method and approach; the TPP has to follow the decision."
+      - "The TPP identifies itself with a qualified certificate containing all its authorised roles."
+      - "The default validity of a transaction resource is 30 minutes, which the ASPSP may change."
+    tags: [operational-rules, baseline]
+
+  - id: NGPSD2-DOM-001
+    version: nextgenpsd2-v1.3
+    title: Domestic JSON payment products and AIS extensions (NextGenPSD2 1.3 baseline)
+    sources:
+      - source_id: bg-nextgenpsd2-v1.3-domestic-pis-ais-definitions
+        locator: section:1.2
+        note: Domestic Payment and Account Information Definitions
+      - source_id: bg-nextgenpsd2-v1.3-domestic-pis-ais-definitions
+        locator: section:2
+        note: JSON Domestic Payment Products and Extensions of SCT
+      - source_id: bg-nextgenpsd2-v1.3-domestic-pis-ais-definitions
+        locator: page:6
+      - source_id: bg-nextgenpsd2-v1.3-domestic-pis-ais-definitions
+        locator: page:11
+    acceptance_criteria:
+      - "Communities may liberalise or extend the core JSON payment definitions and define domestic JSON payment products."
+      - "Where available, community documentation is the normative reference."
+      - "Community ASPSPs extend the permitted data elements of the SCT, SCT INST, Target2 and cross-border core formats."
+    tags: [domestic, pis, ais, baseline]
+
+  - id: NGPSD2-SEC-001
+    version: nextgenpsd2-v1.3
+    title: TPP identification and message signing (NextGenPSD2 1.3.16 baseline)
+    sources:
+      - source_id: bg-nextgenpsd2-v1.3-implementation-guidelines
+        locator: section:4.2
+        note: Signing Messages at Application Layer
+      - source_id: bg-nextgenpsd2-v1.3-implementation-guidelines
+        locator: section:4.9
+        note: Requirements on TPP Identification
+      - source_id: bg-nextgenpsd2-v1.3-implementation-guidelines
+        locator: page:24-25
+      - source_id: bg-nextgenpsd2-v1.3-implementation-guidelines
+        locator: page:34
+    acceptance_criteria:
+      - "The ASPSP may require the TPP to sign request messages, stated in its documentation."
+      - "The TPP's electronic signature is based on a qualified certificate for electronic seals."
+      - "Digest is contained if and only if Signature is contained."
+      - "PSD2 mandates TPP identification by PSD2 eIDAS certificates (QWAC and/or QSEAL)."
+    tags: [security, certificates, signing, baseline]

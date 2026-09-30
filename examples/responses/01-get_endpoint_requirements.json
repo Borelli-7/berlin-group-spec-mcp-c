@@ -536,7 +536,7 @@
           "text": "The ASPSP declares countingOfAisRequests as \"none\", \"timeslot\" or \"byEndpointCall\".",
           "mapping": {
             "file": "requirements/requirements.yaml",
-            "file_sha256": "9ea404b1b672915d530528ae7207e864ebf5aa196bb7d05f59fe9f1ddebe0b43",
+            "file_sha256": "3ae38e0143eaa9db6343eb134dc4bc795adcd79daf06d9898cb17505ae6cb58c",
             "locator": "requirement:OFV2-AIS-FREQUENCY-001",
             "sha256": "8d0eee6ecb6939782e1391bf11b09be66d9c2168b5cb96924f51d6dd1ad4e306"
           }
@@ -547,7 +547,7 @@
           "text": "Accesses without PSU involvement beyond the consented frequencyPerDay are rejected with HTTP 429 ACCESS_EXCEEDED.",
           "mapping": {
             "file": "requirements/requirements.yaml",
-            "file_sha256": "9ea404b1b672915d530528ae7207e864ebf5aa196bb7d05f59fe9f1ddebe0b43",
+            "file_sha256": "3ae38e0143eaa9db6343eb134dc4bc795adcd79daf06d9898cb17505ae6cb58c",
             "locator": "requirement:OFV2-AIS-FREQUENCY-001",
             "sha256": "8d0eee6ecb6939782e1391bf11b09be66d9c2168b5cb96924f51d6dd1ad4e306"
           }
@@ -662,30 +662,318 @@
             "version": "openfinance-v2",
             "authority": "project",
             "precedence": 10,
-            "sha256": "0526127db9e64ec84102c2472ddb7f6b8170e284ec73ac508a7ef28ac161d431",
+            "sha256": "7502b7ea2dcd76791b6b92ce9687fe372b2ecc2f5b4f73a1b35629ea1299f776",
             "status": "indexed"
           },
           "excerpt": "E-07 Counting of AIS accesses without PSU involvement\n\nNextGenPSD2 1.3.16 limits frequencyPerDay to at most 4 unless agreed bilaterally (page 155) and\nrejects excess accesses with HTTP 429 ACCESS_EXCEEDED (page 309). openFinance keeps the same\nfrequencyPerDay rule (Consent API 2.2, pages 25-26) but the Data Dictionary 2.3.1 (page 100)\nlets the ASPSP declare the counting method in countingOfAisRequests: \"none\", \"timeslot\"\n(aggregated accesses in a time interval count once) or \"byEndpointCall\" (4 accesses per day per\nendpoint).\n\nClarification: the counting unit is not fixed by the framework. The project counts according\nto the value it publishes in countingOfAisRequests and returns 429 ACCESS_EXCEEDED when exceeded.",
           "provenance": [
             {
               "source_id": "project-openfinance-v2-errata",
-              "document_id": "project-openfinance-v2-errata@0526127db9e6",
+              "document_id": "project-openfinance-v2-errata@7502b7ea2dcd",
               "version": "openfinance-v2",
               "kind": "text",
               "authority": "project",
               "precedence": 10,
               "locator": "chunk:project-openfinance-v2-errata:p1:c7",
               "sha256": "dc976beef3d15205e45601d415c2ed9c6166c9f49f107fd936cb98ad04db7d28",
-              "document_sha256": "0526127db9e64ec84102c2472ddb7f6b8170e284ec73ac508a7ef28ac161d431"
+              "document_sha256": "7502b7ea2dcd76791b6b92ce9687fe372b2ecc2f5b4f73a1b35629ea1299f776"
             }
           ]
         }
       ],
       "mapping": {
         "file": "requirements/requirements.yaml",
-        "file_sha256": "9ea404b1b672915d530528ae7207e864ebf5aa196bb7d05f59fe9f1ddebe0b43",
+        "file_sha256": "3ae38e0143eaa9db6343eb134dc4bc795adcd79daf06d9898cb17505ae6cb58c",
         "locator": "requirement:OFV2-AIS-FREQUENCY-001",
         "sha256": "8d0eee6ecb6939782e1391bf11b09be66d9c2168b5cb96924f51d6dd1ad4e306"
+      }
+    },
+    {
+      "requirement_id": "OFV2-AIS-MULTICURRENCY-001",
+      "classification": "authoritative_requirement",
+      "title": "Multicurrency account specifics for account information",
+      "linked_via": [
+        "endpoints",
+        "source:bg-openfinance-v2-openapi-ais op:GET /v2/accounts/{account-id}/transactions"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "OFV2-AIS-MULTICURRENCY-001/AC1",
+          "requirement_id": "OFV2-AIS-MULTICURRENCY-001",
+          "text": "An IBAN (account identifier) together with a currency uniquely addresses a sub-account of a multicurrency account.",
+          "mapping": {
+            "file": "requirements/requirements.yaml",
+            "file_sha256": "3ae38e0143eaa9db6343eb134dc4bc795adcd79daf06d9898cb17505ae6cb58c",
+            "locator": "requirement:OFV2-AIS-MULTICURRENCY-001",
+            "sha256": "b23fda92af4eb7cc7a32b93ac4a021954242bb62bcdb35acefd4eafd98096b45"
+          }
+        },
+        {
+          "id": "OFV2-AIS-MULTICURRENCY-001/AC2",
+          "requirement_id": "OFV2-AIS-MULTICURRENCY-001",
+          "text": "The ASPSP decides whether it grants access on aggregation level, on aggregation and sub-account level, or only on sub-account level.",
+          "mapping": {
+            "file": "requirements/requirements.yaml",
+            "file_sha256": "3ae38e0143eaa9db6343eb134dc4bc795adcd79daf06d9898cb17505ae6cb58c",
+            "locator": "requirement:OFV2-AIS-MULTICURRENCY-001",
+            "sha256": "b23fda92af4eb7cc7a32b93ac4a021954242bb62bcdb35acefd4eafd98096b45"
+          }
+        },
+        {
+          "id": "OFV2-AIS-MULTICURRENCY-001/AC3",
+          "requirement_id": "OFV2-AIS-MULTICURRENCY-001",
+          "text": "Reading balances on aggregation level returns the balances of all sub-accounts.",
+          "mapping": {
+            "file": "requirements/requirements.yaml",
+            "file_sha256": "3ae38e0143eaa9db6343eb134dc4bc795adcd79daf06d9898cb17505ae6cb58c",
+            "locator": "requirement:OFV2-AIS-MULTICURRENCY-001",
+            "sha256": "b23fda92af4eb7cc7a32b93ac4a021954242bb62bcdb35acefd4eafd98096b45"
+          }
+        },
+        {
+          "id": "OFV2-AIS-MULTICURRENCY-001/AC4",
+          "requirement_id": "OFV2-AIS-MULTICURRENCY-001",
+          "text": "Reading transactions on aggregation level returns all transactions of all sub-accounts, possibly with different transaction currencies.",
+          "mapping": {
+            "file": "requirements/requirements.yaml",
+            "file_sha256": "3ae38e0143eaa9db6343eb134dc4bc795adcd79daf06d9898cb17505ae6cb58c",
+            "locator": "requirement:OFV2-AIS-MULTICURRENCY-001",
+            "sha256": "b23fda92af4eb7cc7a32b93ac4a021954242bb62bcdb35acefd4eafd98096b45"
+          }
+        }
+      ],
+      "sources": [
+        {
+          "source_id": "bg-openfinance-v2-xs2a-implementation-guidelines",
+          "locator": "section:4.3",
+          "note": "Multi-currency Account Specifics for Account Information",
+          "status": "resolved",
+          "document": {
+            "title": "openFinance XS2A API as PSD2 Interface - Implementation Guidelines 2.4 (2025-10-31)",
+            "kind": "pdf",
+            "version": "openfinance-v2",
+            "authority": "normative",
+            "precedence": 100,
+            "sha256": "ec74c8bcb7f785463fb3e383b4849531bb2048e0e2e2494ad6b1f43753a4fdea",
+            "status": "indexed"
+          },
+          "excerpt": "4.3 Multi-currency Account Specifics for Account Information.............. 78\n4.3 Multi-currency Account Specifics for Account Information\n\nThe methods on multicurrency accounts for account information differ in the inter-face due to\nthe fact, that a collection of accounts is addressed. In the following the differences are\ndescribed on abstract level. Of course, the sub-accounts can also be addressed as dedicated\naccounts by adding the sub account currency explicitly. This case is not further mentioned\nspecifically.\n\nMulticurrency Accounts in Reading Accounts or Account Details\n\nThe ASPSP will decide in its implementation whether to grant data access to a multicurrency\naccount on aggregation level, on aggregation and sub-account level, or only on sub-account\nlevel.\n\nMulticurrency Accounts in Reading Balances on Aggregation Level\n\nThe consequence for this function is that an array of balances of all sub-accounts are returned,\nif a multicurrency account is addressed on aggregation level. The currency of the respective\nsub-account is implicitly provided as the currency of the balanceAmount element within the\nbalance, cp Section 4.4.3 for an example.\n\nMulticurrency Accounts in Reading …",
+          "provenance": [
+            {
+              "source_id": "bg-openfinance-v2-xs2a-implementation-guidelines",
+              "document_id": "bg-openfinance-v2-xs2a-implementation-guidelines@ec74c8bcb7f7",
+              "version": "openfinance-v2",
+              "kind": "pdf",
+              "authority": "normative",
+              "precedence": 100,
+              "locator": "chunk:bg-openfinance-v2-xs2a-implementation-guidelines:p4:c16",
+              "sha256": "0a8b87e10e41542649aececc8f94f1062f6643a9847b2ec2edfa50790354a11d",
+              "document_sha256": "ec74c8bcb7f785463fb3e383b4849531bb2048e0e2e2494ad6b1f43753a4fdea"
+            },
+            {
+              "source_id": "bg-openfinance-v2-xs2a-implementation-guidelines",
+              "document_id": "bg-openfinance-v2-xs2a-implementation-guidelines@ec74c8bcb7f7",
+              "version": "openfinance-v2",
+              "kind": "pdf",
+              "authority": "normative",
+              "precedence": 100,
+              "locator": "chunk:bg-openfinance-v2-xs2a-implementation-guidelines:p83:c1",
+              "sha256": "40af0fd84718ff1d7b8d8329ed049b60a05e384a7af67ae62f083c625a7d64a5",
+              "document_sha256": "ec74c8bcb7f785463fb3e383b4849531bb2048e0e2e2494ad6b1f43753a4fdea"
+            },
+            {
+              "source_id": "bg-openfinance-v2-xs2a-implementation-guidelines",
+              "document_id": "bg-openfinance-v2-xs2a-implementation-guidelines@ec74c8bcb7f7",
+              "version": "openfinance-v2",
+              "kind": "pdf",
+              "authority": "normative",
+              "precedence": 100,
+              "locator": "chunk:bg-openfinance-v2-xs2a-implementation-guidelines:p84:c0",
+              "sha256": "d56debef8aad380e63a08a8852bb2a1834e087ae22b33d0f892d41932100d098",
+              "document_sha256": "ec74c8bcb7f785463fb3e383b4849531bb2048e0e2e2494ad6b1f43753a4fdea"
+            },
+            {
+              "source_id": "bg-openfinance-v2-xs2a-implementation-guidelines",
+              "document_id": "bg-openfinance-v2-xs2a-implementation-guidelines@ec74c8bcb7f7",
+              "version": "openfinance-v2",
+              "kind": "pdf",
+              "authority": "normative",
+              "precedence": 100,
+              "locator": "chunk:bg-openfinance-v2-xs2a-implementation-guidelines:p85:c0",
+              "sha256": "80dea88353de1828ab95ce16478b29fe49a7befd04b2c63961a435fa2ee0a130",
+              "document_sha256": "ec74c8bcb7f785463fb3e383b4849531bb2048e0e2e2494ad6b1f43753a4fdea"
+            }
+          ]
+        },
+        {
+          "source_id": "bg-openfinance-v2-xs2a-implementation-guidelines",
+          "locator": "page:83-84",
+          "status": "resolved",
+          "document": {
+            "title": "openFinance XS2A API as PSD2 Interface - Implementation Guidelines 2.4 (2025-10-31)",
+            "kind": "pdf",
+            "version": "openfinance-v2",
+            "authority": "normative",
+            "precedence": 100,
+            "sha256": "ec74c8bcb7f785463fb3e383b4849531bb2048e0e2e2494ad6b1f43753a4fdea",
+            "status": "indexed"
+          },
+          "excerpt": "openFinance PSD2 XSZA API – Implementation Guidelines Account Information Service\n\n\nData element Attribute encoding Location Usage\n\n\n\n\n\n\n\n\n\n\nPath Query Param. Header Body Certificate Read Data Req. Read Data Resp\nPSU Card Account accountDetails x c\nDetails\n\nCard Transactions cardTransactions x c\n\n\n\nPSU IP Address/Port and Further PSU related Information\n\nThe above table addresses several PSU related context data. These data, its importance and\nits usage are defined in detail in [oFA PFSM]. They are not mentioned anymore in the following\ndetailed definitions for matter of better readability, as long as the usage is not mandated.\n\n4.3 Multi-currency Account Specifics for Account Information\n\nThe methods on multicurrency accounts for account information differ in the inter-face due to\nthe fact, that a collection of accounts is addressed. In the following the differences are\ndescribed on abstract level. Of course, the sub-accounts can also be addressed as dedicated\naccounts by adding the sub account currency explicitly. This case is not further mentioned\nspecifically.\n\nMulticurrency Accounts in Reading Accounts or Account Details\n\nThe ASPSP will decide in its implementation whether t…",
+          "provenance": [
+            {
+              "source_id": "bg-openfinance-v2-xs2a-implementation-guidelines",
+              "document_id": "bg-openfinance-v2-xs2a-implementation-guidelines@ec74c8bcb7f7",
+              "version": "openfinance-v2",
+              "kind": "pdf",
+              "authority": "normative",
+              "precedence": 100,
+              "locator": "page:83",
+              "sha256": "777fee858e5c0d446d379e28876fbec2004e68af2ddca4bb291502aae6aa8661",
+              "document_sha256": "ec74c8bcb7f785463fb3e383b4849531bb2048e0e2e2494ad6b1f43753a4fdea"
+            },
+            {
+              "source_id": "bg-openfinance-v2-xs2a-implementation-guidelines",
+              "document_id": "bg-openfinance-v2-xs2a-implementation-guidelines@ec74c8bcb7f7",
+              "version": "openfinance-v2",
+              "kind": "pdf",
+              "authority": "normative",
+              "precedence": 100,
+              "locator": "page:84",
+              "sha256": "acf05b03f392bb0fd205689763998f0cffd3559fa287cc032450c1d0d54f0abc",
+              "document_sha256": "ec74c8bcb7f785463fb3e383b4849531bb2048e0e2e2494ad6b1f43753a4fdea"
+            }
+          ]
+        },
+        {
+          "source_id": "bg-openfinance-v2-xs2a-operational-rules",
+          "locator": "page:16",
+          "note": "Definition of a multicurrency account",
+          "status": "resolved",
+          "document": {
+            "title": "openFinance XS2A API as PSD2 Interface - Operational Rules 2.0 (2025-10-31)",
+            "kind": "pdf",
+            "version": "openfinance-v2",
+            "authority": "normative",
+            "precedence": 80,
+            "sha256": "2ae69baf7c95937a134650faa7621aebb0cbdfb5f2b6ae01b6429c9ebdc703a7",
+            "status": "indexed"
+          },
+          "excerpt": "NextGenPSD2 XS2A Framework - Operational Rules API Services supported for the core services\n\n\nIf an API Service does not require direct involvement of the PSU, strong customer\nauthentication is not possible. In this case the PSU has to give consent by other means prior\nto the service. A longer time period may elapse between the PSU giving the consent and the\nactual execution of the service by the TPP. The steps necessary for giving and proving the\nconsent of the PSU depend on the API Service and will be explained in the following sections\nand in section 5.2.\n\nThe account information services can deal with regular payment accounts with one account\ncurrency and with multicurrency accounts:\n\nDefinition: A multicurrency account is a payment account which is a collection of different subaccounts which are all addressed by the same account identifier like an IBAN by e.g. payment\ninitiating parties. The sub-accounts are legally different accounts and all differ in their currency,\nbalances and transactions. An account identifier like an IBAN together with a currency always\naddresses uniquely a sub-account of a multicurrency account.\n\nIn the below API Services, it is mentioned when it makes…",
+          "provenance": [
+            {
+              "source_id": "bg-openfinance-v2-xs2a-operational-rules",
+              "document_id": "bg-openfinance-v2-xs2a-operational-rules@2ae69baf7c95",
+              "version": "openfinance-v2",
+              "kind": "pdf",
+              "authority": "normative",
+              "precedence": 80,
+              "locator": "page:16",
+              "sha256": "6c3cf5c45bd3824e0d8237521b73246a496aca11d03902e90e5459c32b16f34f",
+              "document_sha256": "2ae69baf7c95937a134650faa7621aebb0cbdfb5f2b6ae01b6429c9ebdc703a7"
+            }
+          ]
+        },
+        {
+          "source_id": "bg-openfinance-v2-xs2a-operational-rules",
+          "locator": "page:24-25",
+          "status": "resolved",
+          "document": {
+            "title": "openFinance XS2A API as PSD2 Interface - Operational Rules 2.0 (2025-10-31)",
+            "kind": "pdf",
+            "version": "openfinance-v2",
+            "authority": "normative",
+            "precedence": 80,
+            "sha256": "2ae69baf7c95937a134650faa7621aebb0cbdfb5f2b6ae01b6429c9ebdc703a7",
+            "status": "indexed"
+          },
+          "excerpt": "NextGenPSD2 XS2A Framework - Operational Rules API Services supported for the core services\n\n\nThe following figure shows only the very top level information flow:\n\nPSU AISP ASPSP\n\n\nTPP requests to get details of the list of\naccessible accounts for a given PSU\nat the XS2A interface of the ASPSP\n\nGet the list of account details\n\n\n\nFigure 9: API Service Get account details of a list of accessible accounts\n\n\n\n4.9 API Service: Get balances for a given account\n\nThe support of this API Service at the XS2A interface is mandatory.\n\nThe TPP can use this API Service to receive the balances for a given account. As a result the\nTPP will receive detailed balances for the account identified in the request of this service,\nbesides booked balances this can be e.g. authorised or intermediary balances, depending on\nthe implementation of the ASPSP. No further information about transactions of the accounts\nwill be returned.\n\nIf the PSU has granted access to balances of several accounts, then a corresponding service\nhas to be submitted for each account separately.\n\nPlease note that in case of a multicurrency account a list of all balances of the existing subaccounts in the related currencies is returned…",
+          "provenance": [
+            {
+              "source_id": "bg-openfinance-v2-xs2a-operational-rules",
+              "document_id": "bg-openfinance-v2-xs2a-operational-rules@2ae69baf7c95",
+              "version": "openfinance-v2",
+              "kind": "pdf",
+              "authority": "normative",
+              "precedence": 80,
+              "locator": "page:24",
+              "sha256": "87b7093ece78495aea16ee05f22a6639eda66d780a051ef7449665e9195d5b5f",
+              "document_sha256": "2ae69baf7c95937a134650faa7621aebb0cbdfb5f2b6ae01b6429c9ebdc703a7"
+            },
+            {
+              "source_id": "bg-openfinance-v2-xs2a-operational-rules",
+              "document_id": "bg-openfinance-v2-xs2a-operational-rules@2ae69baf7c95",
+              "version": "openfinance-v2",
+              "kind": "pdf",
+              "authority": "normative",
+              "precedence": 80,
+              "locator": "page:25",
+              "sha256": "1cd4a8a2d16284ae16e21334a0c0040243385019b936ce0da6ebcefae0aa9cbd",
+              "document_sha256": "2ae69baf7c95937a134650faa7621aebb0cbdfb5f2b6ae01b6429c9ebdc703a7"
+            }
+          ]
+        },
+        {
+          "source_id": "bg-openfinance-v2-openapi-ais",
+          "locator": "op:GET /v2/accounts/{account-id}/balances",
+          "status": "resolved",
+          "document": {
+            "title": "openFinance XS2A API - Account Information Service OpenAPI 2.3 (2026-02-04)",
+            "kind": "openapi",
+            "version": "openfinance-v2",
+            "authority": "technical",
+            "precedence": 90,
+            "sha256": "d818f580bc8779f28fb28c6a43ba0853650587be536f55ca60ed455005ff847d",
+            "status": "indexed"
+          },
+          "excerpt": "GET /v2/accounts/{account-id}/balances Read Account Balance",
+          "provenance": [
+            {
+              "source_id": "bg-openfinance-v2-openapi-ais",
+              "document_id": "bg-openfinance-v2-openapi-ais@d818f580bc87",
+              "version": "openfinance-v2",
+              "kind": "openapi",
+              "authority": "technical",
+              "precedence": 90,
+              "locator": "op:GET /v2/accounts/{account-id}/balances",
+              "sha256": "f906784269a22ee39621f32bcd900be262725bd1152dd70aa8ceb4f405fe0684",
+              "document_sha256": "d818f580bc8779f28fb28c6a43ba0853650587be536f55ca60ed455005ff847d"
+            }
+          ]
+        },
+        {
+          "source_id": "bg-openfinance-v2-openapi-ais",
+          "locator": "op:GET /v2/accounts/{account-id}/transactions",
+          "status": "resolved",
+          "document": {
+            "title": "openFinance XS2A API - Account Information Service OpenAPI 2.3 (2026-02-04)",
+            "kind": "openapi",
+            "version": "openfinance-v2",
+            "authority": "technical",
+            "precedence": 90,
+            "sha256": "d818f580bc8779f28fb28c6a43ba0853650587be536f55ca60ed455005ff847d",
+            "status": "indexed"
+          },
+          "excerpt": "GET /v2/accounts/{account-id}/transactions Read Transaction List",
+          "provenance": [
+            {
+              "source_id": "bg-openfinance-v2-openapi-ais",
+              "document_id": "bg-openfinance-v2-openapi-ais@d818f580bc87",
+              "version": "openfinance-v2",
+              "kind": "openapi",
+              "authority": "technical",
+              "precedence": 90,
+              "locator": "op:GET /v2/accounts/{account-id}/transactions",
+              "sha256": "1ac959a669ca13c3a53e7651206e921982b26377bf77fdd32f3a80f1cd31f644",
+              "document_sha256": "d818f580bc8779f28fb28c6a43ba0853650587be536f55ca60ed455005ff847d"
+            }
+          ]
+        }
+      ],
+      "mapping": {
+        "file": "requirements/requirements.yaml",
+        "file_sha256": "3ae38e0143eaa9db6343eb134dc4bc795adcd79daf06d9898cb17505ae6cb58c",
+        "locator": "requirement:OFV2-AIS-MULTICURRENCY-001",
+        "sha256": "b23fda92af4eb7cc7a32b93ac4a021954242bb62bcdb35acefd4eafd98096b45"
       }
     },
     {
@@ -704,7 +992,7 @@
           "text": "A request without the bookingStatus query parameter is rejected with HTTP 400 FORMAT_ERROR.",
           "mapping": {
             "file": "requirements/requirements.yaml",
-            "file_sha256": "9ea404b1b672915d530528ae7207e864ebf5aa196bb7d05f59fe9f1ddebe0b43",
+            "file_sha256": "3ae38e0143eaa9db6343eb134dc4bc795adcd79daf06d9898cb17505ae6cb58c",
             "locator": "requirement:OFV2-AIS-TRANSACTIONS-001",
             "sha256": "c95c7ec0266b89ca12c9972bb87646b187773386475f611e7c6bfc28044eb739"
           }
@@ -715,7 +1003,7 @@
           "text": "bookingStatus \"booked\" is supported; \"pending\" is supported if the ASPSP online channels show pending transactions.",
           "mapping": {
             "file": "requirements/requirements.yaml",
-            "file_sha256": "9ea404b1b672915d530528ae7207e864ebf5aa196bb7d05f59fe9f1ddebe0b43",
+            "file_sha256": "3ae38e0143eaa9db6343eb134dc4bc795adcd79daf06d9898cb17505ae6cb58c",
             "locator": "requirement:OFV2-AIS-TRANSACTIONS-001",
             "sha256": "c95c7ec0266b89ca12c9972bb87646b187773386475f611e7c6bfc28044eb739"
           }
@@ -726,7 +1014,7 @@
           "text": "bookingStatus \"both\", \"information\" and \"all\" are optional; an unsupported value is answered with an error code.",
           "mapping": {
             "file": "requirements/requirements.yaml",
-            "file_sha256": "9ea404b1b672915d530528ae7207e864ebf5aa196bb7d05f59fe9f1ddebe0b43",
+            "file_sha256": "3ae38e0143eaa9db6343eb134dc4bc795adcd79daf06d9898cb17505ae6cb58c",
             "locator": "requirement:OFV2-AIS-TRANSACTIONS-001",
             "sha256": "c95c7ec0266b89ca12c9972bb87646b187773386475f611e7c6bfc28044eb739"
           }
@@ -737,7 +1025,7 @@
           "text": "dateFrom is mandatory unless deltaList or entryReferenceFrom is used or bookingStatus equals \"information\".",
           "mapping": {
             "file": "requirements/requirements.yaml",
-            "file_sha256": "9ea404b1b672915d530528ae7207e864ebf5aa196bb7d05f59fe9f1ddebe0b43",
+            "file_sha256": "3ae38e0143eaa9db6343eb134dc4bc795adcd79daf06d9898cb17505ae6cb58c",
             "locator": "requirement:OFV2-AIS-TRANSACTIONS-001",
             "sha256": "c95c7ec0266b89ca12c9972bb87646b187773386475f611e7c6bfc28044eb739"
           }
@@ -748,7 +1036,7 @@
           "text": "If dateTo is absent, \"today\" is used as end date.",
           "mapping": {
             "file": "requirements/requirements.yaml",
-            "file_sha256": "9ea404b1b672915d530528ae7207e864ebf5aa196bb7d05f59fe9f1ddebe0b43",
+            "file_sha256": "3ae38e0143eaa9db6343eb134dc4bc795adcd79daf06d9898cb17505ae6cb58c",
             "locator": "requirement:OFV2-AIS-TRANSACTIONS-001",
             "sha256": "c95c7ec0266b89ca12c9972bb87646b187773386475f611e7c6bfc28044eb739"
           }
@@ -759,7 +1047,7 @@
           "text": "For bookingStatus \"information\", dateFrom, dateTo, withBalance, deltaList and entryReferenceFrom have no effect.",
           "mapping": {
             "file": "requirements/requirements.yaml",
-            "file_sha256": "9ea404b1b672915d530528ae7207e864ebf5aa196bb7d05f59fe9f1ddebe0b43",
+            "file_sha256": "3ae38e0143eaa9db6343eb134dc4bc795adcd79daf06d9898cb17505ae6cb58c",
             "locator": "requirement:OFV2-AIS-TRANSACTIONS-001",
             "sha256": "c95c7ec0266b89ca12c9972bb87646b187773386475f611e7c6bfc28044eb739"
           }
@@ -770,7 +1058,7 @@
           "text": "A successful response has HTTP 200 and contains the mandatory account reference.",
           "mapping": {
             "file": "requirements/requirements.yaml",
-            "file_sha256": "9ea404b1b672915d530528ae7207e864ebf5aa196bb7d05f59fe9f1ddebe0b43",
+            "file_sha256": "3ae38e0143eaa9db6343eb134dc4bc795adcd79daf06d9898cb17505ae6cb58c",
             "locator": "requirement:OFV2-AIS-TRANSACTIONS-001",
             "sha256": "c95c7ec0266b89ca12c9972bb87646b187773386475f611e7c6bfc28044eb739"
           }
@@ -1113,7 +1401,7 @@
       ],
       "mapping": {
         "file": "requirements/requirements.yaml",
-        "file_sha256": "9ea404b1b672915d530528ae7207e864ebf5aa196bb7d05f59fe9f1ddebe0b43",
+        "file_sha256": "3ae38e0143eaa9db6343eb134dc4bc795adcd79daf06d9898cb17505ae6cb58c",
         "locator": "requirement:OFV2-AIS-TRANSACTIONS-001",
         "sha256": "c95c7ec0266b89ca12c9972bb87646b187773386475f611e7c6bfc28044eb739"
       }
@@ -1133,7 +1421,7 @@
           "text": "If pageSize is not supported, a request containing it is rejected with HTTP 400 PARAMETER_NOT_SUPPORTED.",
           "mapping": {
             "file": "requirements/requirements.yaml",
-            "file_sha256": "9ea404b1b672915d530528ae7207e864ebf5aa196bb7d05f59fe9f1ddebe0b43",
+            "file_sha256": "3ae38e0143eaa9db6343eb134dc4bc795adcd79daf06d9898cb17505ae6cb58c",
             "locator": "requirement:OFV2-AIS-TRANSACTIONS-002",
             "sha256": "244dc1f91d0fb67427a172c139bb5b5661a032d84f0d98612381471f11b31945"
           }
@@ -1144,7 +1432,7 @@
           "text": "If pageSize is supported and exceeds maxPageSize, the request is rejected.",
           "mapping": {
             "file": "requirements/requirements.yaml",
-            "file_sha256": "9ea404b1b672915d530528ae7207e864ebf5aa196bb7d05f59fe9f1ddebe0b43",
+            "file_sha256": "3ae38e0143eaa9db6343eb134dc4bc795adcd79daf06d9898cb17505ae6cb58c",
             "locator": "requirement:OFV2-AIS-TRANSACTIONS-002",
             "sha256": "244dc1f91d0fb67427a172c139bb5b5661a032d84f0d98612381471f11b31945"
           }
@@ -1155,7 +1443,7 @@
           "text": "If pageSize is supported, maxPageSize is published and \"pageSize\" is listed in supportedQueryParametersTransactions.",
           "mapping": {
             "file": "requirements/requirements.yaml",
-            "file_sha256": "9ea404b1b672915d530528ae7207e864ebf5aa196bb7d05f59fe9f1ddebe0b43",
+            "file_sha256": "3ae38e0143eaa9db6343eb134dc4bc795adcd79daf06d9898cb17505ae6cb58c",
             "locator": "requirement:OFV2-AIS-TRANSACTIONS-002",
             "sha256": "244dc1f91d0fb67427a172c139bb5b5661a032d84f0d98612381471f11b31945"
           }
@@ -1259,28 +1547,28 @@
             "version": "openfinance-v2",
             "authority": "project",
             "precedence": 10,
-            "sha256": "0526127db9e64ec84102c2472ddb7f6b8170e284ec73ac508a7ef28ac161d431",
+            "sha256": "7502b7ea2dcd76791b6b92ce9687fe372b2ecc2f5b4f73a1b35629ea1299f776",
             "status": "indexed"
           },
           "excerpt": "E-03 pageSize query parameter not declared in the AIS OpenAPI\n\nXS2A API Implementation Guidelines 2.4, section 4.4.4 Read Transaction List (page 96), defines\nthe optional query parameter pageSize (\"Optional if supported by API provider\"; rejected if not\nsupported or if higher than maxPageSize). Data Dictionary 2.3.1 (page 99) lists \"pageSize\" as a\nvalue of supportedQueryParametersTransactions and defines maxPageSize. The AIS OpenAPI 2.3\noperation GET /v2/accounts/{account-id}/transactions does not declare pageSize. NextGenPSD2\n1.3.16 has no pageSize parameter at all.\n\nClarification: implement pageSize as described in the Implementation Guidelines when supported\nand advertise it together with maxPageSize. The OpenAPI contract alone is incomplete here.",
           "provenance": [
             {
               "source_id": "project-openfinance-v2-errata",
-              "document_id": "project-openfinance-v2-errata@0526127db9e6",
+              "document_id": "project-openfinance-v2-errata@7502b7ea2dcd",
               "version": "openfinance-v2",
               "kind": "text",
               "authority": "project",
               "precedence": 10,
               "locator": "chunk:project-openfinance-v2-errata:p1:c3",
               "sha256": "9390458f6168d72e8c3f7cfac387dd4f37584f3e6a2330838ad09e11f1e1a7d9",
-              "document_sha256": "0526127db9e64ec84102c2472ddb7f6b8170e284ec73ac508a7ef28ac161d431"
+              "document_sha256": "7502b7ea2dcd76791b6b92ce9687fe372b2ecc2f5b4f73a1b35629ea1299f776"
             }
           ]
         }
       ],
       "mapping": {
         "file": "requirements/requirements.yaml",
-        "file_sha256": "9ea404b1b672915d530528ae7207e864ebf5aa196bb7d05f59fe9f1ddebe0b43",
+        "file_sha256": "3ae38e0143eaa9db6343eb134dc4bc795adcd79daf06d9898cb17505ae6cb58c",
         "locator": "requirement:OFV2-AIS-TRANSACTIONS-002",
         "sha256": "244dc1f91d0fb67427a172c139bb5b5661a032d84f0d98612381471f11b31945"
       }
@@ -1596,7 +1884,7 @@
       "locator": "chunk:bg-openfinance-v2-xs2a-implementation-guidelines:p114:c1",
       "page": 114,
       "evidence": "4.5.4 Read Card Account Transaction List\n\nCall\n\nGET /v2/card-accounts/{account-id}/transactions {query-parameters}\n\nReads account data from a given card reconciliation account addressed by \"account-id\".\n\nRemark: This account-id is a tokenised identification due to data protection reason since the\npath information might be logged on intermediary servers within the ASPSP sphere. This\naccount-id then",
-      "relevance": 54.22800064086914,
+      "relevance": 52.775001525878906,
       "sha256": "84e8b40565b8d32b8d73f37daa7a6143bdf7ecdf42236936a26678a1eb6078d8",
       "classification": "discovered_evidence"
     },
@@ -1612,7 +1900,7 @@
       "locator": "chunk:bg-openfinance-v2-xs2a-operational-rules:p26:c0",
       "page": 26,
       "evidence": "requests information about transactions for a given account\nat the XS2A interface of the ASPSP\n\nGet the transaction information and the\nbalance for the account\n\nFigure 11: API Service Get payment transaction information for a given account",
-      "relevance": 51.63600158691406,
+      "relevance": 50.37200164794922,
       "sha256": "380bb84c0070ff6d9b9b67a8aec3b082bef45805b27f62de007c3f1f40d7cc13",
       "classification": "discovered_evidence"
     },
@@ -1628,7 +1916,7 @@
       "locator": "chunk:bg-openfinance-v2-xs2a-operational-rules:p3:c23",
       "page": 3,
       "evidence": "4.10 API Service: Get transaction information for a given account ........ 21",
-      "relevance": 50.29600143432617,
+      "relevance": 48.99300003051758,
       "sha256": "027ef2739b8ea40e96e57b880902adf6937752e5670ce1201d4fa814616b521f",
       "classification": "discovered_evidence"
     },
@@ -1644,7 +1932,7 @@
       "locator": "chunk:bg-openfinance-v2-xs2a-operational-rules:p25:c1",
       "page": 25,
       "evidence": "4.10 API Service: Get transaction information for a given account\n\nThe support of this API Service at the XS2A interface is mandatory.\n\nThe TPP can use this API Service to receive information about payment transactions of a\nspecific account. As a result the TPP will receive information about all payment transactions\nexecuted during the time period indicated in the request. In addition, the ASPSP",
-      "relevance": 49.933998107910156,
+      "relevance": 48.755001068115234,
       "sha256": "88f2881e76c9cd57c1cfeef0f8d35ded71fd640c8639a53c8d265f74c881d96b",
       "classification": "discovered_evidence"
     },
@@ -1660,7 +1948,7 @@
       "locator": "chunk:bg-openfinance-v2-xs2a-implementation-guidelines:p4:c27",
       "page": 4,
       "evidence": "4.5.4 Read Card Account Transaction List ................................ 109",
-      "relevance": 49.65700149536133,
+      "relevance": 48.18600082397461,
       "sha256": "6f3bf1ca11f400a247922bdd58d678522d9ef494f189db9b499e5c0f1e58c8aa",
       "classification": "discovered_evidence"
     },
@@ -1676,7 +1964,7 @@
       "locator": "chunk:bg-openfinance-v2-xs2a-implementation-guidelines:p95:c1",
       "page": 95,
       "evidence": "4.4.4 Read Transaction List\n\nCall\n\nGET /v2/accounts/{account-id}/transactions {query-parameters}\n\nReads account transaction data from a given account addressed by \"account-id\". This can be\neither booked or pending transactions or a list of standing orders as further transactional\ninformation.\n\nNote: The ASPSP might use standard compression methods on application level for the\nresponse message as",
-      "relevance": 47.32899856567383,
+      "relevance": 46.56999969482422,
       "sha256": "746e3ff6d46c56ccacf8fb3a2dd3992f41478619afbd4a293ffc7c20c2f3e388",
       "classification": "discovered_evidence"
     },
@@ -1692,7 +1980,7 @@
       "locator": "chunk:bg-openfinance-v2-xs2a-implementation-guidelines:p117:c0",
       "page": 117,
       "evidence": "the amount of debits on the reports are\nquoted negative.\n\nJSON based account report.\n\nA list of balances regarding this account, which\nmight be restricted to the current balance.\n\nA list of hyperlinks to be recognised by the TPP.\n\nType of links admitted in this response:\n\n\"download\": a link to a resource, where the\ntransaction list might be downloaded from in case\nwhere transaction lists have a",
-      "relevance": 46.65299987792969,
+      "relevance": 45.380001068115234,
       "sha256": "3d9078f853328382d9a756d3cd65d1612d304cca7772e5ff294206923fc405c7",
       "classification": "discovered_evidence"
     },
@@ -1708,7 +1996,7 @@
       "locator": "chunk:bg-openfinance-v2-xs2a-implementation-guidelines:p115:c0",
       "page": 115,
       "evidence": "Optional if\nsupported by\nAPI provider\n\nMandatory\n\nOptional if\nsupported by\nAPI provider\n\n  Optional, if\nsupported by\nthe ASPSP\n\nAccount Information Service\n\nDescription\n\nStarting date (inclusive the date dateFrom)\nof the transaction list, mandated if no delta\naccess is required\n\nEnd date (inclusive the data dateTo) of the\ntransaction list, default is \"today\" if not\ngiven.\n\nThis query parameter",
-      "relevance": 45.45899963378906,
+      "relevance": 44.222999572753906,
       "sha256": "1801d90e05ff3dc6567d2c85ee575cd9e7d2699ecd325ab963f72ac9082b40bc",
       "classification": "discovered_evidence"
     }
@@ -1806,7 +2094,7 @@
       "precedence": 90
     },
     {
-      "_truncated_items": 140
+      "_truncated_items": 150
     }
   ]
 }

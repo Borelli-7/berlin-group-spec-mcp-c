@@ -3,7 +3,7 @@
 //! `cargo test -p bg-spec-indexer --release --test real_corpus -- --ignored`.
 
 use bg_spec_core::{
-    domain::ConflictKind,
+    domain::{ConflictKind, DocumentKind},
     services::{ServiceSettings, Services, SourceResolution},
 };
 use bg_spec_indexer::{IndexAction, IndexOptions, Indexer, testing};
@@ -19,7 +19,7 @@ async fn real_corpus_indexes_and_every_requirement_resolves() {
         .await
         .expect("index");
     assert_eq!(report.count(IndexAction::Indexed), 28, "{report:#?}");
-    assert_eq!(report.requirements, 14);
+    assert_eq!(report.requirements, 101);
 
     let (catalog, search) = bg_spec_store::open_read_only(&config)
         .await
@@ -32,7 +32,7 @@ async fn real_corpus_indexes_and_every_requirement_resolves() {
         .lines()
         .filter_map(|l| l.trim().strip_prefix("- id: "))
         .collect();
-    assert_eq!(ids.len(), 14);
+    assert_eq!(ids.len(), 101);
     for id in ids {
         let trace = svc.requirements.trace(id).await.unwrap();
         for s in &trace.sources {
@@ -113,4 +113,41 @@ async fn real_corpus_indexes_and_every_requirement_resolves() {
         .map(|r| r.requirement_id.as_str())
         .collect();
     assert!(ids.contains(&"OFV2-AIS-TRANSACTIONS-001"), "{ids:?}");
+
+    // Completeness: every openFinance v2 OpenAPI operation is linked to a curated requirement.
+    let manifest = Indexer::load_manifest(&config).expect("manifest");
+    let mut unlinked = Vec::new();
+    let mut checked = 0;
+    for source in manifest
+        .sources
+        .iter()
+        .filter(|s| s.kind == DocumentKind::Openapi && s.version.as_str() == "openfinance-v2")
+    {
+        let raw = std::fs::read_to_string(config.corpus_root.join(&source.path)).expect("openapi");
+        let root = bg_spec_indexer::openapi::parse_document(&raw, &source.path).expect("parse");
+        let Some(paths) = root.get("paths").and_then(|p| p.as_object()) else {
+            continue;
+        };
+        for (path, item) in paths.iter().filter(|(p, _)| !p.starts_with("x-")) {
+            for method in ["get", "put", "post", "delete", "patch"] {
+                if item.get(method).is_none() {
+                    continue;
+                }
+                checked += 1;
+                let bundle = svc
+                    .requirements
+                    .endpoint_requirements(Some("openfinance-v2"), path.trim(), method, None)
+                    .await
+                    .unwrap();
+                if bundle.requirements.is_empty() {
+                    unlinked.push(format!("{} {method} {path}", source.id));
+                }
+            }
+        }
+    }
+    assert_eq!(checked, 45);
+    assert!(
+        unlinked.is_empty(),
+        "operations without a curated requirement: {unlinked:#?}"
+    );
 }

@@ -103,8 +103,11 @@ The server **reports** conflicts with citations and provenance. Deciding which s
 
 ### Official corpus (`corpus/`)
 
-`corpus/requirements/requirements.yaml` maps 14 requirements (11 `OFV2-*`, 3 `NGPSD2-*` baseline) onto the
-official Berlin Group files. Discrepancies between those files are recorded as project errata in
+`corpus/requirements/requirements.yaml` maps 101 requirements (72 `OFV2-*`, 29 `NGPSD2-*` baseline) onto the
+official Berlin Group files. Every openFinance v2 OpenAPI operation is linked to at least one requirement;
+NextGenPSD2 1.3 operations are covered where a v2 counterpart exists, and endpoint-less requirements cover
+protocol functions, operational rules, administrative services and the Data Dictionary message codes.
+Discrepancies between those files are recorded as project errata in
 `corpus/text/v2/errata.md` (source `project-openfinance-v2-errata`, authority `project`, precedence 10).
 
 | Requirement | Demonstrates |
@@ -113,9 +116,12 @@ official Berlin Group files. Discrepancies between those files are recorded as p
 | `OFV2-SCA-APPROACH-001` ↔ `-002` | `declared` conflict: Protocol Functions 8.4.2 lists `SIGNATURE`, the OpenAPI enum omits it (errata E-01) |
 | `OFV2-AIS-TRANSACTIONS-002`, `OFV2-AIS-FREQUENCY-001` | Normative sources complemented by project errata (E-03 `pageSize`, E-07 access counting) |
 | `NGPSD2-AIS-TRANSACTIONS-001`, `NGPSD2-AIS-BALANCES-001` | v1.3 baseline reached from the v2 path through the `/v1` ↔ `/v2` canonical key |
+| `OFV2-PIS-STATUS-CODES-001`, `OFV2-SCA-REQUEST-HEADERS-001` | Normative sources complemented by project errata (E-09 `PACT`/`PATC`, E-10 header names in change logs) |
+| `OFV2-PIS-GET-PAYMENT-001`, `OFV2-AUTH-SUBRESOURCES-001` | Linked through `op:` citations only, because `GET /v2/{payment-service}/{payment-product}/{paymentId}` and `GET /v2/{resource-path}/{resourceId}/{authorisation-category}` share one canonical key |
 
 The ignored smoke test `cargo test -p bg-spec-indexer --release --test real_corpus -- --ignored` indexes
-this corpus and asserts that every cited locator resolves and that only declared conflicts remain.
+this corpus and asserts that every cited locator resolves, that only declared conflicts remain and that
+every openFinance v2 OpenAPI operation returns at least one curated requirement from `get_endpoint_requirements`.
 
 ### Test fixture corpus (`crates/bg-spec-indexer/tests/fixtures/corpus/`)
 

@@ -37,7 +37,7 @@
           "text": "The ASPSP declares countingOfAisRequests as \"none\", \"timeslot\" or \"byEndpointCall\".",
           "mapping": {
             "file": "requirements/requirements.yaml",
-            "file_sha256": "9ea404b1b672915d530528ae7207e864ebf5aa196bb7d05f59fe9f1ddebe0b43",
+            "file_sha256": "3ae38e0143eaa9db6343eb134dc4bc795adcd79daf06d9898cb17505ae6cb58c",
             "locator": "requirement:OFV2-AIS-FREQUENCY-001",
             "sha256": "8d0eee6ecb6939782e1391bf11b09be66d9c2168b5cb96924f51d6dd1ad4e306"
           }
@@ -48,7 +48,7 @@
           "text": "Accesses without PSU involvement beyond the consented frequencyPerDay are rejected with HTTP 429 ACCESS_EXCEEDED.",
           "mapping": {
             "file": "requirements/requirements.yaml",
-            "file_sha256": "9ea404b1b672915d530528ae7207e864ebf5aa196bb7d05f59fe9f1ddebe0b43",
+            "file_sha256": "3ae38e0143eaa9db6343eb134dc4bc795adcd79daf06d9898cb17505ae6cb58c",
             "locator": "requirement:OFV2-AIS-FREQUENCY-001",
             "sha256": "8d0eee6ecb6939782e1391bf11b09be66d9c2168b5cb96924f51d6dd1ad4e306"
           }
@@ -56,7 +56,7 @@
       ],
       "mapping": {
         "file": "requirements/requirements.yaml",
-        "file_sha256": "9ea404b1b672915d530528ae7207e864ebf5aa196bb7d05f59fe9f1ddebe0b43",
+        "file_sha256": "3ae38e0143eaa9db6343eb134dc4bc795adcd79daf06d9898cb17505ae6cb58c",
         "locator": "requirement:OFV2-AIS-FREQUENCY-001",
         "sha256": "8d0eee6ecb6939782e1391bf11b09be66d9c2168b5cb96924f51d6dd1ad4e306"
       }
@@ -92,7 +92,7 @@
           "text": "access, consentType, recurringIndicator, validTo and frequencyPerDay are mandatory in the request body.",
           "mapping": {
             "file": "requirements/requirements.yaml",
-            "file_sha256": "9ea404b1b672915d530528ae7207e864ebf5aa196bb7d05f59fe9f1ddebe0b43",
+            "file_sha256": "3ae38e0143eaa9db6343eb134dc4bc795adcd79daf06d9898cb17505ae6cb58c",
             "locator": "requirement:OFV2-CONSENT-AIS-001",
             "sha256": "b8336d107c307e4cb51be32363eacde5530e52a6501e8c06f9645bc607a6fb73"
           }
@@ -103,7 +103,7 @@
           "text": "frequencyPerDay is at least 1 and, unless agreed bilaterally, at most 4; a one-off access uses 1.",
           "mapping": {
             "file": "requirements/requirements.yaml",
-            "file_sha256": "9ea404b1b672915d530528ae7207e864ebf5aa196bb7d05f59fe9f1ddebe0b43",
+            "file_sha256": "3ae38e0143eaa9db6343eb134dc4bc795adcd79daf06d9898cb17505ae6cb58c",
             "locator": "requirement:OFV2-CONSENT-AIS-001",
             "sha256": "b8336d107c307e4cb51be32363eacde5530e52a6501e8c06f9645bc607a6fb73"
           }
@@ -114,7 +114,7 @@
           "text": "validTo \"9999-12-31\" requests the maximum validity; the ASPSP may adjust the date.",
           "mapping": {
             "file": "requirements/requirements.yaml",
-            "file_sha256": "9ea404b1b672915d530528ae7207e864ebf5aa196bb7d05f59fe9f1ddebe0b43",
+            "file_sha256": "3ae38e0143eaa9db6343eb134dc4bc795adcd79daf06d9898cb17505ae6cb58c",
             "locator": "requirement:OFV2-CONSENT-AIS-001",
             "sha256": "b8336d107c307e4cb51be32363eacde5530e52a6501e8c06f9645bc607a6fb73"
           }
@@ -125,7 +125,7 @@
           "text": "consentType \"detailed\" is supported by every ASPSP.",
           "mapping": {
             "file": "requirements/requirements.yaml",
-            "file_sha256": "9ea404b1b672915d530528ae7207e864ebf5aa196bb7d05f59fe9f1ddebe0b43",
+            "file_sha256": "3ae38e0143eaa9db6343eb134dc4bc795adcd79daf06d9898cb17505ae6cb58c",
             "locator": "requirement:OFV2-CONSENT-AIS-001",
             "sha256": "b8336d107c307e4cb51be32363eacde5530e52a6501e8c06f9645bc607a6fb73"
           }
@@ -136,7 +136,7 @@
           "text": "A successful response has HTTP 201 and contains consentStatus and consentId.",
           "mapping": {
             "file": "requirements/requirements.yaml",
-            "file_sha256": "9ea404b1b672915d530528ae7207e864ebf5aa196bb7d05f59fe9f1ddebe0b43",
+            "file_sha256": "3ae38e0143eaa9db6343eb134dc4bc795adcd79daf06d9898cb17505ae6cb58c",
             "locator": "requirement:OFV2-CONSENT-AIS-001",
             "sha256": "b8336d107c307e4cb51be32363eacde5530e52a6501e8c06f9645bc607a6fb73"
           }
@@ -147,7 +147,7 @@
           "text": "An authorised recurring consent lets a former recurring consent of the same PSU and API Client expire, unless the Multiple Consents Service is offered.",
           "mapping": {
             "file": "requirements/requirements.yaml",
-            "file_sha256": "9ea404b1b672915d530528ae7207e864ebf5aa196bb7d05f59fe9f1ddebe0b43",
+            "file_sha256": "3ae38e0143eaa9db6343eb134dc4bc795adcd79daf06d9898cb17505ae6cb58c",
             "locator": "requirement:OFV2-CONSENT-AIS-001",
             "sha256": "b8336d107c307e4cb51be32363eacde5530e52a6501e8c06f9645bc607a6fb73"
           }
@@ -155,9 +155,86 @@
       ],
       "mapping": {
         "file": "requirements/requirements.yaml",
-        "file_sha256": "9ea404b1b672915d530528ae7207e864ebf5aa196bb7d05f59fe9f1ddebe0b43",
+        "file_sha256": "3ae38e0143eaa9db6343eb134dc4bc795adcd79daf06d9898cb17505ae6cb58c",
         "locator": "requirement:OFV2-CONSENT-AIS-001",
         "sha256": "b8336d107c307e4cb51be32363eacde5530e52a6501e8c06f9645bc607a6fb73"
+      }
+    },
+    {
+      "requirement_id": "OFV2-CONSENT-AIS-GET-001",
+      "classification": "authoritative_requirement",
+      "version": "openfinance-v2",
+      "title": "Read an account information consent",
+      "match_reason": "text",
+      "sources": [
+        {
+          "source_id": "bg-openfinance-v2-consent-api",
+          "locator": "section:3.4.2"
+        },
+        {
+          "source_id": "bg-openfinance-v2-consent-api",
+          "locator": "page:35-37"
+        },
+        {
+          "source_id": "bg-openfinance-v2-openapi-consent",
+          "locator": "op:GET /v2/consents/account-access/{consentId}"
+        }
+      ],
+      "related_endpoints": [
+        "GET /v2/consents/account-access/{consentId}",
+        "GET /v2/consents/account-access/{consentId}"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "OFV2-CONSENT-AIS-GET-001/AC1",
+          "requirement_id": "OFV2-CONSENT-AIS-GET-001",
+          "text": "A successful response has HTTP 200.",
+          "mapping": {
+            "file": "requirements/requirements.yaml",
+            "file_sha256": "3ae38e0143eaa9db6343eb134dc4bc795adcd79daf06d9898cb17505ae6cb58c",
+            "locator": "requirement:OFV2-CONSENT-AIS-GET-001",
+            "sha256": "ebcff0fe53330b5e5e32f710c7cbb384fe9ecada4f0fa7c613c2f376a305b4d7"
+          }
+        },
+        {
+          "id": "OFV2-CONSENT-AIS-GET-001/AC2",
+          "requirement_id": "OFV2-CONSENT-AIS-GET-001",
+          "text": "The response contains the mandatory frequencyPerDay and consentStatus.",
+          "mapping": {
+            "file": "requirements/requirements.yaml",
+            "file_sha256": "3ae38e0143eaa9db6343eb134dc4bc795adcd79daf06d9898cb17505ae6cb58c",
+            "locator": "requirement:OFV2-CONSENT-AIS-GET-001",
+            "sha256": "ebcff0fe53330b5e5e32f710c7cbb384fe9ecada4f0fa7c613c2f376a305b4d7"
+          }
+        },
+        {
+          "id": "OFV2-CONSENT-AIS-GET-001/AC3",
+          "requirement_id": "OFV2-CONSENT-AIS-GET-001",
+          "text": "For account-access consents the ASPSP delivers all detailed account references and consented access rights after positive SCA.",
+          "mapping": {
+            "file": "requirements/requirements.yaml",
+            "file_sha256": "3ae38e0143eaa9db6343eb134dc4bc795adcd79daf06d9898cb17505ae6cb58c",
+            "locator": "requirement:OFV2-CONSENT-AIS-GET-001",
+            "sha256": "ebcff0fe53330b5e5e32f710c7cbb384fe9ecada4f0fa7c613c2f376a305b4d7"
+          }
+        },
+        {
+          "id": "OFV2-CONSENT-AIS-GET-001/AC4",
+          "requirement_id": "OFV2-CONSENT-AIS-GET-001",
+          "text": "Hyperlinks to all accounts provided in the consent are added.",
+          "mapping": {
+            "file": "requirements/requirements.yaml",
+            "file_sha256": "3ae38e0143eaa9db6343eb134dc4bc795adcd79daf06d9898cb17505ae6cb58c",
+            "locator": "requirement:OFV2-CONSENT-AIS-GET-001",
+            "sha256": "ebcff0fe53330b5e5e32f710c7cbb384fe9ecada4f0fa7c613c2f376a305b4d7"
+          }
+        }
+      ],
+      "mapping": {
+        "file": "requirements/requirements.yaml",
+        "file_sha256": "3ae38e0143eaa9db6343eb134dc4bc795adcd79daf06d9898cb17505ae6cb58c",
+        "locator": "requirement:OFV2-CONSENT-AIS-GET-001",
+        "sha256": "ebcff0fe53330b5e5e32f710c7cbb384fe9ecada4f0fa7c613c2f376a305b4d7"
       }
     }
   ],
@@ -174,7 +251,7 @@
       "locator": "chunk:bg-openfinance-v2-data-dictionary:p244:c2",
       "page": 244,
       "evidence": "3.19 Renamed Frequency Code to\n\nEvent Frequency Code\nISO20022 compliance.\nTo differentiate between standing\norders Frequency Code and Mandate\nFrequency Code, which are slightly\ndifferent in ISO20022",
-      "relevance": 20.5939998626709,
+      "relevance": 20.632999420166016,
       "sha256": "acd66821f9136f34981af84d810ec59964fb2ad2a2fc1677d9ef51d384abd140",
       "classification": "discovered_evidence"
     },
@@ -190,7 +267,7 @@
       "locator": "chunk:bg-openfinance-v2-data-dictionary:p10:c7",
       "page": 10,
       "evidence": "3.19 Event Frequency Code ................................................................ 184",
-      "relevance": 19.291000366210938,
+      "relevance": 19.33099937438965,
       "sha256": "aa05bb76611529359a319f4170c3cc53386b6df4dfb143c98269639aff7e9b04",
       "classification": "discovered_evidence"
     },
@@ -206,7 +283,7 @@
       "locator": "chunk:bg-openfinance-v2-data-dictionary:p196:c1",
       "page": 196,
       "evidence": "3.19 Event Frequency Code\n\nThe following codes from the \"EventFrequency7Code\" of ISO 20022 are supported:\n\n• Daily\n• Weekly\n• EveryTwoWeeks\n• Monthly\n• EveryTwoMonths\n• Quarterly\n• SemiAnnual\n• Annual\n• MonthlyVariable\n\nThis code is used in [oFA-IG-Com], [oFA-IG-XPIS",
-      "relevance": 18.454999923706055,
+      "relevance": 18.525999069213867,
       "sha256": "81e85b8487392870fa63e96900f21ed49f9b9fd53730803310d296a8c61f5c9b",
       "classification": "discovered_evidence"
     }

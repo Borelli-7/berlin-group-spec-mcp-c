@@ -20,7 +20,7 @@
       "locator": "chunk:bg-openfinance-v2-data-dictionary:p99:c0",
       "page": 99,
       "evidence": "Attribute Type Condition Description\nsupportedQueryParameters\nBalances Array of\nMax35Text\nMandatory Query parameters supported for\nbalances.\n\"dateFrom\" as potential value.\n(IO66)\nsupportedQueryParameters\nTransactions Array of\nMax35Text\nMandatory Query parameters supported for\ntransactions.\n\"dateFrom\", \"dateTo\",\n\"entryReferenceFrom\",\n\"bookingStatus\", \"deltaList\",\n\"withBalance\", \"pageSize\" as",
-      "relevance": 10.071000099182129,
+      "relevance": 10.220000267028809,
       "sha256": "fd43732462d8ed89e4713c18bc6f84cd169be865fdde72aa2911731df54135d9",
       "classification": "discovered_evidence"
     },
@@ -36,7 +36,7 @@
       "locator": "chunk:bg-openfinance-v2-xs2a-implementation-guidelines:p115:c0",
       "page": 115,
       "evidence": "Optional if\nsupported by\nAPI provider\n\nMandatory\n\nOptional if\nsupported by\nAPI provider\n\n  Optional, if\nsupported by\nthe ASPSP\n\nAccount Information Service\n\nDescription\n\nStarting date (inclusive the date dateFrom)\nof the transaction list, mandated if no delta\naccess is required\n\nEnd date (inclusive the data dateTo) of the\ntransaction list, default is \"today\" if not\ngiven.\n\nThis query parameter",
-      "relevance": 7.294000148773193,
+      "relevance": 7.482999801635742,
       "sha256": "1801d90e05ff3dc6567d2c85ee575cd9e7d2699ecd325ab963f72ac9082b40bc",
       "classification": "discovered_evidence"
     },
@@ -52,7 +52,7 @@
       "locator": "chunk:bg-openfinance-v2-xs2a-implementation-guidelines:p98:c0",
       "page": 98,
       "evidence": "openFinance PSD2 XSZA API\n\nAttribute\n\nwithBalance\n\ncardBrand\n\nNOTE: In case of bookingStatus equals \"information\", the query parameters dateFrom,\ndateTo, withBalance deltaList and entryReferenceFrom will be ignored and have no effect on\nthe result.\n\nRequest Header\n\nAttribute Type\n\n                                     determined by the initiating party.\nPSU-IP-Address String Conditional The",
-      "relevance": 6.986999988555908,
+      "relevance": 7.184999942779541,
       "sha256": "61da9137c071c151cd2e2c174db39a5ba6adab58cf6d6d1ecb85ea0ca9eda021",
       "classification": "discovered_evidence"
     }

@@ -8,18 +8,18 @@
     "documents": 28,
     "pages": 1320,
     "ocr_required_pages": 1,
-    "chunks": 3391,
+    "chunks": 3393,
     "operations": 100,
     "schemas": 1730,
-    "requirements": 14
+    "requirements": 101
   },
   "index": {
     "schema_version": 1,
     "last_indexed_at_unix": "<timestamp>",
-    "index_generation": 3,
-    "requirements_file_sha256": "9ea404b1b672915d530528ae7207e864ebf5aa196bb7d05f59fe9f1ddebe0b43"
+    "index_generation": 5,
+    "requirements_file_sha256": "3ae38e0143eaa9db6343eb134dc4bc795adcd79daf06d9898cb17505ae6cb58c"
   },
-  "search_documents": 5221,
+  "search_documents": 5223,
   "versions": [
     "nextgenpsd2-v1.3",
     "openfinance-v2"

@@ -95,3 +95,24 @@ page 196).
 
 Clarification: v2 endpoints accept only the Client-prefixed names; any v1 compatibility layer
 must translate the headers explicitly.
+
+## E-09 Multilevel SCA transaction status spelled PACT once in the Implementation Guidelines
+
+XS2A API Implementation Guidelines 2.4, section 2.3.1 Status Information for PIS, introduces the
+status for partially authorised payments as "PACT" (PartiallyAcceptedTechnicalCorrect, page 18)
+but uses "PATC" for the same status two pages later (page 20). The Data Dictionary 2.3.1
+Transaction Status code list (page 223) and the TransactionStatus enums of the v2 AIS, PIS,
+Consent, Signing Basket, Push and Data Dictionary OpenAPI files only contain PATC.
+
+Clarification: PATC is the only valid code. PACT is a typo in the Implementation Guidelines.
+
+## E-10 Change logs name the SCA preference and negative redirect headers differently
+
+The change log of Protocol Functions and Security Measures 2.3 (pages 204-205) records the
+renames TPP-SCA-Preference to Client-SCA-Preference and TPP-Nok-Redirect-URI to Client-Nok-URI;
+the Consent API 2.2 change log (page 75) also names Client-SCA-Preference. The normative header
+tables of Protocol Functions section 8.4.1 (pages 93-94) and the v2 OpenAPI files use
+Client-SCA-Approach-Preference and Client-Nok-Redirect-URI.
+
+Clarification: implement the header names of section 8.4.1 and the OpenAPI files
+(Client-SCA-Approach-Preference, Client-Nok-Redirect-URI). The change log names are not used.
