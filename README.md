@@ -48,8 +48,8 @@ cargo build --release                                   # bg-spec, bg-spec-mcp
 Register the server with Copilot CLI (see [CONFIGURATION.md](CONFIGURATION.md#copilot-cli)):
 
 ```bash
-examples/copilot/install.sh        # prints a config with absolute paths for this checkout
-# merge the output into ~/.copilot/mcp-config.json, or copy examples/copilot/.mcp.json into a repository
+examples/copilot/install.sh        # prints the config and merges it into ~/.copilot/mcp-config.json
+# alternatively, copy examples/copilot/.mcp.json into a repository
 ```
 
 Then, inside Copilot CLI, `/mcp` should list `berlin-group-spec` with 10 tools.
