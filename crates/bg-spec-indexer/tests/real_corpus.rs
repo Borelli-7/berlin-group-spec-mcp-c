@@ -19,7 +19,7 @@ async fn real_corpus_indexes_and_every_requirement_resolves() {
         .await
         .expect("index");
     assert_eq!(report.count(IndexAction::Indexed), 28, "{report:#?}");
-    assert_eq!(report.requirements, 101);
+    assert_eq!(report.requirements, 102);
 
     let (catalog, search) = bg_spec_store::open_read_only(&config)
         .await
@@ -32,7 +32,7 @@ async fn real_corpus_indexes_and_every_requirement_resolves() {
         .lines()
         .filter_map(|l| l.trim().strip_prefix("- id: "))
         .collect();
-    assert_eq!(ids.len(), 101);
+    assert_eq!(ids.len(), 102);
     for id in ids {
         let trace = svc.requirements.trace(id).await.unwrap();
         for s in &trace.sources {

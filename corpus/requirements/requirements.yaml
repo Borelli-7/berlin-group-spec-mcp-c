@@ -1269,7 +1269,8 @@ requirements:
       - "Client-Notification-Content-Preferred has the form status=X1, ..., Xn with the constants SCA, PROCESS and LAST."
       - "If only one of the two notification headers is present, the ASPSP ignores it."
       - "ASPSP-Notification-Support is returned when the ASPSP generally supports the function (true for the created resource, false otherwise)."
-    tags: [push, notification]
+    # The operation is exposed by the API Client, not by the ASPSP.
+    tags: [push, notification, api-client-side]
 
   # ======================================================== openFinance v2 - Protocol functions and security measures (cross-cutting)
   - id: OFV2-HDR-REQUEST-001
@@ -1396,6 +1397,46 @@ requirements:
       - "Support of message signing is optional for the ASPSP and mandatory for the API Client; if the ASPSP requests it, the API Client signs the request."
       - "The API Client signs with a qualified certificate for electronic seals (QSealC)."
     tags: [security, signing]
+
+  - id: OFV2-SEC-TOBESIGNED-001
+    version: openfinance-v2
+    title: Request the data to be signed of a transaction resource (toBeSigned)
+    description: >-
+      Before posting signature data to the authorisation end-point, the API Client may read the exact
+      representation of a payment, consent or signing basket resource that has to be signed, via
+      GET /v2/{resource-path}/{resourceId}?toBeSigned=true.
+    sources:
+      - source_id: bg-openfinance-v2-protocol-functions
+        locator: section:7.1.3.2
+        note: Requesting the data to be signed
+      - source_id: bg-openfinance-v2-protocol-functions
+        locator: page:67-68
+      - source_id: bg-openfinance-v2-openapi-consent
+        locator: op:GET /v2/consents/account-access/{consentId}
+      - source_id: bg-openfinance-v2-openapi-consent
+        locator: op:GET /v2/consents/document-services/{consentId}
+      - source_id: bg-openfinance-v2-openapi-consent
+        locator: op:GET /v2/consents/funds-confirmations/{consentId}
+      - source_id: bg-openfinance-v2-openapi-consent
+        locator: op:GET /v2/consents/user-parameters-access/{consentId}
+      - source_id: bg-openfinance-v2-openapi-signing-basket
+        locator: op:GET /v2/signing-baskets/{basketId}
+      # Linked via op: only; the template shares its canonical key with the authorisation sub-resource list.
+      - source_id: bg-openfinance-v2-openapi-pis
+        locator: op:GET /v2/{payment-service}/{payment-product}/{paymentId}
+    endpoints:
+      - GET /v2/consents/account-access/{consentId}
+      - GET /v2/consents/document-services/{consentId}
+      - GET /v2/consents/funds-confirmations/{consentId}
+      - GET /v2/consents/user-parameters-access/{consentId}
+      - GET /v2/signing-baskets/{basketId}
+    acceptance_criteria:
+      - "Requesting the data to be signed is optional for the API Client and may be repeated for each signer individually."
+      - "The GET call on the resource accepts the optional query parameter toBeSigned; if present, it is set to true."
+      - "The request needs no special request headers and no request body."
+      - "A successful response has HTTP 200 and no special response headers."
+      - "The response body contains the transaction or payment data to be signed as it is; the ASPSP may filter some data from the technical resource data."
+    tags: [security, signing, pis, consent, signing-basket]
 
   - id: OFV2-SEC-OAUTH2-001
     version: openfinance-v2

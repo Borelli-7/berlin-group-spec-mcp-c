@@ -85,7 +85,7 @@ get_endpoint_requirements → read_openapi_endpoint → trace_requirement → re
 Framework v2.x PDFs and OpenAPI files, 28 sources), published by the Berlin Group mostly under the
 Creative Commons Attribution-NoDerivatives 4.0 license; they are redistributed unmodified. Authority and
 precedence are **declared** in `corpus/manifest.yaml`, never inferred from file names.
-`corpus/requirements/requirements.yaml` holds 101 curated requirements, and `corpus/text/v2/errata.md`
+`corpus/requirements/requirements.yaml` holds 102 curated requirements, and `corpus/text/v2/errata.md`
 records project clarifications on discrepancies between the official files (not a Berlin Group publication).
 
 Tests use a separate **synthetic fixture corpus** in `crates/bg-spec-indexer/tests/fixtures/corpus/`
