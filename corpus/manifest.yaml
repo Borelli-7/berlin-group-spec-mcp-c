@@ -220,6 +220,7 @@ sources:
     path: pdf/v2/openFinance API Framework Domestic AIS-PIS Definitions for Version 2.x2.1.pdf
     title: openFinance Domestic AIS/PIS Definitions for Version 2.x 2.1 (2025-10-31)
     tags: [domestic, pis, ais]
+    blank_pages: [2]   # verso of the cover page: no fonts, no images
 
   - id: bg-openfinance-v2-xs2a-operational-rules
     kind: pdf

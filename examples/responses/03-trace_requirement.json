@@ -55,7 +55,7 @@
   },
   "mapping": {
     "file": "requirements/requirements.yaml",
-    "file_sha256": "3ae38e0143eaa9db6343eb134dc4bc795adcd79daf06d9898cb17505ae6cb58c",
+    "file_sha256": "27d8c3ca4a5b7e1ec82a073e9bfa08a3f0bbc235925e279bf4403b6fc6abfd9f",
     "locator": "requirement:OFV2-AIS-TRANSACTIONS-001",
     "sha256": "c95c7ec0266b89ca12c9972bb87646b187773386475f611e7c6bfc28044eb739"
   },
@@ -685,7 +685,7 @@
       "text": "A request without the bookingStatus query parameter is rejected with HTTP 400 FORMAT_ERROR.",
       "mapping": {
         "file": "requirements/requirements.yaml",
-        "file_sha256": "3ae38e0143eaa9db6343eb134dc4bc795adcd79daf06d9898cb17505ae6cb58c",
+        "file_sha256": "27d8c3ca4a5b7e1ec82a073e9bfa08a3f0bbc235925e279bf4403b6fc6abfd9f",
         "locator": "requirement:OFV2-AIS-TRANSACTIONS-001",
         "sha256": "c95c7ec0266b89ca12c9972bb87646b187773386475f611e7c6bfc28044eb739"
       }
@@ -696,7 +696,7 @@
       "text": "bookingStatus \"booked\" is supported; \"pending\" is supported if the ASPSP online channels show pending transactions.",
       "mapping": {
         "file": "requirements/requirements.yaml",
-        "file_sha256": "3ae38e0143eaa9db6343eb134dc4bc795adcd79daf06d9898cb17505ae6cb58c",
+        "file_sha256": "27d8c3ca4a5b7e1ec82a073e9bfa08a3f0bbc235925e279bf4403b6fc6abfd9f",
         "locator": "requirement:OFV2-AIS-TRANSACTIONS-001",
         "sha256": "c95c7ec0266b89ca12c9972bb87646b187773386475f611e7c6bfc28044eb739"
       }
@@ -707,7 +707,7 @@
       "text": "bookingStatus \"both\", \"information\" and \"all\" are optional; an unsupported value is answered with an error code.",
       "mapping": {
         "file": "requirements/requirements.yaml",
-        "file_sha256": "3ae38e0143eaa9db6343eb134dc4bc795adcd79daf06d9898cb17505ae6cb58c",
+        "file_sha256": "27d8c3ca4a5b7e1ec82a073e9bfa08a3f0bbc235925e279bf4403b6fc6abfd9f",
         "locator": "requirement:OFV2-AIS-TRANSACTIONS-001",
         "sha256": "c95c7ec0266b89ca12c9972bb87646b187773386475f611e7c6bfc28044eb739"
       }
@@ -718,7 +718,7 @@
       "text": "dateFrom is mandatory unless deltaList or entryReferenceFrom is used or bookingStatus equals \"information\".",
       "mapping": {
         "file": "requirements/requirements.yaml",
-        "file_sha256": "3ae38e0143eaa9db6343eb134dc4bc795adcd79daf06d9898cb17505ae6cb58c",
+        "file_sha256": "27d8c3ca4a5b7e1ec82a073e9bfa08a3f0bbc235925e279bf4403b6fc6abfd9f",
         "locator": "requirement:OFV2-AIS-TRANSACTIONS-001",
         "sha256": "c95c7ec0266b89ca12c9972bb87646b187773386475f611e7c6bfc28044eb739"
       }
@@ -729,7 +729,7 @@
       "text": "If dateTo is absent, \"today\" is used as end date.",
       "mapping": {
         "file": "requirements/requirements.yaml",
-        "file_sha256": "3ae38e0143eaa9db6343eb134dc4bc795adcd79daf06d9898cb17505ae6cb58c",
+        "file_sha256": "27d8c3ca4a5b7e1ec82a073e9bfa08a3f0bbc235925e279bf4403b6fc6abfd9f",
         "locator": "requirement:OFV2-AIS-TRANSACTIONS-001",
         "sha256": "c95c7ec0266b89ca12c9972bb87646b187773386475f611e7c6bfc28044eb739"
       }
@@ -740,7 +740,7 @@
       "text": "For bookingStatus \"information\", dateFrom, dateTo, withBalance, deltaList and entryReferenceFrom have no effect.",
       "mapping": {
         "file": "requirements/requirements.yaml",
-        "file_sha256": "3ae38e0143eaa9db6343eb134dc4bc795adcd79daf06d9898cb17505ae6cb58c",
+        "file_sha256": "27d8c3ca4a5b7e1ec82a073e9bfa08a3f0bbc235925e279bf4403b6fc6abfd9f",
         "locator": "requirement:OFV2-AIS-TRANSACTIONS-001",
         "sha256": "c95c7ec0266b89ca12c9972bb87646b187773386475f611e7c6bfc28044eb739"
       }
@@ -751,7 +751,7 @@
       "text": "A successful response has HTTP 200 and contains the mandatory account reference.",
       "mapping": {
         "file": "requirements/requirements.yaml",
-        "file_sha256": "3ae38e0143eaa9db6343eb134dc4bc795adcd79daf06d9898cb17505ae6cb58c",
+        "file_sha256": "27d8c3ca4a5b7e1ec82a073e9bfa08a3f0bbc235925e279bf4403b6fc6abfd9f",
         "locator": "requirement:OFV2-AIS-TRANSACTIONS-001",
         "sha256": "c95c7ec0266b89ca12c9972bb87646b187773386475f611e7c6bfc28044eb739"
       }
@@ -770,7 +770,7 @@
       "locator": "chunk:bg-openfinance-v2-xs2a-implementation-guidelines:p95:c1",
       "page": 95,
       "evidence": "Description\n\nStarting date (inclusive the date dateFrom)\nof the transaction list, mandated if no delta\naccess is required and if bookingStatus\ndoes not equal \"information\". Might be\nignored if a delta function is used or if\nbookingStatus equals \"information\".\n\nFor booked transactions, the relevant date\nis the booking date. For pending\ntransactions, the relevant date is the entry\ndate, which may",
-      "relevance": 91.8489990234375,
+      "relevance": 91.98100280761719,
       "sha256": "746e3ff6d46c56ccacf8fb3a2dd3992f41478619afbd4a293ffc7c20c2f3e388",
       "classification": "discovered_evidence"
     },
@@ -786,7 +786,7 @@
       "locator": "chunk:bg-openfinance-v2-xs2a-implementation-guidelines:p97:c0",
       "page": 97,
       "evidence": "bookingStatus\n(\"pending\", \"booked\" or \"information\").\n\nThis data attribute is indicating that the\nAISP is in favour to get all transactions after\nthe last report access for this PSU on the\naddressed account. This is another\nimplementation of a delta access-report.\n\nThis delta indicator might be rejected by the\nASPSP if this function is not supported.\n\nIf this data element is contained, the entries",
-      "relevance": 82.21800231933594,
+      "relevance": 82.33699798583984,
       "sha256": "9a87a2cebee2ec5b8aa0ca651aa7eba235e82faa504b0c8a732f5e5ae419c009",
       "classification": "discovered_evidence"
     },
@@ -802,7 +802,7 @@
       "locator": "chunk:bg-openfinance-v2-xs2a-implementation-guidelines:p115:c0",
       "page": 115,
       "evidence": "Optional if\nsupported by\nAPI provider\n\nMandatory\n\nOptional if\nsupported by\nAPI provider\n\n  Optional, if\nsupported by\nthe ASPSP\n\nAccount Information Service\n\nDescription\n\nStarting date (inclusive the date dateFrom)\nof the transaction list, mandated if no delta\naccess is required\n\nEnd date (inclusive the data dateTo) of the\ntransaction list, default is \"today\" if not\ngiven.\n\nThis query parameter",
-      "relevance": 78.16300201416016,
+      "relevance": 78.30799865722656,
       "sha256": "1801d90e05ff3dc6567d2c85ee575cd9e7d2699ecd325ab963f72ac9082b40bc",
       "classification": "discovered_evidence"
     },
@@ -818,7 +818,7 @@
       "locator": "chunk:bg-openfinance-v2-xs2a-implementation-guidelines:p96:c0",
       "page": 96,
       "evidence": "the transaction with entryReference\nidentification entryReferenceFrom\nalternatively to the above defined period.\nThis is an implementation of a delta access.\n\nIf this data element is contained, the entries\n\"dateFrom\" and \"dateTo\" might be ignored\nby the ASPSP if a delta report is supported.\n\nThis query parameter defines the\ntransaction entries per call to be retrieved\nfor extended services.\n\nIf",
-      "relevance": 71.8239974975586,
+      "relevance": 71.93199920654297,
       "sha256": "88600b8e48b2b7840712ed8191993b80fc5386f87dec7d4567f8b31c14a1df72",
       "classification": "discovered_evidence"
     },
@@ -834,7 +834,7 @@
       "locator": "chunk:bg-openfinance-v2-xs2a-operational-rules:p37:c2",
       "page": 37,
       "evidence": "Delta\nIndicator, but only to be used if supported by ASPSP).\n\nThe referred transaction is the last transaction known by the TPP. The request\nis then only to receive all payment transactions booked after this payment\ntransaction.\n\n• Booking status (mandatory)\n\nWith the booking status, the TPP can ask for only booked or booked and\npending payment transactions together. If supported by the ASPSP",
-      "relevance": 66.92500305175781,
+      "relevance": 67.03199768066406,
       "sha256": "f5d02ac0c7defe5f39343130a4a4b0bbe35a57eb6e5f3110d430246c19ace0bc",
       "classification": "discovered_evidence"
     }

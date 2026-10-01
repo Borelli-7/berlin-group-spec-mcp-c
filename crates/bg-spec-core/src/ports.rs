@@ -16,6 +16,7 @@ pub struct CatalogStats {
     pub documents: u64,
     pub pages: u64,
     pub ocr_required_pages: u64,
+    pub blank_pages: u64,
     pub chunks: u64,
     pub operations: u64,
     pub schemas: u64,

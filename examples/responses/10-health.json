@@ -1,5 +1,5 @@
 {
-  "status": "degraded",
+  "status": "ok",
   "read_only": true,
   "server_version": "0.1.0",
   "baseline_version": "nextgenpsd2-v1.3",
@@ -7,24 +7,23 @@
   "catalog": {
     "documents": 28,
     "pages": 1320,
-    "ocr_required_pages": 1,
+    "ocr_required_pages": 0,
+    "blank_pages": 1,
     "chunks": 3393,
     "operations": 100,
     "schemas": 1730,
-    "requirements": 101
+    "requirements": 102
   },
   "index": {
     "schema_version": 1,
     "last_indexed_at_unix": "<timestamp>",
-    "index_generation": 5,
-    "requirements_file_sha256": "3ae38e0143eaa9db6343eb134dc4bc795adcd79daf06d9898cb17505ae6cb58c"
+    "index_generation": 7,
+    "requirements_file_sha256": "27d8c3ca4a5b7e1ec82a073e9bfa08a3f0bbc235925e279bf4403b6fc6abfd9f"
   },
   "search_documents": 5223,
   "versions": [
     "nextgenpsd2-v1.3",
     "openfinance-v2"
   ],
-  "problems": [
-    "1 page(s) require OCR (no extractable text)"
-  ]
+  "problems": []
 }

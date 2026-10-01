@@ -49,7 +49,7 @@
   },
   "mapping": {
     "file": "requirements/requirements.yaml",
-    "file_sha256": "3ae38e0143eaa9db6343eb134dc4bc795adcd79daf06d9898cb17505ae6cb58c",
+    "file_sha256": "27d8c3ca4a5b7e1ec82a073e9bfa08a3f0bbc235925e279bf4403b6fc6abfd9f",
     "locator": "requirement:OFV2-SCA-APPROACH-001",
     "sha256": "23ed73fb597a5eed14c7ff1a02c582fdef2900090a720dc3ac37cc1ce1df5cd0"
   },
@@ -482,7 +482,7 @@
       "text": "ASPSP-SCA-Approach is contained if the SCA approach is already fixed.",
       "mapping": {
         "file": "requirements/requirements.yaml",
-        "file_sha256": "3ae38e0143eaa9db6343eb134dc4bc795adcd79daf06d9898cb17505ae6cb58c",
+        "file_sha256": "27d8c3ca4a5b7e1ec82a073e9bfa08a3f0bbc235925e279bf4403b6fc6abfd9f",
         "locator": "requirement:OFV2-SCA-APPROACH-001",
         "sha256": "23ed73fb597a5eed14c7ff1a02c582fdef2900090a720dc3ac37cc1ce1df5cd0"
       }
@@ -493,7 +493,7 @@
       "text": "Permitted values are EMBEDDED, DECOUPLED, REDIRECT, ASPSP-CHANNEL and SIGNATURE.",
       "mapping": {
         "file": "requirements/requirements.yaml",
-        "file_sha256": "3ae38e0143eaa9db6343eb134dc4bc795adcd79daf06d9898cb17505ae6cb58c",
+        "file_sha256": "27d8c3ca4a5b7e1ec82a073e9bfa08a3f0bbc235925e279bf4403b6fc6abfd9f",
         "locator": "requirement:OFV2-SCA-APPROACH-001",
         "sha256": "23ed73fb597a5eed14c7ff1a02c582fdef2900090a720dc3ac37cc1ce1df5cd0"
       }
@@ -504,7 +504,7 @@
       "text": "The OAuth SCA approach is reported as REDIRECT.",
       "mapping": {
         "file": "requirements/requirements.yaml",
-        "file_sha256": "3ae38e0143eaa9db6343eb134dc4bc795adcd79daf06d9898cb17505ae6cb58c",
+        "file_sha256": "27d8c3ca4a5b7e1ec82a073e9bfa08a3f0bbc235925e279bf4403b6fc6abfd9f",
         "locator": "requirement:OFV2-SCA-APPROACH-001",
         "sha256": "23ed73fb597a5eed14c7ff1a02c582fdef2900090a720dc3ac37cc1ce1df5cd0"
       }
@@ -523,7 +523,7 @@
       "locator": "chunk:project-openfinance-v2-errata:p1:c1",
       "page": 1,
       "evidence": "E-01 ASPSP-SCA-Approach value SIGNATURE missing from the OpenAPI enum\n\nProtocol Functions and Security Measures 2.3, section 8.4.2 (page 95), lists the values\nEMBEDDED, DECOUPLED, REDIRECT, ASPSP-CHANNEL and SIGNATURE for the ASPSP-SCA-Approach\nresponse header. Consent API 2.2 uses \"ASPSP-SCA-Approach: SIGNATURE\" in an example (page 32).\nThe header definitions in the Signing Basket 2.3, Consent 2",
-      "relevance": 67.46499633789062,
+      "relevance": 67.63300323486328,
       "sha256": "f61fbf5b2dc6599f89948614cf01a732dbd705e76cfaf0454af9775125bc5697",
       "classification": "discovered_evidence"
     },
@@ -539,7 +539,7 @@
       "locator": "chunk:project-openfinance-v2-errata:p1:c2",
       "page": 1,
       "evidence": "E-02 SCA Approach Type codes in the Data Dictionary differ from header values\n\nData Dictionary 2.3.1, section 3.39 SCA Approach Type (page 213), and the schema\nSCAApproachType of the Data Dictionary OpenAPI 2.3.1 define the codes Decoupled, Embedded,\nOAauth2, Redirect and Online-Channel. The header values of E-01 use ASPSP-CHANNEL instead of\nOnline-Channel, subsume OAuth under REDIRECT and add",
-      "relevance": 53.702999114990234,
+      "relevance": 53.832000732421875,
       "sha256": "ef27daf89a42822d0e08ef41e72cad7a6b8006fda2ef2ff1aa4a09cd629f59df",
       "classification": "discovered_evidence"
     },
@@ -555,7 +555,7 @@
       "locator": "chunk:bg-openfinance-v2-protocol-functions:p102:c4",
       "page": 102,
       "evidence": "8.10 Signature SCA Approach\n\nThe Signature SCA Approach is defined to be the SCA approach, where the PSU is providing\na digital signature on transaction data submitted to the ASPSP. After a Transaction Initiation",
-      "relevance": 36.992000579833984,
+      "relevance": 37.0880012512207,
       "sha256": "d7e6e7be9c98641465b75dc3eb1b4d6c16ad0d5b030f51a091c915bee6bbd722",
       "classification": "discovered_evidence"
     },
@@ -571,7 +571,7 @@
       "locator": "chunk:bg-openfinance-v2-protocol-functions:p93:c2",
       "page": 93,
       "evidence": "8.4.1 Request Header Parameters Steering SCA Approaches\n\nThe following request headers might be used by an API Client in a Transaction Initiation\nRequest to communicate SCA preferences to the ASPSP for transaction authorisation.\n\nAttribute Type Condition\n\nClient-SCA- Max35Text Optional\nApproach-\nPreference\n\nPublished by the Berlin Group under Creative Commons Attribution-NoDerivatives 4.0",
-      "relevance": 36.32500076293945,
+      "relevance": 36.40599822998047,
       "sha256": "8d0f334c9a74beec2e325f0e25871d5bd5d02e8456fb5c8483217ec7ac70e35a",
       "classification": "discovered_evidence"
     },
@@ -587,7 +587,7 @@
       "locator": "chunk:bg-openfinance-v2-basic-operational-rules:p29:c1",
       "page": 29,
       "evidence": "4.8.6 SCA using the digital signature SCA approach\n\nInstead of having a distinct authorisation phase during or after the transaction initiation where\nthe ASPSP receives the PSU's consent, this SCA approach relies on the usage of certificates\nwhich have been submitted to the ASPSP and activated in a process including the ASPSP and\nthe PSU beforehand. Then these certificates can be used to digitally",
-      "relevance": 34.66899871826172,
+      "relevance": 34.74800109863281,
       "sha256": "6f766f1fb0894d88f88908e34a00648b3e6d6ba99aed8dc18749db2b133097c6",
       "classification": "discovered_evidence"
     }

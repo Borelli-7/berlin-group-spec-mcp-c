@@ -86,7 +86,7 @@ Returns exact indexed content by `source_id` and `locator`. Filesystem paths are
 Input: `source_id`, `locator`.
 Output: `{source:{…catalog metadata, status, ocr_required_pages, diagnostics…}, locator,
 classification:"source_content", content:{type:"pages"|"chunks"|"operations"|"schemas", …},
-provenance:[…]}`. A page whose status is `ocr_required` is returned with empty text and that
+provenance:[…]}`. A page whose status is `ocr_required` or `blank` is returned with empty text and that
 status. The server never substitutes invented text. See [04](examples/responses/04-read_source.json),
 [13](examples/responses/13-read_source-section.json), and the error example [12](examples/responses/12-error-unknown-source.json).
 
@@ -152,7 +152,7 @@ ocr_required_pages, diagnostics, indexed_at_unix}]}`.
 
 Input: `{}`.
 Output: `{status(ok|degraded), read_only:true, server_version, baseline_version, target_version,
-catalog:{documents, pages, ocr_required_pages, chunks, operations, schemas, requirements},
+catalog:{documents, pages, ocr_required_pages, blank_pages, chunks, operations, schemas, requirements},
 index:{schema_version, last_indexed_at_unix, index_generation, requirements_file_sha256},
 search_documents, versions, problems}`. See [10](examples/responses/10-health.json).
 

@@ -536,7 +536,7 @@
           "text": "The ASPSP declares countingOfAisRequests as \"none\", \"timeslot\" or \"byEndpointCall\".",
           "mapping": {
             "file": "requirements/requirements.yaml",
-            "file_sha256": "3ae38e0143eaa9db6343eb134dc4bc795adcd79daf06d9898cb17505ae6cb58c",
+            "file_sha256": "27d8c3ca4a5b7e1ec82a073e9bfa08a3f0bbc235925e279bf4403b6fc6abfd9f",
             "locator": "requirement:OFV2-AIS-FREQUENCY-001",
             "sha256": "8d0eee6ecb6939782e1391bf11b09be66d9c2168b5cb96924f51d6dd1ad4e306"
           }
@@ -547,7 +547,7 @@
           "text": "Accesses without PSU involvement beyond the consented frequencyPerDay are rejected with HTTP 429 ACCESS_EXCEEDED.",
           "mapping": {
             "file": "requirements/requirements.yaml",
-            "file_sha256": "3ae38e0143eaa9db6343eb134dc4bc795adcd79daf06d9898cb17505ae6cb58c",
+            "file_sha256": "27d8c3ca4a5b7e1ec82a073e9bfa08a3f0bbc235925e279bf4403b6fc6abfd9f",
             "locator": "requirement:OFV2-AIS-FREQUENCY-001",
             "sha256": "8d0eee6ecb6939782e1391bf11b09be66d9c2168b5cb96924f51d6dd1ad4e306"
           }
@@ -683,7 +683,7 @@
       ],
       "mapping": {
         "file": "requirements/requirements.yaml",
-        "file_sha256": "3ae38e0143eaa9db6343eb134dc4bc795adcd79daf06d9898cb17505ae6cb58c",
+        "file_sha256": "27d8c3ca4a5b7e1ec82a073e9bfa08a3f0bbc235925e279bf4403b6fc6abfd9f",
         "locator": "requirement:OFV2-AIS-FREQUENCY-001",
         "sha256": "8d0eee6ecb6939782e1391bf11b09be66d9c2168b5cb96924f51d6dd1ad4e306"
       }
@@ -703,7 +703,7 @@
           "text": "An IBAN (account identifier) together with a currency uniquely addresses a sub-account of a multicurrency account.",
           "mapping": {
             "file": "requirements/requirements.yaml",
-            "file_sha256": "3ae38e0143eaa9db6343eb134dc4bc795adcd79daf06d9898cb17505ae6cb58c",
+            "file_sha256": "27d8c3ca4a5b7e1ec82a073e9bfa08a3f0bbc235925e279bf4403b6fc6abfd9f",
             "locator": "requirement:OFV2-AIS-MULTICURRENCY-001",
             "sha256": "b23fda92af4eb7cc7a32b93ac4a021954242bb62bcdb35acefd4eafd98096b45"
           }
@@ -714,7 +714,7 @@
           "text": "The ASPSP decides whether it grants access on aggregation level, on aggregation and sub-account level, or only on sub-account level.",
           "mapping": {
             "file": "requirements/requirements.yaml",
-            "file_sha256": "3ae38e0143eaa9db6343eb134dc4bc795adcd79daf06d9898cb17505ae6cb58c",
+            "file_sha256": "27d8c3ca4a5b7e1ec82a073e9bfa08a3f0bbc235925e279bf4403b6fc6abfd9f",
             "locator": "requirement:OFV2-AIS-MULTICURRENCY-001",
             "sha256": "b23fda92af4eb7cc7a32b93ac4a021954242bb62bcdb35acefd4eafd98096b45"
           }
@@ -725,7 +725,7 @@
           "text": "Reading balances on aggregation level returns the balances of all sub-accounts.",
           "mapping": {
             "file": "requirements/requirements.yaml",
-            "file_sha256": "3ae38e0143eaa9db6343eb134dc4bc795adcd79daf06d9898cb17505ae6cb58c",
+            "file_sha256": "27d8c3ca4a5b7e1ec82a073e9bfa08a3f0bbc235925e279bf4403b6fc6abfd9f",
             "locator": "requirement:OFV2-AIS-MULTICURRENCY-001",
             "sha256": "b23fda92af4eb7cc7a32b93ac4a021954242bb62bcdb35acefd4eafd98096b45"
           }
@@ -736,7 +736,7 @@
           "text": "Reading transactions on aggregation level returns all transactions of all sub-accounts, possibly with different transaction currencies.",
           "mapping": {
             "file": "requirements/requirements.yaml",
-            "file_sha256": "3ae38e0143eaa9db6343eb134dc4bc795adcd79daf06d9898cb17505ae6cb58c",
+            "file_sha256": "27d8c3ca4a5b7e1ec82a073e9bfa08a3f0bbc235925e279bf4403b6fc6abfd9f",
             "locator": "requirement:OFV2-AIS-MULTICURRENCY-001",
             "sha256": "b23fda92af4eb7cc7a32b93ac4a021954242bb62bcdb35acefd4eafd98096b45"
           }
@@ -971,7 +971,7 @@
       ],
       "mapping": {
         "file": "requirements/requirements.yaml",
-        "file_sha256": "3ae38e0143eaa9db6343eb134dc4bc795adcd79daf06d9898cb17505ae6cb58c",
+        "file_sha256": "27d8c3ca4a5b7e1ec82a073e9bfa08a3f0bbc235925e279bf4403b6fc6abfd9f",
         "locator": "requirement:OFV2-AIS-MULTICURRENCY-001",
         "sha256": "b23fda92af4eb7cc7a32b93ac4a021954242bb62bcdb35acefd4eafd98096b45"
       }
@@ -992,7 +992,7 @@
           "text": "A request without the bookingStatus query parameter is rejected with HTTP 400 FORMAT_ERROR.",
           "mapping": {
             "file": "requirements/requirements.yaml",
-            "file_sha256": "3ae38e0143eaa9db6343eb134dc4bc795adcd79daf06d9898cb17505ae6cb58c",
+            "file_sha256": "27d8c3ca4a5b7e1ec82a073e9bfa08a3f0bbc235925e279bf4403b6fc6abfd9f",
             "locator": "requirement:OFV2-AIS-TRANSACTIONS-001",
             "sha256": "c95c7ec0266b89ca12c9972bb87646b187773386475f611e7c6bfc28044eb739"
           }
@@ -1003,7 +1003,7 @@
           "text": "bookingStatus \"booked\" is supported; \"pending\" is supported if the ASPSP online channels show pending transactions.",
           "mapping": {
             "file": "requirements/requirements.yaml",
-            "file_sha256": "3ae38e0143eaa9db6343eb134dc4bc795adcd79daf06d9898cb17505ae6cb58c",
+            "file_sha256": "27d8c3ca4a5b7e1ec82a073e9bfa08a3f0bbc235925e279bf4403b6fc6abfd9f",
             "locator": "requirement:OFV2-AIS-TRANSACTIONS-001",
             "sha256": "c95c7ec0266b89ca12c9972bb87646b187773386475f611e7c6bfc28044eb739"
           }
@@ -1014,7 +1014,7 @@
           "text": "bookingStatus \"both\", \"information\" and \"all\" are optional; an unsupported value is answered with an error code.",
           "mapping": {
             "file": "requirements/requirements.yaml",
-            "file_sha256": "3ae38e0143eaa9db6343eb134dc4bc795adcd79daf06d9898cb17505ae6cb58c",
+            "file_sha256": "27d8c3ca4a5b7e1ec82a073e9bfa08a3f0bbc235925e279bf4403b6fc6abfd9f",
             "locator": "requirement:OFV2-AIS-TRANSACTIONS-001",
             "sha256": "c95c7ec0266b89ca12c9972bb87646b187773386475f611e7c6bfc28044eb739"
           }
@@ -1025,7 +1025,7 @@
           "text": "dateFrom is mandatory unless deltaList or entryReferenceFrom is used or bookingStatus equals \"information\".",
           "mapping": {
             "file": "requirements/requirements.yaml",
-            "file_sha256": "3ae38e0143eaa9db6343eb134dc4bc795adcd79daf06d9898cb17505ae6cb58c",
+            "file_sha256": "27d8c3ca4a5b7e1ec82a073e9bfa08a3f0bbc235925e279bf4403b6fc6abfd9f",
             "locator": "requirement:OFV2-AIS-TRANSACTIONS-001",
             "sha256": "c95c7ec0266b89ca12c9972bb87646b187773386475f611e7c6bfc28044eb739"
           }
@@ -1036,7 +1036,7 @@
           "text": "If dateTo is absent, \"today\" is used as end date.",
           "mapping": {
             "file": "requirements/requirements.yaml",
-            "file_sha256": "3ae38e0143eaa9db6343eb134dc4bc795adcd79daf06d9898cb17505ae6cb58c",
+            "file_sha256": "27d8c3ca4a5b7e1ec82a073e9bfa08a3f0bbc235925e279bf4403b6fc6abfd9f",
             "locator": "requirement:OFV2-AIS-TRANSACTIONS-001",
             "sha256": "c95c7ec0266b89ca12c9972bb87646b187773386475f611e7c6bfc28044eb739"
           }
@@ -1047,7 +1047,7 @@
           "text": "For bookingStatus \"information\", dateFrom, dateTo, withBalance, deltaList and entryReferenceFrom have no effect.",
           "mapping": {
             "file": "requirements/requirements.yaml",
-            "file_sha256": "3ae38e0143eaa9db6343eb134dc4bc795adcd79daf06d9898cb17505ae6cb58c",
+            "file_sha256": "27d8c3ca4a5b7e1ec82a073e9bfa08a3f0bbc235925e279bf4403b6fc6abfd9f",
             "locator": "requirement:OFV2-AIS-TRANSACTIONS-001",
             "sha256": "c95c7ec0266b89ca12c9972bb87646b187773386475f611e7c6bfc28044eb739"
           }
@@ -1058,7 +1058,7 @@
           "text": "A successful response has HTTP 200 and contains the mandatory account reference.",
           "mapping": {
             "file": "requirements/requirements.yaml",
-            "file_sha256": "3ae38e0143eaa9db6343eb134dc4bc795adcd79daf06d9898cb17505ae6cb58c",
+            "file_sha256": "27d8c3ca4a5b7e1ec82a073e9bfa08a3f0bbc235925e279bf4403b6fc6abfd9f",
             "locator": "requirement:OFV2-AIS-TRANSACTIONS-001",
             "sha256": "c95c7ec0266b89ca12c9972bb87646b187773386475f611e7c6bfc28044eb739"
           }
@@ -1401,7 +1401,7 @@
       ],
       "mapping": {
         "file": "requirements/requirements.yaml",
-        "file_sha256": "3ae38e0143eaa9db6343eb134dc4bc795adcd79daf06d9898cb17505ae6cb58c",
+        "file_sha256": "27d8c3ca4a5b7e1ec82a073e9bfa08a3f0bbc235925e279bf4403b6fc6abfd9f",
         "locator": "requirement:OFV2-AIS-TRANSACTIONS-001",
         "sha256": "c95c7ec0266b89ca12c9972bb87646b187773386475f611e7c6bfc28044eb739"
       }
@@ -1421,7 +1421,7 @@
           "text": "If pageSize is not supported, a request containing it is rejected with HTTP 400 PARAMETER_NOT_SUPPORTED.",
           "mapping": {
             "file": "requirements/requirements.yaml",
-            "file_sha256": "3ae38e0143eaa9db6343eb134dc4bc795adcd79daf06d9898cb17505ae6cb58c",
+            "file_sha256": "27d8c3ca4a5b7e1ec82a073e9bfa08a3f0bbc235925e279bf4403b6fc6abfd9f",
             "locator": "requirement:OFV2-AIS-TRANSACTIONS-002",
             "sha256": "244dc1f91d0fb67427a172c139bb5b5661a032d84f0d98612381471f11b31945"
           }
@@ -1432,7 +1432,7 @@
           "text": "If pageSize is supported and exceeds maxPageSize, the request is rejected.",
           "mapping": {
             "file": "requirements/requirements.yaml",
-            "file_sha256": "3ae38e0143eaa9db6343eb134dc4bc795adcd79daf06d9898cb17505ae6cb58c",
+            "file_sha256": "27d8c3ca4a5b7e1ec82a073e9bfa08a3f0bbc235925e279bf4403b6fc6abfd9f",
             "locator": "requirement:OFV2-AIS-TRANSACTIONS-002",
             "sha256": "244dc1f91d0fb67427a172c139bb5b5661a032d84f0d98612381471f11b31945"
           }
@@ -1443,7 +1443,7 @@
           "text": "If pageSize is supported, maxPageSize is published and \"pageSize\" is listed in supportedQueryParametersTransactions.",
           "mapping": {
             "file": "requirements/requirements.yaml",
-            "file_sha256": "3ae38e0143eaa9db6343eb134dc4bc795adcd79daf06d9898cb17505ae6cb58c",
+            "file_sha256": "27d8c3ca4a5b7e1ec82a073e9bfa08a3f0bbc235925e279bf4403b6fc6abfd9f",
             "locator": "requirement:OFV2-AIS-TRANSACTIONS-002",
             "sha256": "244dc1f91d0fb67427a172c139bb5b5661a032d84f0d98612381471f11b31945"
           }
@@ -1568,7 +1568,7 @@
       ],
       "mapping": {
         "file": "requirements/requirements.yaml",
-        "file_sha256": "3ae38e0143eaa9db6343eb134dc4bc795adcd79daf06d9898cb17505ae6cb58c",
+        "file_sha256": "27d8c3ca4a5b7e1ec82a073e9bfa08a3f0bbc235925e279bf4403b6fc6abfd9f",
         "locator": "requirement:OFV2-AIS-TRANSACTIONS-002",
         "sha256": "244dc1f91d0fb67427a172c139bb5b5661a032d84f0d98612381471f11b31945"
       }
@@ -1884,7 +1884,7 @@
       "locator": "chunk:bg-openfinance-v2-xs2a-implementation-guidelines:p114:c1",
       "page": 114,
       "evidence": "4.5.4 Read Card Account Transaction List\n\nCall\n\nGET /v2/card-accounts/{account-id}/transactions {query-parameters}\n\nReads account data from a given card reconciliation account addressed by \"account-id\".\n\nRemark: This account-id is a tokenised identification due to data protection reason since the\npath information might be logged on intermediary servers within the ASPSP sphere. This\naccount-id then",
-      "relevance": 52.775001525878906,
+      "relevance": 52.92599868774414,
       "sha256": "84e8b40565b8d32b8d73f37daa7a6143bdf7ecdf42236936a26678a1eb6078d8",
       "classification": "discovered_evidence"
     },
@@ -1900,7 +1900,7 @@
       "locator": "chunk:bg-openfinance-v2-xs2a-operational-rules:p26:c0",
       "page": 26,
       "evidence": "requests information about transactions for a given account\nat the XS2A interface of the ASPSP\n\nGet the transaction information and the\nbalance for the account\n\nFigure 11: API Service Get payment transaction information for a given account",
-      "relevance": 50.37200164794922,
+      "relevance": 50.52399826049805,
       "sha256": "380bb84c0070ff6d9b9b67a8aec3b082bef45805b27f62de007c3f1f40d7cc13",
       "classification": "discovered_evidence"
     },
@@ -1916,7 +1916,7 @@
       "locator": "chunk:bg-openfinance-v2-xs2a-operational-rules:p3:c23",
       "page": 3,
       "evidence": "4.10 API Service: Get transaction information for a given account ........ 21",
-      "relevance": 48.99300003051758,
+      "relevance": 49.1510009765625,
       "sha256": "027ef2739b8ea40e96e57b880902adf6937752e5670ce1201d4fa814616b521f",
       "classification": "discovered_evidence"
     },
@@ -1932,7 +1932,7 @@
       "locator": "chunk:bg-openfinance-v2-xs2a-operational-rules:p25:c1",
       "page": 25,
       "evidence": "4.10 API Service: Get transaction information for a given account\n\nThe support of this API Service at the XS2A interface is mandatory.\n\nThe TPP can use this API Service to receive information about payment transactions of a\nspecific account. As a result the TPP will receive information about all payment transactions\nexecuted during the time period indicated in the request. In addition, the ASPSP",
-      "relevance": 48.755001068115234,
+      "relevance": 48.89799880981445,
       "sha256": "88f2881e76c9cd57c1cfeef0f8d35ded71fd640c8639a53c8d265f74c881d96b",
       "classification": "discovered_evidence"
     },
@@ -1948,7 +1948,7 @@
       "locator": "chunk:bg-openfinance-v2-xs2a-implementation-guidelines:p4:c27",
       "page": 4,
       "evidence": "4.5.4 Read Card Account Transaction List ................................ 109",
-      "relevance": 48.18600082397461,
+      "relevance": 48.3489990234375,
       "sha256": "6f3bf1ca11f400a247922bdd58d678522d9ef494f189db9b499e5c0f1e58c8aa",
       "classification": "discovered_evidence"
     },
@@ -1964,7 +1964,7 @@
       "locator": "chunk:bg-openfinance-v2-xs2a-implementation-guidelines:p95:c1",
       "page": 95,
       "evidence": "4.4.4 Read Transaction List\n\nCall\n\nGET /v2/accounts/{account-id}/transactions {query-parameters}\n\nReads account transaction data from a given account addressed by \"account-id\". This can be\neither booked or pending transactions or a list of standing orders as further transactional\ninformation.\n\nNote: The ASPSP might use standard compression methods on application level for the\nresponse message as",
-      "relevance": 46.56999969482422,
+      "relevance": 46.68899917602539,
       "sha256": "746e3ff6d46c56ccacf8fb3a2dd3992f41478619afbd4a293ffc7c20c2f3e388",
       "classification": "discovered_evidence"
     },
@@ -1980,7 +1980,7 @@
       "locator": "chunk:bg-openfinance-v2-xs2a-implementation-guidelines:p117:c0",
       "page": 117,
       "evidence": "the amount of debits on the reports are\nquoted negative.\n\nJSON based account report.\n\nA list of balances regarding this account, which\nmight be restricted to the current balance.\n\nA list of hyperlinks to be recognised by the TPP.\n\nType of links admitted in this response:\n\n\"download\": a link to a resource, where the\ntransaction list might be downloaded from in case\nwhere transaction lists have a",
-      "relevance": 45.380001068115234,
+      "relevance": 45.516998291015625,
       "sha256": "3d9078f853328382d9a756d3cd65d1612d304cca7772e5ff294206923fc405c7",
       "classification": "discovered_evidence"
     },
@@ -1996,7 +1996,7 @@
       "locator": "chunk:bg-openfinance-v2-xs2a-implementation-guidelines:p115:c0",
       "page": 115,
       "evidence": "Optional if\nsupported by\nAPI provider\n\nMandatory\n\nOptional if\nsupported by\nAPI provider\n\n  Optional, if\nsupported by\nthe ASPSP\n\nAccount Information Service\n\nDescription\n\nStarting date (inclusive the date dateFrom)\nof the transaction list, mandated if no delta\naccess is required\n\nEnd date (inclusive the data dateTo) of the\ntransaction list, default is \"today\" if not\ngiven.\n\nThis query parameter",
-      "relevance": 44.222999572753906,
+      "relevance": 44.354000091552734,
       "sha256": "1801d90e05ff3dc6567d2c85ee575cd9e7d2699ecd325ab963f72ac9082b40bc",
       "classification": "discovered_evidence"
     }

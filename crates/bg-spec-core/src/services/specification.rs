@@ -493,12 +493,17 @@ impl SpecificationService {
                 let pages = pages
                     .into_iter()
                     .map(|p| PageContent {
-                        warning: (p.status != PageStatus::Extracted).then(|| {
-                            format!(
+                        warning: match p.status {
+                            PageStatus::Extracted => None,
+                            PageStatus::Blank => Some(format!(
+                                "page {} is declared intentionally blank in the manifest",
+                                p.page
+                            )),
+                            _ => Some(format!(
                                 "page {} has status '{}'; no extractable text is available",
                                 p.page, p.status
-                            )
-                        }),
+                            )),
+                        },
                         page: p.page,
                         status: p.status,
                         text: p.text,

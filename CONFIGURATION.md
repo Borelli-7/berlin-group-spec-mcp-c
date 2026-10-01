@@ -62,6 +62,7 @@ sources:
     title: openFinance XS2A API as PSD2 Interface - Implementation Guidelines 2.4 (2025-10-31)   # optional
     description: ...                                       # optional
     tags: [implementation-guidelines]                      # optional
+    blank_pages: [2]                                       # optional, pdf/text only: intentionally blank pages
 ```
 
 Rules:
@@ -69,6 +70,9 @@ Rules:
 * Ids must be unique. Paths must be relative, must not contain `..`, and must stay within the corpus root after symlink resolution.
 * `text` sources are UTF-8 files (Markdown or plain text). Form feed (`\f`) separates pages, and
   numbered or Markdown headings become sections.
+* `blank_pages` lists physical page numbers that are intentionally blank. Such a page is stored with
+  `status: blank` instead of `ocr_required`, so it does not make the document `partial` or `health` `degraded`.
+  Only declare a page after checking that it really has no content (e.g. `pdffonts`/`pdfimages -f N -l N`).
 * Files under `openapi/`, `pdf/` or `text/` that are not listed in the manifest are reported as orphans,
   but are never indexed.
 

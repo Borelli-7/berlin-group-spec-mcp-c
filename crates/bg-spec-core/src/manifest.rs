@@ -38,6 +38,9 @@ pub struct ManifestSource {
     pub description: Option<String>,
     #[serde(default)]
     pub tags: Vec<String>,
+    /// Physical pages intentionally left blank (paged sources only); not flagged `ocr_required`.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub blank_pages: Vec<u32>,
 }
 
 impl ManifestSource {
@@ -112,6 +115,21 @@ impl Manifest {
                     "source '{}': precedence must be 0..={MAX_PRECEDENCE}",
                     s.id
                 )));
+            }
+            if !s.blank_pages.is_empty() {
+                if s.kind == DocumentKind::Openapi {
+                    return Err(CoreError::Manifest(format!(
+                        "source '{}': blank_pages is only allowed for pdf and text sources",
+                        s.id
+                    )));
+                }
+                let mut seen = HashSet::new();
+                if let Some(p) = s.blank_pages.iter().find(|&&p| p == 0 || !seen.insert(p)) {
+                    return Err(CoreError::Manifest(format!(
+                        "source '{}': blank_pages entry {p} must be a unique page number >= 1",
+                        s.id
+                    )));
+                }
             }
         }
         Ok(())
@@ -195,5 +213,25 @@ sources:
         assert!(Manifest::parse(&dup).is_err());
         assert!(Manifest::parse(&YAML.replace("bg-openfinance-v2-openapi", "Bad ID")).is_err());
         assert!(Manifest::parse(&YAML.replace("precedence: 90", "precedence: 5000")).is_err());
+    }
+
+    #[test]
+    fn blank_pages_are_validated() {
+        let pdf = |v: &str| {
+            YAML.replace(
+                "path: pdf/v2/implementation-guidelines.pdf",
+                &format!("path: pdf/v2/implementation-guidelines.pdf\n    blank_pages: {v}"),
+            )
+        };
+        let m = Manifest::parse(&pdf("[2, 7]")).unwrap();
+        assert_eq!(m.sources[0].blank_pages, vec![2, 7]);
+        assert!(m.sources[1].blank_pages.is_empty());
+        assert!(Manifest::parse(&pdf("[0]")).is_err());
+        assert!(Manifest::parse(&pdf("[2, 2]")).is_err());
+        let openapi = YAML.replace(
+            "path: openapi/v2/openfinance.yaml",
+            "path: openapi/v2/openfinance.yaml\n    blank_pages: [1]",
+        );
+        assert!(Manifest::parse(&openapi).is_err());
     }
 }

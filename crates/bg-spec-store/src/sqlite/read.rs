@@ -243,6 +243,9 @@ impl CatalogRepository for SqliteCatalog {
             ocr_required_pages: self
                 .count("SELECT COUNT(*) FROM pages WHERE status = 'ocr_required'")
                 .await?,
+            blank_pages: self
+                .count("SELECT COUNT(*) FROM pages WHERE status = 'blank'")
+                .await?,
             chunks: self.count("SELECT COUNT(*) FROM chunks").await?,
             operations: self
                 .count("SELECT COUNT(*) FROM openapi_operations")

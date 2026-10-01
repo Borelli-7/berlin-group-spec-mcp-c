@@ -79,7 +79,7 @@ Migration `crates/bg-spec-store/migrations/0001_init.sql`:
 |---|---|
 | `index_meta` | Key/value pairs: schema_version, index_generation, last_indexed_at_unix, requirements_file_sha256, indexer_format_version, index_in_progress. |
 | `documents` | One row per manifest source. Holds status, sha256, fingerprint, and the full `Document` JSON. |
-| `pages` | Per-page status (`extracted`, `ocr_required`, `extraction_failed`), text, and sha256. |
+| `pages` | Per-page status (`extracted`, `ocr_required`, `extraction_failed`, `blank`), text, and sha256. |
 | `chunks` | `chunk_id`, `source_id`, `document_id`, version, page, section, ordinal, locator, text, sha256, and JSON. |
 | `openapi_operations` | Unique on (source, method, path). Also stores a canonical `path_key` for cross-version matching, plus the JSON. |
 | `openapi_schemas` | Unique on (source, name). Stores the JSON and the referenced schema names. |

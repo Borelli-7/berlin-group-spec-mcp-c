@@ -335,7 +335,10 @@ impl Indexer {
         }
 
         let document = self.base_document(source, Some(sha), Some(size), DocumentStatus::Indexed);
-        let processed = match self.process(document.clone(), path).await {
+        let processed = match self
+            .process(document.clone(), path, source.blank_pages.clone())
+            .await
+        {
             Ok(p) => p,
             Err(e) => {
                 let mut doc = document;
@@ -367,7 +370,12 @@ impl Indexer {
         })
     }
 
-    async fn process(&self, document: Document, path: PathBuf) -> Result<Processed> {
+    async fn process(
+        &self,
+        document: Document,
+        path: PathBuf,
+        blank_pages: Vec<u32>,
+    ) -> Result<Processed> {
         let settings = ChunkSettings {
             max_chars: self.config.chunking.max_chars,
             overlap_chars: self.config.chunking.overlap_chars,
@@ -389,6 +397,7 @@ impl Indexer {
                     extracted.pages,
                     settings,
                     min_chars,
+                    &blank_pages,
                 ))
             }
             DocumentKind::Text => {
@@ -404,7 +413,13 @@ impl Indexer {
                     .collect();
                 let mut document = document;
                 document.extractor = Some("text".into());
-                Ok(process_paged(document, pages, settings, min_chars))
+                Ok(process_paged(
+                    document,
+                    pages,
+                    settings,
+                    min_chars,
+                    &blank_pages,
+                ))
             }
             DocumentKind::Openapi => process_openapi(document, &path, prefix.as_deref()),
         })
@@ -487,6 +502,7 @@ fn process_paged(
     pages: Vec<ExtractedPage>,
     settings: ChunkSettings,
     min_chars: usize,
+    blank_pages: &[u32],
 ) -> Processed {
     let mut records = Vec::with_capacity(pages.len());
     for page in pages {
@@ -499,8 +515,11 @@ fn process_paged(
             .trim()
             .to_owned();
         let significant = text.chars().filter(|c| !c.is_whitespace()).count();
+        let declared_blank = blank_pages.contains(&page.number);
         let status = if page.error.is_some() {
             PageStatus::ExtractionFailed
+        } else if significant < min_chars && declared_blank {
+            PageStatus::Blank
         } else if significant < min_chars {
             PageStatus::OcrRequired
         } else {
@@ -510,6 +529,17 @@ fn process_paged(
             (Some(e), _) => document.diagnostics.push(
                 Diagnostic::new(Severity::Warning, "page_extraction_failed", format!("page {}: {e}", page.number))
                     .at(format!("page:{}", page.number)),
+            ),
+            (None, PageStatus::Extracted) if declared_blank => document.diagnostics.push(
+                Diagnostic::new(
+                    Severity::Warning,
+                    "blank_page_has_text",
+                    format!(
+                        "page {} is declared in blank_pages but has {significant} extractable characters; indexed as text",
+                        page.number
+                    ),
+                )
+                .at(format!("page:{}", page.number)),
             ),
             (None, PageStatus::OcrRequired) => document.diagnostics.push(
                 Diagnostic::new(
@@ -545,8 +575,22 @@ fn process_paged(
     let raw_chunks = chunk_pages(&extracted, settings);
     let extracted_count = extracted.len();
     let total = records.len();
+    let blank = records
+        .iter()
+        .filter(|p| p.status == PageStatus::Blank)
+        .count();
+    for &p in blank_pages.iter().filter(|&&p| p as usize > total) {
+        document.diagnostics.push(
+            Diagnostic::new(
+                Severity::Warning,
+                "blank_page_out_of_range",
+                format!("blank_pages entry {p} exceeds the document's {total} page(s)"),
+            )
+            .at(format!("page:{p}")),
+        );
+    }
     document.page_count = Some(total as u32);
-    document.status = if extracted_count == total && total > 0 {
+    document.status = if extracted_count + blank == total && extracted_count > 0 {
         DocumentStatus::Indexed
     } else {
         DocumentStatus::Partial
@@ -606,6 +650,7 @@ fn process_paged(
         m.insert("pages".into(), json!(total));
         m.insert("extracted_pages".into(), json!(extracted_count));
         m.insert("ocr_required_pages".into(), json!(ocr));
+        m.insert("blank_pages".into(), json!(blank));
         m.insert("chunks".into(), json!(chunks.len()));
     }
     Processed {

@@ -167,11 +167,14 @@ pub enum PageStatus {
     OcrRequired,
     /// The extractor failed for this page.
     ExtractionFailed,
+    /// No text, and declared intentionally blank in the manifest (`blank_pages`).
+    Blank,
 }
 string_enum!(PageStatus {
     Extracted => "extracted",
     OcrRequired => "ocr_required",
     ExtractionFailed => "extraction_failed",
+    Blank => "blank",
 });
 
 /// Full text of one page of a paged document.

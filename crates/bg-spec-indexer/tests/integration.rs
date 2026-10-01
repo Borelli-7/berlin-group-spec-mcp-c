@@ -178,6 +178,65 @@ async fn ocr_required_pages_are_reported_not_emitted_as_evidence() {
 }
 
 #[tokio::test]
+async fn declared_blank_pages_are_not_ocr_required() {
+    let env = indexed().await;
+    let manifest = env.config.corpus_root.join("manifest.yaml");
+    let raw = std::fs::read_to_string(&manifest).unwrap();
+    let path_line = "    path: pdf/v2/implementation-guidelines.pdf\n";
+    assert!(raw.contains(path_line));
+    let raw = raw.replacen(
+        path_line,
+        &format!("{path_line}    blank_pages: [4, 99]\n"),
+        1,
+    );
+    std::fs::write(&manifest, raw).unwrap();
+
+    let report = Indexer::new(env.config.clone())
+        .run(IndexOptions::default())
+        .await
+        .unwrap();
+    assert_eq!(report.count(IndexAction::Indexed), 1, "{report:#?}");
+    let ig_report = report
+        .documents
+        .iter()
+        .find(|d| d.source_id == "bg-openfinance-v2-implementation-guidelines")
+        .unwrap();
+    assert!(
+        ig_report
+            .diagnostics
+            .iter()
+            .any(|d| d.code == "blank_page_out_of_range")
+    );
+
+    let svc = services(&env).await;
+    let health = svc.specification.health().await.unwrap();
+    assert_eq!(health.catalog.ocr_required_pages, 0);
+    assert_eq!(health.catalog.blank_pages, 1);
+    assert_eq!(health.status, "ok", "{:?}", health.problems);
+
+    let listing = svc
+        .specification
+        .list_sources(Some("openfinance-v2"), Some("pdf"))
+        .await
+        .unwrap();
+    let ig = listing
+        .sources
+        .iter()
+        .find(|s| s.source_id == "bg-openfinance-v2-implementation-guidelines")
+        .unwrap();
+    assert_eq!(ig.status, DocumentStatus::Indexed);
+    assert!(ig.ocr_required_pages.is_empty());
+
+    let doc = svc
+        .specification
+        .read_source(&ig.source_id, "page:4")
+        .await
+        .unwrap();
+    let json = serde_json::to_value(&doc).unwrap();
+    assert_eq!(json["content"]["pages"][0]["status"], "blank");
+}
+
+#[tokio::test]
 async fn search_filters_and_provenance() {
     let env = indexed().await;
     let svc = services(&env).await;

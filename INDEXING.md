@@ -51,6 +51,11 @@ returns empty evidence. A document with some OCR pages becomes `partial`, and on
 gets the error diagnostic `no_extractable_text`. `read_source` returns such pages with an explicit status,
 `health` reports `degraded`, and `bg-spec doctor` lists them.
 
+Pages declared in the manifest's `blank_pages` are the exception: when they have no text they are stored with
+`status: blank`, produce no chunk and no diagnostic, and do not degrade the document. If a declared page does
+contain text it is indexed normally with the warning `blank_page_has_text`, and a number beyond the page count
+yields `blank_page_out_of_range`.
+
 ### Chunking
 
 ```text
@@ -108,6 +113,7 @@ and `index_meta`. The database is in WAL mode, and the MCP opens it read-only an
 ## Diagnostics
 
 `file_missing`, `path_rejected`, `processing_failed`, `page_extraction_failed`, `ocr_required`,
+`blank_page_has_text`, `blank_page_out_of_range`,
 `no_extractable_text`, `openapi_typed_parse_failed`, `openapi_31_fallback`,
 `openapi_operation_count_mismatch`, `requirements_missing`, and `dangling_source`. They are shown by `bg-spec index`,
 `bg-spec sources`, `bg-spec doctor`, and the `diagnostics` field of `list_sources`.

@@ -181,8 +181,8 @@ async fn stats(config: &Config, json: bool) -> Result<ExitCode> {
     } else {
         println!("documents          {}", stats.documents);
         println!(
-            "pages              {} ({} ocr_required)",
-            stats.pages, stats.ocr_required_pages
+            "pages              {} ({} ocr_required, {} blank)",
+            stats.pages, stats.ocr_required_pages, stats.blank_pages
         );
         println!("chunks             {}", stats.chunks);
         println!("openapi operations {}", stats.operations);
