@@ -8,8 +8,10 @@
 
 mod error;
 mod inputs;
+mod reload;
 mod server;
 
 pub use error::ToolError;
 pub use inputs::*;
+pub use reload::ServiceSource;
 pub use server::{BgSpecServer, SERVER_INSTRUCTIONS, TOOL_NAMES};

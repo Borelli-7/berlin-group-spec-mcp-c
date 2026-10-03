@@ -104,7 +104,7 @@ crates/
 corpus/            official corpus: manifest.yaml, openapi/, pdf/, text/, requirements/
 crates/bg-spec-indexer/tests/fixtures/corpus/   synthetic test corpus
 config/config.toml
-data/              catalog.db, tantivy/   (generated; git-ignored)
+data/              CURRENT, generations/<n>/{catalog.db,tantivy/}   (generated; git-ignored)
 examples/          Copilot configs, example calls and responses
 ```
 

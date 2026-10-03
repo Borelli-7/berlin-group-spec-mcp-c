@@ -433,3 +433,45 @@ async fn session_does_not_modify_catalog_index_or_corpus() {
     let after = hash_tree(s.dir.path());
     assert_eq!(before, after, "an MCP session must not modify any file");
 }
+
+#[tokio::test]
+async fn reloading_source_follows_published_generations() {
+    use bg_spec_mcp::ServiceSource;
+    let dir = tempfile::tempdir().unwrap();
+    let config = testing::stage_example_corpus(dir.path()).unwrap();
+    let index = || async {
+        Indexer::new(config.clone())
+            .run(IndexOptions::default())
+            .await
+            .unwrap()
+    };
+    index().await;
+    let source = ServiceSource::open(config.clone()).await.unwrap();
+    assert_eq!(source.generation().await, Some(1));
+
+    index().await;
+    let services = source.services().await;
+    assert_eq!(source.generation().await, Some(2));
+    let health = services.specification.health().await.unwrap();
+    assert_eq!(health.index.index_generation, Some(2));
+    assert!(
+        health
+            .problems
+            .iter()
+            .all(|p| !p.contains("never been indexed")),
+        "{:?}",
+        health.problems
+    );
+
+    // An unreadable new generation is skipped; the last good one keeps serving.
+    std::fs::write(config.data_dir.join("CURRENT"), "99\n").unwrap();
+    assert_eq!(source.generation().await, Some(2));
+    let search = source
+        .services()
+        .await
+        .specification
+        .search("transactions", None, None, None, Some(3))
+        .await
+        .unwrap();
+    assert!(!search.results.is_empty());
+}

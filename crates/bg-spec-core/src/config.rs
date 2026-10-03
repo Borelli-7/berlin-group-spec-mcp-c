@@ -12,7 +12,7 @@ use std::{
 pub struct Config {
     /// Root directory of the corpus. All sources must live below it.
     pub corpus_root: PathBuf,
-    /// Directory holding `catalog.db` and `tantivy/`.
+    /// Directory holding the published index generations (`CURRENT`, `generations/<n>/`).
     pub data_dir: PathBuf,
     /// Manifest path relative to `corpus_root`.
     #[serde(default = "default_manifest")]
@@ -178,14 +178,6 @@ impl Config {
         Ok(())
     }
 
-    pub fn catalog_path(&self) -> PathBuf {
-        self.data_dir.join("catalog.db")
-    }
-
-    pub fn tantivy_dir(&self) -> PathBuf {
-        self.data_dir.join("tantivy")
-    }
-
     pub fn manifest_path(&self) -> PathBuf {
         self.corpus_root.join(&self.manifest)
     }
@@ -216,10 +208,7 @@ target = "openfinance-v2"
         assert_eq!(cfg.chunking.max_chars, 6000);
         assert_eq!(cfg.chunking.overlap_chars, 500);
         assert_eq!(cfg.versions.prefix_for(&cfg.versions.baseline), Some("/v1"));
-        assert_eq!(
-            cfg.catalog_path(),
-            PathBuf::from("/opt/bg/config/../data/catalog.db")
-        );
+        assert_eq!(cfg.data_dir, PathBuf::from("/opt/bg/config/../data"));
     }
 
     #[test]

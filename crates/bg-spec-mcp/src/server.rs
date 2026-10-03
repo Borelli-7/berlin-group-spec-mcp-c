@@ -1,4 +1,4 @@
-use crate::{error::ToolError, inputs::*};
+use crate::{error::ToolError, inputs::*, reload::ServiceSource};
 use bg_spec_core::services::{
     ComparisonReport, EndpointEvidenceBundle, EndpointResponse, FindRequirementResponse,
     HealthReport, ListSourcesResponse, ReadSourceResponse, RequirementTrace, SchemaResponse,
@@ -38,17 +38,27 @@ Recommended flow: get_endpoint_requirements -> read_openapi_endpoint -> trace_re
 /// The MCP server. Holds only service handles; all logic lives in `bg_spec_core::services`.
 #[derive(Clone)]
 pub struct BgSpecServer {
-    services: Services,
+    source: ServiceSource,
     tool_router: ToolRouter<Self>,
 }
 
 #[tool_router(router = tool_router)]
 impl BgSpecServer {
+    /// Serves fixed service handles.
     pub fn new(services: Services) -> Self {
+        Self::with_source(ServiceSource::fixed(services))
+    }
+
+    /// Serves whatever `source` supplies (see [`ServiceSource::open`] for generation reload).
+    pub fn with_source(source: ServiceSource) -> Self {
         Self {
-            services,
+            source,
             tool_router: Self::tool_router(),
         }
+    }
+
+    async fn services(&self) -> Services {
+        self.source.services().await
     }
 
     #[tool(
@@ -70,7 +80,8 @@ Verify with read_source and prefer curated requirements (find_requirement / trac
         Parameters(p): Parameters<SearchSpecificationInput>,
     ) -> Result<Json<SearchResponse>, ToolError> {
         let r = self
-            .services
+            .services()
+            .await
             .specification
             .search(
                 &p.query,
@@ -101,7 +112,8 @@ Requirement ids are never invented: if no curated mapping exists, the requiremen
         Parameters(p): Parameters<FindRequirementInput>,
     ) -> Result<Json<FindRequirementResponse>, ToolError> {
         Ok(Json(
-            self.services
+            self.services()
+                .await
                 .requirements
                 .find(&p.query, p.version.as_deref(), p.limit)
                 .await?,
@@ -125,7 +137,8 @@ Returns source metadata, the resolved location, content and hashes. Arbitrary fi
         Parameters(p): Parameters<ReadSourceInput>,
     ) -> Result<Json<ReadSourceResponse>, ToolError> {
         Ok(Json(
-            self.services
+            self.services()
+                .await
                 .specification
                 .read_source(&p.source_id, &p.locator)
                 .await?,
@@ -149,7 +162,8 @@ for a version, path template and HTTP method, with source provenance. $refs in p
         Parameters(p): Parameters<EndpointInput>,
     ) -> Result<Json<EndpointResponse>, ToolError> {
         Ok(Json(
-            self.services
+            self.services()
+                .await
                 .specification
                 .read_endpoint(p.version.as_deref(), &p.path, &p.method)
                 .await?,
@@ -172,7 +186,8 @@ for a version, path template and HTTP method, with source provenance. $refs in p
         Parameters(p): Parameters<SchemaInput>,
     ) -> Result<Json<SchemaResponse>, ToolError> {
         Ok(Json(
-            self.services
+            self.services()
+                .await
                 .specification
                 .read_schema(p.version.as_deref(), &p.name)
                 .await?,
@@ -198,7 +213,8 @@ Nothing is generated or interpreted; conflicts are reported, not resolved.",
         Parameters(p): Parameters<EndpointRequirementsInput>,
     ) -> Result<Json<EndpointEvidenceBundle>, ToolError> {
         let r = self
-            .services
+            .services()
+            .await
             .requirements
             .endpoint_requirements(p.version.as_deref(), &p.path, &p.method, p.evidence_limit)
             .await?;
@@ -222,7 +238,11 @@ acceptance criteria -> related evidence -> conflicts. Every relationship carries
         Parameters(p): Parameters<TraceRequirementInput>,
     ) -> Result<Json<RequirementTrace>, ToolError> {
         Ok(Json(
-            self.services.requirements.trace(&p.requirement_id).await?,
+            self.services()
+                .await
+                .requirements
+                .trace(&p.requirement_id)
+                .await?,
         ))
     }
 
@@ -244,7 +264,8 @@ as added/removed/modified/unchanged with JSON pointers, plus factual compatibili
         Parameters(p): Parameters<CompareInput>,
     ) -> Result<Json<ComparisonReport>, ToolError> {
         let r = self
-            .services
+            .services()
+            .await
             .compatibility
             .compare(
                 &p.path,
@@ -272,7 +293,8 @@ as added/removed/modified/unchanged with JSON pointers, plus factual compatibili
         Parameters(p): Parameters<ListSourcesInput>,
     ) -> Result<Json<ListSourcesResponse>, ToolError> {
         Ok(Json(
-            self.services
+            self.services()
+                .await
                 .specification
                 .list_sources(p.version.as_deref(), p.kind.as_deref())
                 .await?,
@@ -294,7 +316,10 @@ as added/removed/modified/unchanged with JSON pointers, plus factual compatibili
         &self,
         Parameters(_): Parameters<HealthInput>,
     ) -> Result<Json<HealthReport>, ToolError> {
-        Ok(Json(self.services.specification.health().await?))
+        let services = self.services().await;
+        let mut report = services.specification.health().await?;
+        report.published_generation = self.source.generation().await;
+        Ok(Json(report))
     }
 }
 

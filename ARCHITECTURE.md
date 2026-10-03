@@ -71,7 +71,17 @@ returned without it.
 
 ## 4. Storage
 
-### SQLite (`data/catalog.db`): authoritative metadata and content
+### Published generations (`data/CURRENT`, `data/generations/<n>/`)
+
+Every index run builds a complete catalog and search index in `data/generations/.staging-*`, seeded with a
+copy of the published generation so unchanged sources are still skipped. When the run succeeds the staging
+directory is renamed to `generations/<n>` (`n` = `index_generation`) and `CURRENT` is replaced atomically
+(write, fsync, rename). Readers therefore always open a SQLite catalog and a Tantivy index from the same run,
+and a failed run leaves the published generation untouched. The current generation and its predecessor are
+kept; older generations, abandoned staging directories and the legacy unversioned layout (`data/catalog.db`,
+`data/tantivy/` without `CURRENT`, which readers still accept) are removed after publishing.
+
+### SQLite (`generations/<n>/catalog.db`): authoritative metadata and content
 
 Migration `crates/bg-spec-store/migrations/0001_init.sql`:
 
@@ -90,7 +100,7 @@ Migration `crates/bg-spec-store/migrations/0001_init.sql`:
 The indexer opens the database read-write with WAL and foreign keys, and truncates the WAL
 checkpoint at the end of each run. The MCP opens it `read_only(true)`, checks `schema_version`, and never migrates.
 
-### Tantivy (`data/tantivy/`): full-text retrieval
+### Tantivy (`generations/<n>/tantivy/`): full-text retrieval
 
 | Field | Options |
 |---|---|
@@ -119,19 +129,23 @@ manifest.yaml ─► validate ─► for each source:
 removed from manifest ─► delete from both stores
 requirements.yaml ─► validate ─► replace requirement tables
 commit Tantivy, checkpoint SQLite, bump index_generation
+publish generations/<n> via CURRENT ─► remove old generations
 ```
 
-An `index_in_progress` flag forces a full rebuild if a previous run was interrupted.
+All writes go to a staging copy; see *Published generations*. An `index_in_progress` flag still forces a full
+rebuild if a legacy-layout run was interrupted.
 
 ### Runtime (`bg-spec-mcp`)
 
 ```text
-start ─► load config ─► open SQLite (ro) + Tantivy reader ─► serve stdio
-tool call ─► typed input (serde, deny_unknown_fields) ─► service ─► repositories ─► JSON + provenance
+start ─► load config ─► open published generation: SQLite (ro) + Tantivy reader ─► serve stdio
+tool call ─► CURRENT changed? reopen ─► typed input (serde, deny_unknown_fields) ─► service ─► repositories ─► JSON + provenance
 ```
 
-The Tantivy reader reloads on commit, so a running server picks up a re-index without a restart.
-`health` shows the `index_generation`.
+Each tool call reads `CURRENT`; when a new generation has been published the server opens it and switches
+handles (calls already running finish on the old ones), so a re-index is picked up without a restart. If the
+new generation cannot be opened, the server logs a warning and keeps serving the previous one. `health` shows
+the catalog's `index_generation` and the `published_generation` being served.
 
 ## 6. Services
 

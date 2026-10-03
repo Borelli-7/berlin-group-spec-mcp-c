@@ -32,8 +32,10 @@ For each manifest source, the indexer performs these steps:
    deleted by `source_id` and re-added.
 
 Sources removed from the manifest are deleted from both stores. Each run increments
-`index_generation`. A run that was interrupted (the `index_in_progress` flag is still set) triggers a full
-rebuild on the next run. `--force` always rebuilds everything, as does a missing or incompatible Tantivy schema.
+`index_generation` and works on a staging copy of the published generation; only a completed run is
+published (`data/generations/<n>/`, selected by `data/CURRENT`), so an interrupted or failed run never affects
+readers and its staging directory is removed by the next run. The current and previous generations are
+kept. A legacy-layout catalog whose `index_in_progress` flag is still set triggers a full rebuild. `--force` always rebuilds everything, as does a missing or incompatible Tantivy schema.
 
 ## PDF
 

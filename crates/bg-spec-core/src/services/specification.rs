@@ -374,6 +374,10 @@ pub struct HealthReport {
     pub search_documents: u64,
     pub versions: Vec<String>,
     pub problems: Vec<String>,
+    /// Published index generation the server is reading (set by the MCP server; absent for the
+    /// legacy unversioned data layout).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub published_generation: Option<u64>,
 }
 
 /// Source retrieval, OpenAPI lookup and full-text search.
@@ -1045,6 +1049,7 @@ impl SpecificationService {
             index,
             search_documents,
             problems,
+            published_generation: None,
         })
     }
 }

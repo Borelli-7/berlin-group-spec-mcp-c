@@ -29,7 +29,8 @@ use bg_spec_core::{
     timing::Timer,
 };
 use bg_spec_store::{
-    DocumentBundle, SearchDocument, SqliteCatalog, StoredOperation, TantivyWriter,
+    DocumentBundle, IndexLayout, SearchDocument, SqliteCatalog, StoredOperation, TantivyWriter,
+    layout,
 };
 use serde::Serialize;
 use serde_json::json;
@@ -139,13 +140,60 @@ impl Indexer {
         sha256_hex(settings.to_string())
     }
 
+    /// Builds a new index generation in a staging directory (seeded from the published one, so
+    /// unchanged sources are skipped) and publishes it atomically. Readers never see a partially
+    /// written catalog or a catalog/search pair from different runs.
     pub async fn run(&self, options: IndexOptions) -> Result<IndexReport> {
         let _timer = Timer::start("indexer.run");
         let started = Instant::now();
+        // Fail on configuration problems before touching the data directory.
         let manifest = Self::load_manifest(&self.config)?;
         let root = CorpusRoot::open(&self.config.corpus_root)?;
-        let catalog = SqliteCatalog::open_read_write(&self.config.catalog_path()).await?;
-        let tantivy_dir = self.config.tantivy_dir();
+        let data_dir = self.config.data_dir.clone();
+        let published = layout::current_layout(&data_dir)?;
+        let staging = layout::create_staging(&data_dir)?;
+        let guard = StagingGuard(Some(staging.clone()));
+        {
+            let _seed = Timer::start("indexer.seed_generation");
+            let staging = staging.clone();
+            tokio::task::spawn_blocking(move || layout::seed_staging(&published, &staging))
+                .await
+                .map_err(join_err)??;
+        }
+        let mut report = self
+            .build(
+                options,
+                manifest,
+                root,
+                &IndexLayout::in_dir(&staging, None),
+            )
+            .await?;
+        let generation = report.index_generation;
+        let published = tokio::task::spawn_blocking(move || {
+            let published = layout::publish(&data_dir, &staging, generation)?;
+            for path in layout::collect_garbage(&data_dir, None)? {
+                info!(path = %path.display(), "removed old index data");
+            }
+            Ok::<_, CoreError>(published)
+        })
+        .await
+        .map_err(join_err)??;
+        guard.disarm();
+        info!(generation, path = %published.catalog_path.display(), "published index generation");
+        report.duration_ms = started.elapsed().as_millis();
+        Ok(report)
+    }
+
+    async fn build(
+        &self,
+        options: IndexOptions,
+        manifest: Manifest,
+        root: CorpusRoot,
+        target: &IndexLayout,
+    ) -> Result<IndexReport> {
+        let started = Instant::now();
+        let catalog = SqliteCatalog::open_read_write(&target.catalog_path).await?;
+        let tantivy_dir = target.tantivy_dir.clone();
         let mut writer =
             tokio::task::spawn_blocking(move || TantivyWriter::open_or_create(&tantivy_dir))
                 .await
@@ -824,4 +872,23 @@ fn process_openapi(mut document: Document, path: &Path, prefix: Option<&str>) ->
         },
         search_docs,
     })
+}
+
+/// Removes an unpublished staging directory when indexing fails.
+struct StagingGuard(Option<PathBuf>);
+
+impl StagingGuard {
+    fn disarm(mut self) {
+        self.0 = None;
+    }
+}
+
+impl Drop for StagingGuard {
+    fn drop(&mut self) {
+        if let Some(dir) = self.0.take()
+            && let Err(e) = std::fs::remove_dir_all(&dir)
+        {
+            warn!(path = %dir.display(), error = %e, "could not remove staging directory");
+        }
+    }
 }

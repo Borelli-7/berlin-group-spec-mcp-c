@@ -980,3 +980,65 @@ async fn batched_catalog_reads_match_single_lookups() {
         expected.iter().map(ident).collect::<Vec<_>>()
     );
 }
+
+#[tokio::test]
+async fn index_runs_publish_generations_atomically() {
+    use bg_spec_store::layout;
+    let env = indexed().await;
+    let data = env.config.data_dir.clone();
+    assert_eq!(layout::read_current(&data).unwrap(), Some(1));
+    let first = layout::current_layout(&data).unwrap();
+    assert!(first.catalog_path.is_file());
+    assert!(first.tantivy_dir.join("meta.json").is_file());
+    assert!(!data.join("catalog.db").exists());
+
+    // A reader opened on generation 1 keeps a consistent view while generation 2 is published.
+    let (old_catalog, old_search) = bg_spec_store::open_read_only(&env.config).await.unwrap();
+    let old = Services::new(
+        old_catalog,
+        old_search,
+        ServiceSettings::from_config(&env.config),
+    );
+
+    // A crashed run leaves a staging directory behind; the next run removes it.
+    let stale = layout::create_staging(&data).unwrap();
+    let report = Indexer::new(env.config.clone())
+        .run(IndexOptions::default())
+        .await
+        .unwrap();
+    assert_eq!(report.index_generation, 2);
+    assert_eq!(report.count(IndexAction::Skipped), 6, "{report:#?}");
+    assert_eq!(layout::read_current(&data).unwrap(), Some(2));
+    assert!(!stale.exists());
+    assert_eq!(
+        old.specification
+            .health()
+            .await
+            .unwrap()
+            .index
+            .index_generation,
+        Some(1)
+    );
+    let svc = services(&env).await;
+    assert_eq!(
+        svc.specification
+            .health()
+            .await
+            .unwrap()
+            .index
+            .index_generation,
+        Some(2)
+    );
+
+    Indexer::new(env.config.clone())
+        .run(IndexOptions::default())
+        .await
+        .unwrap();
+    assert!(!layout::generation_dir(&data, 1).exists());
+    assert!(layout::generation_dir(&data, 2).is_dir());
+    assert!(layout::generation_dir(&data, 3).is_dir());
+    let entries = std::fs::read_dir(data.join(layout::GENERATIONS_DIR))
+        .unwrap()
+        .count();
+    assert_eq!(entries, layout::KEEP_GENERATIONS);
+}

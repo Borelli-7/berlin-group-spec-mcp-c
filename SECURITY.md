@@ -28,7 +28,7 @@ The process only needs access to the following:
 |---|---|
 | `config/config.toml` | read |
 | `corpus/` | read (the `health` and `doctor` commands only read metadata) |
-| `data/catalog.db`, `data/tantivy/` | read. SQLite may need to create `-shm` for WAL readers, so give the directory read-write access if WAL files are absent. |
+| `data/CURRENT`, `data/generations/` | read. SQLite may need to create `-shm` for WAL readers, so give the directory read-write access if WAL files are absent. |
 
 Optionally run the server under a restricted user, a read-only bind mount, or a sandbox (`systemd-run
 --property=ProtectSystem=strict`, `bwrap`, or a container). Run `bg-spec index` as a separate, trusted step.

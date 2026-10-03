@@ -1,4 +1,6 @@
 /target
 /data/catalog.db*
 /data/tantivy/
+/data/CURRENT*
+/data/generations/
 *.snap.new

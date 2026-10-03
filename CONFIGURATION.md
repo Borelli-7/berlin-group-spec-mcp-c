@@ -6,7 +6,7 @@ Relative paths are resolved against the **directory that contains the config fil
 
 ```toml
 corpus_root  = "../corpus"                        # directory with manifest.yaml and the documents
-data_dir     = "../data"                          # catalog.db and tantivy/ are created here
+data_dir     = "../data"                          # CURRENT and generations/<n>/{catalog.db,tantivy/}
 manifest     = "manifest.yaml"                    # relative to corpus_root (default shown)
 requirements = "requirements/requirements.yaml"   # relative to corpus_root (default shown)
 

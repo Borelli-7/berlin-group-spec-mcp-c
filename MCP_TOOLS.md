@@ -177,7 +177,9 @@ Input: `{}`.
 Output: `{status(ok|degraded), read_only:true, server_version, baseline_version, target_version,
 catalog:{documents, pages, ocr_required_pages, blank_pages, chunks, operations, schemas, requirements},
 index:{schema_version, last_indexed_at_unix, index_generation, requirements_file_sha256},
-search_documents, versions, problems}`. See [10](examples/responses/10-health.json).
+search_documents, versions, problems, published_generation?}`. `published_generation` is the
+generation directory being served (absent for the legacy data layout); the server switches to a newly
+published generation on the next call. See [10](examples/responses/10-health.json).
 
 ## Acceptance workflow (Requirements Agent)
 
