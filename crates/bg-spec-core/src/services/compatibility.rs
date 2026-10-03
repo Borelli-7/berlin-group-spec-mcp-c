@@ -64,6 +64,7 @@ impl CompatibilityService {
         from_version: Option<&str>,
         to_version: Option<&str>,
     ) -> Result<ComparisonReport> {
+        let _timer = crate::timing::Timer::start("compatibility.compare");
         let method = normalize_method(method)?;
         let path = validate_path(path)?;
         let from = match from_version.map(str::trim).filter(|s| !s.is_empty()) {

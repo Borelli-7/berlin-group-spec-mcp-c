@@ -22,6 +22,7 @@ use bg_spec_core::{
     manifest::{Manifest, ManifestSource},
     openapi_path,
     requirements::RequirementsFile,
+    timing::Timer,
 };
 use bg_spec_store::{
     DocumentBundle, SearchDocument, SqliteCatalog, StoredOperation, TantivyWriter,
@@ -135,6 +136,7 @@ impl Indexer {
     }
 
     pub async fn run(&self, options: IndexOptions) -> Result<IndexReport> {
+        let _timer = Timer::start("indexer.run");
         let started = Instant::now();
         let manifest = Self::load_manifest(&self.config)?;
         let root = CorpusRoot::open(&self.config.corpus_root)?;
@@ -174,6 +176,7 @@ impl Indexer {
         }
 
         for source in &manifest.sources {
+            let _doc_timer = Timer::start("indexer.index_source");
             let report = self
                 .index_source(&root, source, &catalog, &writer, full_rebuild)
                 .await?;
@@ -182,12 +185,16 @@ impl Indexer {
         }
 
         let generation = meta.index_generation.unwrap_or(0) + 1;
+        let commit_timer = Timer::start("indexer.search_commit");
         tokio::task::spawn_blocking(move || writer.commit())
             .await
             .map_err(join_err)??;
+        drop(commit_timer);
 
+        let requirements_timer = Timer::start("indexer.requirements");
         let (requirements, requirements_diagnostics, req_sha) =
             self.index_requirements(&manifest, &catalog).await?;
+        drop(requirements_timer);
         catalog
             .set_meta("last_indexed_at_unix", &now_unix().to_string())
             .await?;

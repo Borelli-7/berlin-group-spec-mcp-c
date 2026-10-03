@@ -333,6 +333,7 @@ impl RequirementService {
 
     /// Resolves every curated source citation and derives source-level conflicts.
     async fn resolve_sources(&self, rec: &RequirementRecord) -> Result<ResolvedSources> {
+        let _timer = crate::timing::Timer::start("requirement.resolve_sources");
         let req = &rec.requirement;
         let mut sources = Vec::new();
         let mut conflicts = Vec::new();
@@ -586,6 +587,7 @@ impl RequirementService {
         version: Option<&str>,
         limit: Option<usize>,
     ) -> Result<FindRequirementResponse> {
+        let _timer = crate::timing::Timer::start("requirement.find");
         let q = query.trim();
         if q.is_empty() {
             return Err(CoreError::InvalidInput("query must not be empty".into()));
@@ -722,6 +724,7 @@ impl RequirementService {
     }
 
     pub async fn trace(&self, requirement_id: &str) -> Result<RequirementTrace> {
+        let _timer = crate::timing::Timer::start("requirement.trace");
         let rec = self.requirement(requirement_id).await?;
         let all = self.spec.catalog().list_requirements().await?;
         let req = &rec.requirement;
@@ -948,6 +951,7 @@ impl RequirementService {
         method: &str,
         evidence_limit: Option<usize>,
     ) -> Result<EndpointEvidenceBundle> {
+        let _timer = crate::timing::Timer::start("requirement.endpoint_requirements");
         let version = self.spec.version_or_target(version)?;
         self.spec.ensure_known_version(&version).await?;
         let method = normalize_method(method)?;

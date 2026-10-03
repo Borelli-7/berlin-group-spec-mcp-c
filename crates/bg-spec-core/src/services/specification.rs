@@ -306,6 +306,7 @@ impl SpecificationService {
         source_id: Option<&str>,
         limit: Option<usize>,
     ) -> Result<SearchResponse> {
+        let _timer = crate::timing::Timer::start("specification.search");
         let text = query.trim();
         if text.is_empty() {
             return Err(CoreError::InvalidInput("query must not be empty".into()));
@@ -361,6 +362,7 @@ impl SpecificationService {
         version: &SpecificationVersion,
         limit: usize,
     ) -> Result<Vec<SearchResult>> {
+        let _timer = crate::timing::Timer::start("specification.related_evidence");
         let cleaned: String = text
             .chars()
             .map(|c| if c.is_alphanumeric() { c } else { ' ' })
@@ -424,6 +426,7 @@ impl SpecificationService {
     }
 
     pub async fn read_source(&self, source_id: &str, locator: &str) -> Result<ReadSourceResponse> {
+        let _timer = crate::timing::Timer::start("specification.read_source");
         let locator: SourceLocator = locator.parse()?;
         let doc = self.indexed_document(source_id.trim()).await?;
         let listing = SourceListing::from(&doc);
@@ -624,6 +627,7 @@ impl SpecificationService {
         method: &str,
         path: &str,
     ) -> Result<Option<OperationLookup>> {
+        let _timer = crate::timing::Timer::start("specification.lookup_operation");
         let method = normalize_method(method)?;
         let path = validate_path(path)?;
         let mut ops = Vec::new();
@@ -683,6 +687,7 @@ impl SpecificationService {
     }
 
     pub async fn read_schema(&self, version: Option<&str>, name: &str) -> Result<SchemaResponse> {
+        let _timer = crate::timing::Timer::start("specification.read_schema");
         let version = self.version_or_target(version)?;
         let name = name.trim();
         if name.is_empty() || name.len() > 256 {
@@ -729,6 +734,7 @@ impl SpecificationService {
         version: &SpecificationVersion,
         roots: impl IntoIterator<Item = String>,
     ) -> Result<SchemaClosure> {
+        let _timer = crate::timing::Timer::start("specification.schema_closure");
         let mut closure = SchemaClosure::default();
         let mut queue: VecDeque<String> = roots.into_iter().collect();
         while let Some(name) = queue.pop_front() {

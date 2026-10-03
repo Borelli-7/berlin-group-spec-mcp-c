@@ -44,7 +44,7 @@ index` re-indexes the affected documents automatically.
 | Variable | Meaning |
 |---|---|
 | `BG_SPEC_CONFIG` | Default for `--config` (both binaries). |
-| `BG_SPEC_LOG` | `tracing` filter, e.g. `warn` or `bg_spec_core=debug`. Logs always go to stderr. |
+| `BG_SPEC_LOG` | `tracing` filter, e.g. `warn` or `bg_spec_core=debug`. Logs always go to stderr. `bg_spec::timing=debug` logs per-operation latency (`op`, `elapsed_us`) for service calls and indexer stages. |
 
 No secrets are required.
 

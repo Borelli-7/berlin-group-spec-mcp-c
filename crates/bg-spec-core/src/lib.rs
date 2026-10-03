@@ -16,5 +16,6 @@ pub mod openapi_path;
 pub mod ports;
 pub mod requirements;
 pub mod services;
+pub mod timing;
 
 pub use error::{CoreError, Result};
