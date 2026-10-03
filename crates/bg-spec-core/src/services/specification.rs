@@ -19,6 +19,58 @@ use std::{
 const MAX_QUERY_CHARS: usize = 1000;
 const MAX_SCHEMA_CLOSURE: usize = 2000;
 
+const RELATED_MAX_TERMS: usize = 40;
+const STOPWORDS: &[&str] = &[
+    "about", "after", "all", "also", "and", "any", "are", "been", "but", "can", "case", "cases",
+    "does", "each", "for", "from", "has", "have", "into", "its", "may", "might", "more", "must",
+    "not", "only", "other", "same", "shall", "should", "such", "than", "that", "the", "then",
+    "there", "these", "this", "those", "through", "under", "used", "using", "via", "was", "were",
+    "when", "where", "which", "while", "will", "with", "within", "would", "you", "your",
+];
+
+/// Query terms for "related evidence" of a requirement statement: code-like identifiers first
+/// (kept intact, e.g. `PSU-ID`), then distinct non-stopword words in order of appearance.
+fn related_terms(text: &str) -> Vec<String> {
+    let mut seen = BTreeSet::new();
+    let mut identifiers = Vec::new();
+    let mut words = Vec::new();
+    for raw in text.split_whitespace() {
+        let token = raw.trim_matches(|c: char| !c.is_alphanumeric());
+        if crate::identifiers::is_code_like(token) {
+            if seen.insert(token.to_lowercase()) {
+                identifiers.push(token.to_string());
+            }
+            continue;
+        }
+        for w in token.split(|c: char| !c.is_alphanumeric()) {
+            let lower = w.to_lowercase();
+            if w.chars().count() > 2 && !STOPWORDS.contains(&lower.as_str()) && seen.insert(lower) {
+                words.push(w.to_string());
+            }
+        }
+    }
+    identifiers.extend(words);
+    identifiers.truncate(RELATED_MAX_TERMS);
+    identifiers
+}
+
+#[cfg(test)]
+mod related_terms_tests {
+    #[test]
+    fn prefers_identifiers_and_drops_stopwords() {
+        let terms = super::related_terms(
+            "The ASPSP shall reject the request when the PSU-ID header and the psuId are missing; the ASPSP shall respond.",
+        );
+        assert_eq!(&terms[..2], ["PSU-ID", "psuId"]);
+        assert!(
+            !terms
+                .iter()
+                .any(|t| t.eq_ignore_ascii_case("the") || t == "shall")
+        );
+        assert_eq!(terms.iter().filter(|t| *t == "ASPSP").count(), 1);
+    }
+}
+
 /// Hits fetched before duplicates are collapsed, so the requested number of distinct hits remains.
 fn overfetch(limit: usize) -> usize {
     limit.saturating_mul(3).max(limit.saturating_add(10))
@@ -476,15 +528,7 @@ impl SpecificationService {
         limit: usize,
     ) -> Result<Vec<SearchResult>> {
         let _timer = crate::timing::Timer::start("specification.related_evidence");
-        let cleaned: String = text
-            .chars()
-            .map(|c| if c.is_alphanumeric() { c } else { ' ' })
-            .collect();
-        let words: Vec<&str> = cleaned
-            .split_whitespace()
-            .filter(|w| w.len() > 2)
-            .take(40)
-            .collect();
+        let words = related_terms(text);
         if words.is_empty() || limit == 0 {
             return Ok(Vec::new());
         }

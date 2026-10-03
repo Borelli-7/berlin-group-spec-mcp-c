@@ -56,6 +56,26 @@ Pages declared in the manifest's `blank_pages` are the exception: when they have
 contain text it is indexed normally with the warning `blank_page_has_text`, and a number beyond the page count
 yields `blank_page_out_of_range`.
 
+### Extraction quality
+
+Page text served by `read_source page:N` (and its `sha256`) is always the verbatim extraction. Only the text
+that is chunked and indexed for search is cleaned, and only for PDFs:
+
+- **Running headers/footers**: for documents with at least 4 extracted pages, a line among the first or last
+  two non-empty lines of a page is treated as a margin when its digit-normalised form (`Page 12 of 40` →
+  `Page # of #`) appears in the margins of at least `max(3, ⌈pages/2⌉)` pages. Such lines are dropped from
+  the search text.
+- **Hyphenation**: `word-⏎continuation` is joined only when both fragments are lowercase letters and the left
+  fragment has at least two letters, so identifiers such as `X-Request-ID` or `{account-id}` are never merged.
+- **Garbled text**: a page whose share of replacement, control or private-use characters exceeds 5 %, or
+  where more than half of at least 20 tokens are single letters, gets the warning `low_quality_text`
+  (locator `page:N`). It is still indexed; there is no OCR.
+
+Per-document counts are stored in the document metadata as `extraction_quality` (`low_quality_pages`,
+`mean_garbage_ratio`, `repeated_margin_patterns`, `removed_margin_lines`, `hyphenation_repairs`) and are
+aggregated by `bg-spec stats` (and `--json`). `bg-spec doctor` lists `low_quality_text` pages as warnings.
+Changing these rules bumps `INDEXER_FORMAT_VERSION`, so the next `bg-spec index` re-processes every document.
+
 ### Chunking
 
 ```text
@@ -121,7 +141,7 @@ and `index_meta`. The database is in WAL mode, and the MCP opens it read-only an
 
 ## Diagnostics
 
-`file_missing`, `path_rejected`, `processing_failed`, `page_extraction_failed`, `ocr_required`,
+`file_missing`, `path_rejected`, `processing_failed`, `page_extraction_failed`, `ocr_required`, `low_quality_text`,
 `blank_page_has_text`, `blank_page_out_of_range`,
 `no_extractable_text`, `openapi_typed_parse_failed`, `openapi_31_fallback`,
 `openapi_operation_count_mismatch`, `requirements_missing`, and `dangling_source`. They are shown by `bg-spec index`,

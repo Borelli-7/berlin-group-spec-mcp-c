@@ -8,6 +8,7 @@ pub mod discover;
 pub mod openapi;
 pub mod pdf;
 pub mod pipeline;
+pub mod quality;
 pub mod testing;
 
 pub use pipeline::{DocumentReport, IndexAction, IndexOptions, IndexReport, Indexer};

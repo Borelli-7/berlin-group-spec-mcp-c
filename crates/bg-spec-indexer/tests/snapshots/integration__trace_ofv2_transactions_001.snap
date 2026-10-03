@@ -408,8 +408,24 @@ expression: stable(&trace)
       "locator": "chunk:bg-openfinance-v2-implementation-guidelines:p3:c0",
       "page": 3,
       "evidence": "query parameter dateFrom is mandatory unless deltaList is used. The ASPSP SHALL reject a\nrequest without dateFrom with HTTP status 400 and error code FORMAT_ERROR.\n\nThe ASPSP SHALL support the pagination of transaction lists. The TPP MAY limit the page size\nwith the query parameter pageSize. The ASPSP SHALL return a link next when more entries\nexist.\n\nThe ASPSP SHALL return HTTP status 429 with",
-      "relevance": 35.441001892089844,
+      "relevance": 30.57200050354004,
       "sha256": "ffb004d5d4d60493cbcc67cbdf923ef7f782113b7492240ba869ba9de5de294a",
+      "classification": "discovered_evidence"
+    },
+    {
+      "record_id": "bg-openfinance-v2-implementation-guidelines:p5:c0",
+      "record_type": "chunk",
+      "source_id": "bg-openfinance-v2-implementation-guidelines",
+      "document_id": "bg-openfinance-v2-implementation-guidelines@8eec1c4376ce",
+      "version": "openfinance-v2",
+      "kind": "pdf",
+      "authority": "normative",
+      "title": "Open Finance v2 Implementation Guidelines (synthetic fixture) — 4.3 Read Transaction Details",
+      "locator": "chunk:bg-openfinance-v2-implementation-guidelines:p5:c0",
+      "page": 5,
+      "evidence": "4.3 Read Transaction Details\n\nCall GET /accounts/{accountId}/transactions/{transactionId} reads the details of one\ntransaction. The ASPSP SHALL return HTTP status 404 if the transactionId is unknown",
+      "relevance": 16.875999450683594,
+      "sha256": "d2aaf0f1aa71da8795ab975e8126c21a8466627d20fd5c56b48f79153d321ae9",
       "classification": "discovered_evidence"
     },
     {
@@ -424,7 +440,7 @@ expression: stable(&trace)
       "locator": "chunk:bg-openfinance-v2-errata:p1:c2",
       "page": 1,
       "evidence": "E-09 bookingStatus value all\n\nThe bookingStatus value all returns booked, pending and information entries in one\nresponse. ASPSPs that do not support information SHALL reject the value all with\nHTTP status 400 and error code FORMAT_ERROR",
-      "relevance": 24.655000686645508,
+      "relevance": 16.266000747680664,
       "sha256": "242958460734148d175faf9c02d2406c738aa114cc4102e7e51ddfebaeb8aa23",
       "classification": "discovered_evidence"
     },
@@ -440,24 +456,8 @@ expression: stable(&trace)
       "locator": "chunk:bg-openfinance-v2-errata:p1:c1",
       "page": 1,
       "evidence": "E-07 Transaction list access frequency\n\nClarification: the limit of four transaction list reads per calendar day without PSU\ninvolvement is counted per consent only, not per account",
-      "relevance": 18.266000747680664,
+      "relevance": 14.291999816894531,
       "sha256": "dfa8ea7a43492195dc217d436f78b8ee9b2410bb56c56ec34d556d1ecc2d1959",
-      "classification": "discovered_evidence"
-    },
-    {
-      "record_id": "bg-openfinance-v2-implementation-guidelines:p5:c0",
-      "record_type": "chunk",
-      "source_id": "bg-openfinance-v2-implementation-guidelines",
-      "document_id": "bg-openfinance-v2-implementation-guidelines@8eec1c4376ce",
-      "version": "openfinance-v2",
-      "kind": "pdf",
-      "authority": "normative",
-      "title": "Open Finance v2 Implementation Guidelines (synthetic fixture) — 4.3 Read Transaction Details",
-      "locator": "chunk:bg-openfinance-v2-implementation-guidelines:p5:c0",
-      "page": 5,
-      "evidence": "4.3 Read Transaction Details\n\nCall GET /accounts/{accountId}/transactions/{transactionId} reads the details of one\ntransaction. The ASPSP SHALL return HTTP status 404 if the transactionId is unknown",
-      "relevance": 17.972999572753906,
-      "sha256": "d2aaf0f1aa71da8795ab975e8126c21a8466627d20fd5c56b48f79153d321ae9",
       "classification": "discovered_evidence"
     },
     {
@@ -472,7 +472,7 @@ expression: stable(&trace)
       "locator": "chunk:bg-openfinance-v2-operational-rules:p2:c0",
       "page": 2,
       "evidence": "3 Transaction History Access\n\nThe ASPSP SHALL make at least 90 days of transaction history available through the\ntransaction list endpoint.\n\nWithout active PSU involvement the TPP MUST NOT read the transaction list of an account more\nthan four times per calendar day. The limit is counted per account and per consent",
-      "relevance": 14.770000457763672,
+      "relevance": 12.555999755859375,
       "sha256": "07fcee82a83b379bc569924f5a6cc45ee1bfe4abb2036222fb4c6fcd24093ec8",
       "classification": "discovered_evidence"
     }

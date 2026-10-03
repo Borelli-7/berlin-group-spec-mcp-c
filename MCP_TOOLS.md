@@ -145,6 +145,9 @@ Output: `{requirement_id, classification, requirement, mapping:{file, file_sha25
 sources:[{source_id, locator, status, document, excerpt, provenance}], endpoints:[{endpoint, via,
 found, operation, provenance}], schemas:[{name, via, found, referenced_schemas, provenance}],
 acceptance_criteria:[{id, requirement_id, text, mapping}], related_evidence, conflicts, notice}`.
+`related_evidence` is a PDF/text search built from the requirement statement: code-like identifiers
+(`PSU-ID`, `bookingStatus`) come first and are kept intact, followed by distinct non-stopword words, capped at
+40 terms. Duplicates are collapsed as in `search_specification`.
 See [03](examples/responses/03-trace_requirement.json). The conflicts example is
 [11](examples/responses/11-trace_requirement-conflicts.json).
 

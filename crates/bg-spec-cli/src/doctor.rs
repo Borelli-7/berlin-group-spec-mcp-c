@@ -182,6 +182,21 @@ pub async fn run(config: &Config, json: bool) -> Result<ExitCode> {
                                     ),
                                 );
                             }
+                            for diag in d
+                                .diagnostics
+                                .iter()
+                                .filter(|x| x.code == "low_quality_text")
+                            {
+                                c.push(
+                                    Level::Warn,
+                                    "low_quality_text",
+                                    format!(
+                                        "{} {}: extracted text looks garbled",
+                                        d.source_id,
+                                        diag.locator.as_deref().unwrap_or("")
+                                    ),
+                                );
+                            }
                             if let (Some(disk), Some(indexed)) = (disk_hashes.get(&s.id), &d.sha256)
                                 && disk != indexed
                             {

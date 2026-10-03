@@ -163,6 +163,30 @@ async fn stats(config: &Config, json: bool) -> Result<ExitCode> {
         String,
         std::collections::BTreeMap<String, usize>,
     > = Default::default();
+    let mut quality = serde_json::Map::new();
+    for key in [
+        "removed_margin_lines",
+        "hyphenation_repairs",
+        "repeated_margin_patterns",
+    ] {
+        let total: u64 = docs
+            .iter()
+            .filter_map(|d| d.metadata["extraction_quality"][key].as_u64())
+            .sum();
+        quality.insert(key.into(), total.into());
+    }
+    let low_quality: Vec<String> = docs
+        .iter()
+        .flat_map(|d| {
+            d.metadata["extraction_quality"]["low_quality_pages"]
+                .as_array()
+                .into_iter()
+                .flatten()
+                .filter_map(serde_json::Value::as_u64)
+                .map(move |p| format!("{}:page:{p}", d.source_id))
+        })
+        .collect();
+    quality.insert("low_quality_pages".into(), low_quality.clone().into());
     for d in &docs {
         *by_version
             .entry(d.version.to_string())
@@ -175,6 +199,7 @@ async fn stats(config: &Config, json: bool) -> Result<ExitCode> {
         "index": meta,
         "search_documents": search_docs,
         "documents_by_version": by_version,
+        "extraction_quality": quality,
     });
     if json {
         print_json(&out)?;
@@ -185,6 +210,12 @@ async fn stats(config: &Config, json: bool) -> Result<ExitCode> {
             stats.pages, stats.ocr_required_pages, stats.blank_pages
         );
         println!("chunks             {}", stats.chunks);
+        println!(
+            "extraction quality {} low-quality pages, {} margin lines removed, {} hyphenations repaired",
+            low_quality.len(),
+            quality["removed_margin_lines"],
+            quality["hyphenation_repairs"]
+        );
         println!("openapi operations {}", stats.operations);
         println!("openapi schemas    {}", stats.schemas);
         println!("requirements       {}", stats.requirements);

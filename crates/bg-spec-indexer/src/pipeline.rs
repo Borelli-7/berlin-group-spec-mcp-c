@@ -13,6 +13,7 @@ use crate::{
         schema_identifiers, schema_search_text,
     },
     pdf::{ExtractedPage, PdfExtractor, PdfOxideExtractor},
+    quality,
 };
 use bg_spec_core::{
     CoreError, Result,
@@ -40,7 +41,7 @@ use std::{
 use tracing::{info, warn};
 
 /// Bumped when extraction/normalization output changes, forcing re-indexing.
-pub const INDEXER_FORMAT_VERSION: u32 = 3;
+pub const INDEXER_FORMAT_VERSION: u32 = 4;
 const META_IN_PROGRESS: &str = "index_in_progress";
 
 #[derive(Debug, Clone, Copy, Default)]
@@ -574,12 +575,58 @@ fn process_paged(
         });
     }
 
-    let extracted: Vec<PageText<'_>> = records
+    // Search text: page evidence stays verbatim; PDFs get margin removal and hyphenation repair.
+    let extracted_records: Vec<&PageRecord> = records
         .iter()
         .filter(|p| p.status == PageStatus::Extracted)
-        .map(|p| PageText {
-            number: p.page,
-            text: &p.text,
+        .collect();
+    let is_pdf = document.kind == DocumentKind::Pdf;
+    let margins = if is_pdf {
+        quality::repeated_margins(
+            &extracted_records
+                .iter()
+                .map(|p| p.text.as_str())
+                .collect::<Vec<_>>(),
+        )
+    } else {
+        Default::default()
+    };
+    let mut removed_margin_lines = 0;
+    let mut hyphenation_repairs = 0;
+    let mut low_quality_pages = Vec::new();
+    let mut garbage_sum = 0.0f64;
+    let mut search_texts: Vec<(u32, String)> = Vec::with_capacity(extracted_records.len());
+    for p in &extracted_records {
+        let q = quality::page_quality(&p.text);
+        garbage_sum += f64::from(q.garbage_ratio);
+        if q.low_quality {
+            low_quality_pages.push(p.page);
+            document.diagnostics.push(
+                Diagnostic::new(
+                    Severity::Warning,
+                    "low_quality_text",
+                    format!(
+                        "page {} looks garbled (garbage ratio {:.3}, fragment ratio {:.3}); verify against the PDF",
+                        p.page, q.garbage_ratio, q.fragment_ratio
+                    ),
+                )
+                .at(format!("page:{}", p.page)),
+            );
+        }
+        if is_pdf {
+            let c = quality::clean_page(&p.text, &margins);
+            removed_margin_lines += c.removed_margin_lines;
+            hyphenation_repairs += c.hyphenation_repairs;
+            search_texts.push((p.page, c.text));
+        } else {
+            search_texts.push((p.page, p.text.clone()));
+        }
+    }
+    let extracted: Vec<PageText<'_>> = search_texts
+        .iter()
+        .map(|(number, text)| PageText {
+            number: *number,
+            text,
         })
         .collect();
     let raw_chunks = chunk_pages(&extracted, settings);
@@ -663,6 +710,21 @@ fn process_paged(
         m.insert("ocr_required_pages".into(), json!(ocr));
         m.insert("blank_pages".into(), json!(blank));
         m.insert("chunks".into(), json!(chunks.len()));
+        let mean_garbage = if extracted_count == 0 {
+            0.0
+        } else {
+            garbage_sum / extracted_count as f64
+        };
+        m.insert(
+            "extraction_quality".into(),
+            json!({
+                "low_quality_pages": low_quality_pages,
+                "mean_garbage_ratio": (mean_garbage * 10_000.0).round() / 10_000.0,
+                "repeated_margin_patterns": margins.len(),
+                "removed_margin_lines": removed_margin_lines,
+                "hyphenation_repairs": hyphenation_repairs,
+            }),
+        );
     }
     Processed {
         document,
