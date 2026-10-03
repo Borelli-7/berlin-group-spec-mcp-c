@@ -44,6 +44,13 @@ The MSRV is Rust 1.91 (edition 2024), and `rust-toolchain.toml` tracks stable.
   INSTA_UPDATE=always cargo test -p bg-spec-indexer --test integration   # or: cargo insta review
   ```
   Review the diff. Snapshots must not contain absolute paths or timestamps.
+* Retrieval gold cases live in `crates/bg-spec-indexer/tests/fixtures/eval*.yaml`.
+  `cargo test -p bg-spec-indexer --test eval -- --nocapture` gates fixture recall@5,
+  judged precision@5, MRR@5, endpoint identity and citation resolution. Each query has
+  one judged relevant locator; precision does not claim exhaustive relevance labels.
+  Run the official-corpus counterpart with
+  `cargo test -p bg-spec-indexer --release --test eval -- --ignored --nocapture`.
+  Review labels when adding cases; never lower a baseline to accommodate a regression.
 
 ## Fixtures
 

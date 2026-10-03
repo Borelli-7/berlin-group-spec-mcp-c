@@ -1,0 +1,31 @@
+# Reviewed against the synthetic fixture corpus; these are retrieval labels only.
+searches:
+  - query: getTransactionList
+    version: openfinance-v2
+    source_id: bg-openfinance-v2-openapi
+    locator: "op:GET /accounts/{accountId}/transactions"
+  - query: getTransactionDetails
+    version: openfinance-v2
+    source_id: bg-openfinance-v2-openapi
+    locator: "op:GET /accounts/{accountId}/transactions/{transactionId}"
+  - query: getBalances
+    version: openfinance-v2
+    source_id: bg-openfinance-v2-openapi
+    locator: "op:GET /accounts/{accountId}/balances"
+  - query: BookingStatus
+    version: nextgenpsd2-v1.3
+    source_id: bg-nextgenpsd2-v1.3-openapi
+    locator: "schema:BookingStatus"
+endpoints:
+  - version: openfinance-v2
+    path: /v2/accounts/{accountId}/transactions
+    source_id: bg-openfinance-v2-openapi
+    resolved_path: /accounts/{accountId}/transactions
+  - version: nextgenpsd2-v1.3
+    path: /accounts/{accountId}/transactions
+    source_id: bg-nextgenpsd2-v1.3-openapi
+    resolved_path: /v1/accounts/{account-id}/transactions
+requirements:
+  - id: OFV2-TRANSACTIONS-001
+    source_id: bg-openfinance-v2-openapi
+    locator: "op:GET /accounts/{accountId}/transactions"

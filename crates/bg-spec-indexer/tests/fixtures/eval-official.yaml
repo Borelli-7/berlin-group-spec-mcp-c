@@ -1,0 +1,15 @@
+# Labels from corpus/requirements/requirements.yaml, without copying document text.
+searches:
+  - query: transactions
+    version: openfinance-v2
+    source_id: bg-openfinance-v2-openapi-ais
+    locator: "op:GET /v2/accounts/{account-id}/transactions"
+endpoints:
+  - version: openfinance-v2
+    path: /accounts/{account-id}/transactions
+    source_id: bg-openfinance-v2-openapi-ais
+    resolved_path: /v2/accounts/{account-id}/transactions
+requirements:
+  - id: OFV2-AIS-TRANSACTIONS-001
+    source_id: bg-openfinance-v2-openapi-ais
+    locator: "op:GET /v2/accounts/{account-id}/transactions"
