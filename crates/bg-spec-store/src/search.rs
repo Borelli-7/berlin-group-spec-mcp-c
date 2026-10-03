@@ -134,6 +134,13 @@ fn register_tokenizers(index: &Index) {
     );
 }
 
+fn same_schema(a: &Schema, b: &Schema) -> bool {
+    matches!(
+        (serde_json::to_string(a), serde_json::to_string(b)),
+        (Ok(x), Ok(y)) if x == y
+    )
+}
+
 fn marker_ok(dir: &Path) -> bool {
     std::fs::read_to_string(dir.join(MARKER_FILE))
         .ok()
@@ -173,8 +180,13 @@ impl TantivyWriter {
     /// Opens the index for writing, (re)creating it if absent or schema-incompatible.
     pub fn open_or_create(dir: &Path) -> Result<Self> {
         let has_index = dir.join("meta.json").is_file();
-        let (index, rebuilt) = if has_index && marker_ok(dir) {
-            (Index::open_in_dir(dir).map_err(search_err)?, false)
+        // Reuse only when both the marker and the actual field layout match this build.
+        let existing = (has_index && marker_ok(dir))
+            .then(|| Index::open_in_dir(dir).ok())
+            .flatten()
+            .filter(|index| same_schema(&index.schema(), &build_schema().0));
+        let (index, rebuilt) = if let Some(index) = existing {
+            (index, false)
         } else {
             if dir.exists() {
                 std::fs::remove_dir_all(dir)
@@ -422,5 +434,27 @@ impl SearchRepository for TantivySearch {
 
     async fn num_docs(&self) -> Result<u64> {
         Ok(self.reader.searcher().num_docs())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn rebuilds_when_marker_matches_but_fields_differ() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("tantivy");
+        std::fs::create_dir_all(&path).unwrap();
+        let mut b = Schema::builder();
+        b.add_text_field("record_id", STRING | STORED);
+        Index::create_in_dir(&path, b.build()).unwrap();
+        std::fs::write(path.join(MARKER_FILE), SEARCH_SCHEMA_VERSION.to_string()).unwrap();
+
+        let writer = TantivyWriter::open_or_create(&path).unwrap();
+        assert!(writer.was_rebuilt());
+        writer.commit().unwrap();
+        let reopened = TantivyWriter::open_or_create(&path).unwrap();
+        assert!(!reopened.was_rebuilt());
     }
 }
