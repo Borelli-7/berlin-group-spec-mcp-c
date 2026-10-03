@@ -65,8 +65,11 @@ and `/v2/accounts/{account-id}/transactions` share the key `/accounts/{}/transac
 uses the prefix of the requested version and then the prefixes of the other versions, so a v1 path
 finds the v2 operation and vice versa (`matched_by: canonical`). When several templates share one key
 (e.g. `/{payment-service}/{payment-product}/{paymentId}` and
-`/{resource-path}/{resourceId}/{authorisation-category}`), the operation with the same parameter names
-is preferred. Structurally different paths (v1 `POST /v1/{payment-service}/{payment-product}` vs
+`/{resource-path}/{resourceId}/{authorisation-category}`), the best-fitting template is chosen (identical
+path, then identical parameter names, then names equal ignoring case, `-` and `_`, then precedence), the
+others are reported in `other_templates`, and `ambiguous: true` marks a tie decided by precedence. Endpoint
+and locator links must then also fit the resolved template, so requirements of a colliding template are
+not cross-linked. Structurally different paths (v1 `POST /v1/{payment-service}/{payment-product}` vs
 v2 `POST /v2/payments/{payment-product}`, `/v1/consents` vs `/v2/consents/account-access`) are not
 matched; cite both explicitly in the requirement if they belong together.
 

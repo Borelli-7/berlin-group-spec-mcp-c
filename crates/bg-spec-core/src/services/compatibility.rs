@@ -27,6 +27,9 @@ pub struct ComparedSide {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub matched_by: Option<MatchedBy>,
     pub unresolved_schemas: Vec<String>,
+    /// True when the requested path fits several templates equally and precedence decided.
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub ambiguous: bool,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
@@ -142,12 +145,14 @@ impl CompatibilityService {
                 version: from,
                 found: a.is_some(),
                 matched_by: a.as_ref().map(|l| l.matched_by),
+                ambiguous: a.as_ref().is_some_and(|l| l.ambiguous),
                 unresolved_schemas: closure_a.unresolved.into_iter().collect(),
             },
             to: ComparedSide {
                 version: to,
                 found: b.is_some(),
                 matched_by: b.as_ref().map(|l| l.matched_by),
+                ambiguous: b.as_ref().is_some_and(|l| l.ambiguous),
                 unresolved_schemas: closure_b.unresolved.into_iter().collect(),
             },
             notice: COMPARISON_NOTICE.to_owned(),

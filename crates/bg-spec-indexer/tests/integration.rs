@@ -699,3 +699,89 @@ async fn acceptance_scenario_transactions_endpoint() {
     assert!(!cmp.changes.is_empty());
     assert!(cmp.sources.len() >= 2);
 }
+
+#[tokio::test]
+async fn colliding_templates_are_reported_and_not_cross_linked() {
+    let env = indexed().await;
+    let spec = env
+        .config
+        .corpus_root
+        .join("openapi/v2/openfinance-api-v2.yaml");
+    let text = std::fs::read_to_string(&spec).unwrap();
+    let text = text.replacen(
+        "paths:\n",
+        "paths:\n  /accounts/{resourceId}/transactions:\n    get:\n      operationId: getResourceTransactions\n      parameters:\n        - {name: resourceId, in: path, required: true, schema: {type: string}}\n      responses:\n        '200': {description: OK}\n",
+        1,
+    );
+    std::fs::write(&spec, text).unwrap();
+    let reqs = env
+        .config
+        .corpus_root
+        .join("requirements/requirements.yaml");
+    let mut text = std::fs::read_to_string(&reqs).unwrap();
+    text.push_str(
+        "\n  - id: OFV2-RESOURCE-001\n    version: openfinance-v2\n    title: Resource transactions\n    sources:\n      - source_id: bg-openfinance-v2-openapi\n        locator: op:GET /accounts/{resourceId}/transactions\n    endpoints:\n      - GET /accounts/{resourceId}/transactions\n    acceptance_criteria:\n      - \"Resource transactions are readable.\"\n",
+    );
+    std::fs::write(&reqs, text).unwrap();
+    Indexer::new(env.config.clone())
+        .run(IndexOptions::default())
+        .await
+        .unwrap();
+    let svc = services(&env).await;
+
+    let exact = svc
+        .specification
+        .read_endpoint(None, ENDPOINT, "GET")
+        .await
+        .unwrap();
+    assert_eq!(exact.operation.path, ENDPOINT);
+    assert!(!exact.ambiguous);
+    assert!(exact.alternatives.is_empty());
+    assert_eq!(exact.other_templates.len(), 1);
+    assert_eq!(
+        exact.other_templates[0].locator,
+        "op:GET /accounts/{resourceId}/transactions"
+    );
+
+    // Same canonical key, unknown parameter name: precedence decides and says so.
+    let unknown = svc
+        .specification
+        .read_endpoint(None, "/accounts/{x}/transactions", "GET")
+        .await
+        .unwrap();
+    assert!(unknown.ambiguous);
+    // Equivalent parameter spelling (v1 style) still resolves unambiguously.
+    let v1_style = svc
+        .specification
+        .read_endpoint(None, "/accounts/{account-id}/transactions", "GET")
+        .await
+        .unwrap();
+    assert_eq!(v1_style.operation.path, ENDPOINT);
+    assert!(!v1_style.ambiguous);
+
+    let ids = |b: &bg_spec_core::services::EndpointEvidenceBundle| {
+        b.requirements
+            .iter()
+            .map(|r| r.requirement_id.clone())
+            .collect::<Vec<_>>()
+    };
+    let main = svc
+        .requirements
+        .endpoint_requirements(Some("openfinance-v2"), ENDPOINT, "GET", None)
+        .await
+        .unwrap();
+    assert!(!ids(&main).contains(&"OFV2-RESOURCE-001".to_owned()));
+    assert!(ids(&main).contains(&"OFV2-TRANSACTIONS-001".to_owned()));
+    assert_eq!(main.endpoint.other_templates.len(), 1);
+    let other = svc
+        .requirements
+        .endpoint_requirements(
+            Some("openfinance-v2"),
+            "/accounts/{resourceId}/transactions",
+            "GET",
+            None,
+        )
+        .await
+        .unwrap();
+    assert_eq!(ids(&other), vec!["OFV2-RESOURCE-001".to_owned()]);
+}

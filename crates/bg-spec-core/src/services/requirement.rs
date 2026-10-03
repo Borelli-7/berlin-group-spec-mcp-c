@@ -169,6 +169,12 @@ pub struct EndpointDescriptor {
     pub matched_path: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub matched_by: Option<MatchedBy>,
+    /// True when the requested path fits several templates equally and precedence decided.
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub ambiguous: bool,
+    /// Other path templates sharing the canonical key; requirements linked to them are excluded.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub other_templates: Vec<Provenance>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
@@ -1011,14 +1017,19 @@ impl RequirementService {
                 .endpoint_refs(r)
                 .into_iter()
                 .filter(|(e, _)| {
-                    e.method == method && self.spec.path_key_for(&version, &e.path) == key
+                    e.method == method
+                        && self.spec.path_key_for(&version, &e.path) == key
+                        && lookup.as_ref().is_none_or(|l| l.denotes(&e.path))
                 })
                 .map(|(_, via)| via)
                 .collect();
             linked_via.extend(
                 Self::path_refs(r)
                     .into_iter()
-                    .filter(|(p, _)| self.spec.path_key_for(&version, p) == key)
+                    .filter(|(p, _)| {
+                        self.spec.path_key_for(&version, p) == key
+                            && lookup.as_ref().is_none_or(|l| l.denotes(p))
+                    })
                     .map(|(_, v)| v),
             );
             if linked_via.is_empty() {
@@ -1137,6 +1148,16 @@ impl RequirementService {
                 found: lookup.is_some(),
                 matched_path: lookup.as_ref().map(|l| l.primary.path.clone()),
                 matched_by: lookup.as_ref().map(|l| l.matched_by),
+                ambiguous: lookup.as_ref().is_some_and(|l| l.ambiguous),
+                other_templates: lookup
+                    .as_ref()
+                    .map(|l| {
+                        l.other_templates
+                            .iter()
+                            .map(|o| o.provenance.clone())
+                            .collect()
+                    })
+                    .unwrap_or_default(),
             },
             notice: format!(
                 "Only entries in 'requirements' (classification authoritative_requirement) are curated requirements. {EVIDENCE_NOTICE} \

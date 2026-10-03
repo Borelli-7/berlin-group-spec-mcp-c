@@ -6,7 +6,7 @@ use crate::{
         OpenApiOperation, OpenApiSchema, PageStatus, Provenance, SearchQuery, SearchResult,
         SourceLocator, SpecificationVersion,
     },
-    openapi_path::{normalize_method, path_key, template_params, validate_path},
+    openapi_path::{normalize_method, path_key, template_score, validate_path},
     ports::{CatalogRepository, CatalogStats, IndexMeta, SearchRepository},
 };
 use schemars::JsonSchema;
@@ -153,8 +153,24 @@ pub enum MatchedBy {
 pub struct OperationLookup {
     pub primary: OpenApiOperation,
     pub matched_by: MatchedBy,
-    /// Other sources of the same version defining the same operation.
+    /// Other sources of the same version defining the same path template.
     pub others: Vec<OpenApiOperation>,
+    /// Distinct path templates sharing the canonical key (highest precedence per template).
+    pub other_templates: Vec<OpenApiOperation>,
+    /// True when several templates fit equally well and precedence decided.
+    pub ambiguous: bool,
+}
+
+impl OperationLookup {
+    /// Whether a curated endpoint/path reference denotes the resolved template. When other
+    /// templates share the canonical key, parameter names must match the resolved one.
+    pub fn denotes(&self, path: &str) -> bool {
+        self.other_templates.is_empty()
+            || template_score(path, &self.primary.path) > 0
+                && self.other_templates.iter().all(|o| {
+                    template_score(path, &o.path) <= template_score(path, &self.primary.path)
+                })
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
@@ -166,6 +182,12 @@ pub struct EndpointResponse {
     pub operation: OpenApiOperation,
     /// Other sources of the same version defining this operation (highest precedence wins).
     pub alternatives: Vec<Provenance>,
+    /// True when the requested path fits several templates equally and precedence decided.
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub ambiguous: bool,
+    /// Other path templates sharing the canonical key (e.g. differing only in parameter names).
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub other_templates: Vec<Provenance>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
@@ -640,22 +662,33 @@ impl SpecificationService {
         if ops.is_empty() {
             return Ok(None);
         }
-        let wanted = template_params(&path);
-        let (idx, matched_by) = match ops.iter().position(|o| o.path == path) {
-            Some(i) => (i, MatchedBy::Exact),
-            // All-parameter templates share one key; prefer the same parameter names.
-            None => (
-                ops.iter()
-                    .position(|o| template_params(&o.path) == wanted)
-                    .unwrap_or(0),
-                MatchedBy::Canonical,
-            ),
-        };
+        // `ops` is in precedence order; the first operation with the best score wins.
+        let scores: Vec<u8> = ops.iter().map(|o| template_score(&path, &o.path)).collect();
+        let best = scores.iter().copied().max().unwrap_or(0);
+        let idx = scores.iter().position(|s| *s == best).unwrap_or(0);
         let primary = ops.remove(idx);
+        let matched_by = if primary.path == path {
+            MatchedBy::Exact
+        } else {
+            MatchedBy::Canonical
+        };
+        let (others, rest): (Vec<_>, Vec<_>) =
+            ops.into_iter().partition(|o| o.path == primary.path);
+        let mut other_templates: Vec<OpenApiOperation> = Vec::new();
+        for o in rest {
+            if !other_templates.iter().any(|t| t.path == o.path) {
+                other_templates.push(o);
+            }
+        }
+        let ambiguous = other_templates
+            .iter()
+            .any(|o| template_score(&path, &o.path) == best);
         Ok(Some(OperationLookup {
             primary,
             matched_by,
-            others: ops,
+            others,
+            other_templates,
+            ambiguous,
         }))
     }
 
@@ -682,6 +715,12 @@ impl SpecificationService {
             requested_path: path.trim().to_owned(),
             matched_by: lookup.matched_by,
             alternatives: lookup.others.iter().map(|o| o.provenance.clone()).collect(),
+            ambiguous: lookup.ambiguous,
+            other_templates: lookup
+                .other_templates
+                .iter()
+                .map(|o| o.provenance.clone())
+                .collect(),
             operation: lookup.primary,
         })
     }

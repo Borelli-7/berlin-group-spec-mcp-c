@@ -52,7 +52,10 @@ Unknown or missing fields are rejected by rmcp with `failed to deserialize param
 Endpoint lookups first try an **exact** match on the path template, then a **canonical** match:
 the configured version prefixes (`/v1`, `/v2`) are stripped and parameter names are ignored, so
 `/v1/accounts/{account-id}` matches `/v2/accounts/{account-id}` and `/accounts/{accountId}`. The response
-reports which one was used in `matched_by`.
+reports which one was used in `matched_by`. When distinct templates share one canonical key, the best
+fit wins: identical path, then identical parameter names, then names equal ignoring case, `-` and `_`,
+then source precedence. The other templates are listed in `other_templates` (omitted when empty), and
+`ambiguous: true` is added when precedence alone decided between equally fitting templates.
 
 ---
 
@@ -98,7 +101,8 @@ Input: `version?` (defaults to the target), `path`, `method`.
 Output: `{version, requested_method, requested_path, matched_by, operation:{path, method, operation_id,
 summary, description, tags, deprecated, parameters[{name, location, required, schema, component}],
 request_body (only when declared), responses[{status, description, headers, content}], security, security_origin
-(operation|global), referenced_schemas, json_pointer, provenance}, alternatives}`.
+(operation|global), referenced_schemas, json_pointer, provenance}, alternatives, ambiguous?, other_templates?}`.
+`alternatives` lists other sources of the same template; `other_templates` lists different templates with the same canonical key.
 `$ref` values are resolved for parameters, request bodies, and responses. Schemas remain `$ref` values,
 and their names are listed in `referenced_schemas`. See [02](examples/responses/02-read_openapi_endpoint.json).
 
@@ -116,7 +120,7 @@ endpoint **and** by `path:`/`op:` source locators) → related evidence (search 
 summary, split operationId, literal path segments, and tags) → citations → conflict detection → bundle.
 
 Input: `version?`, `path`, `method`, `evidence_limit?`.
-Output: `{endpoint:{version, method, requested_path, found, matched_path, matched_by}, notice, openapi,
+Output: `{endpoint:{version, method, requested_path, found, matched_path, matched_by, ambiguous?, other_templates?}, notice, openapi,
 requirements, schemas, unresolved_schemas, related_evidence, conflicts, sources}`. `sources` is the
 deduplicated list of citations. If the endpoint does not exist, `found` is `false`. That is not an error.
 See [01](examples/responses/01-get_endpoint_requirements.json).
@@ -136,7 +140,7 @@ See [03](examples/responses/03-trace_requirement.json). The conflicts example is
 Structural, deterministic diff. It **never returns a compatibility verdict**.
 
 Input: `path`, `method`, `from_version?` (defaults to the baseline), `to_version?` (defaults to the target).
-Output: `{method, path, from:{version, found, matched_by, unresolved_schemas}, to:{…}, notice,
+Output: `{method, path, from:{version, found, matched_by, unresolved_schemas, ambiguous?}, to:{…}, notice,
 v1_operation, v2_operation, changes:[{area, side, change(added|removed|modified|unchanged), subject,
 before?, after?}], schema_changes:[{schema_name, pointer, kind(schema_added|schema_removed|
 property_added|property_removed|type_changed|format_changed|nullable_changed|required_added|

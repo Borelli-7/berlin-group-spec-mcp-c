@@ -72,6 +72,33 @@ pub fn template_params(path: &str) -> Vec<String> {
         .collect()
 }
 
+/// Template parameter names with case, `-` and `_` ignored (`account-id` ≡ `accountId`).
+pub fn param_shape(path: &str) -> Vec<String> {
+    template_params(path)
+        .iter()
+        .map(|p| {
+            p.chars()
+                .filter(|c| !matches!(c, '-' | '_'))
+                .flat_map(char::to_lowercase)
+                .collect()
+        })
+        .collect()
+}
+
+/// How well `candidate` matches the `requested` template among operations sharing one
+/// canonical key: 3 identical path, 2 identical parameter names, 1 same [`param_shape`], 0 key only.
+pub fn template_score(requested: &str, candidate: &str) -> u8 {
+    if requested == candidate {
+        3
+    } else if template_params(requested) == template_params(candidate) {
+        2
+    } else if param_shape(requested) == param_shape(candidate) {
+        1
+    } else {
+        0
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -80,6 +107,26 @@ mod tests {
     fn methods() {
         assert_eq!(normalize_method("get").unwrap(), "GET");
         assert!(normalize_method("CONNECT").is_err());
+    }
+
+    #[test]
+    fn template_scores() {
+        let pay = "/v2/{payment-service}/{payment-product}/{paymentId}";
+        let auth = "/v2/{resource-path}/{resourceId}/{authorisation-category}";
+        assert_eq!(template_score(pay, pay), 3);
+        assert_eq!(
+            template_score("/{payment-service}/{payment-product}/{paymentId}", pay),
+            2
+        );
+        assert_eq!(
+            template_score("/v2/{paymentService}/{payment_product}/{payment-id}", pay),
+            1
+        );
+        assert_eq!(template_score(pay, auth), 0);
+        assert_eq!(
+            param_shape("/a/{Account-Id}/{x_y}"),
+            vec!["accountid", "xy"]
+        );
     }
 
     #[test]
