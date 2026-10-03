@@ -41,6 +41,9 @@ enum Command {
         /// Re-index every document regardless of hashes.
         #[arg(long)]
         force: bool,
+        /// Sources processed concurrently (overrides `index.jobs`; 0 = automatic).
+        #[arg(long)]
+        jobs: Option<usize>,
     },
     /// Check configuration, corpus, catalog and search index consistency.
     Doctor,
@@ -81,16 +84,16 @@ async fn run(cli: Cli) -> Result<ExitCode> {
         Config::load(&cli.config).with_context(|| format!("loading {}", cli.config.display()))?;
     init_tracing(&config.log.level);
     match cli.command {
-        Command::Index { force } => index(&config, force, cli.json).await,
+        Command::Index { force, jobs } => index(&config, force, jobs, cli.json).await,
         Command::Doctor => doctor::run(&config, cli.json).await,
         Command::Stats => stats(&config, cli.json).await,
         Command::Sources => sources(&config, cli.json).await,
     }
 }
 
-async fn index(config: &Config, force: bool, json: bool) -> Result<ExitCode> {
+async fn index(config: &Config, force: bool, jobs: Option<usize>, json: bool) -> Result<ExitCode> {
     let report = Indexer::new(config.clone())
-        .run(IndexOptions { force })
+        .run(IndexOptions { force, jobs })
         .await?;
     if json {
         print_json(&report)?;

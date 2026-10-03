@@ -42,13 +42,15 @@ use std::{
 use tracing::{info, warn};
 
 /// Bumped when extraction/normalization output changes, forcing re-indexing.
-pub const INDEXER_FORMAT_VERSION: u32 = 5;
+pub const INDEXER_FORMAT_VERSION: u32 = 6;
 const META_IN_PROGRESS: &str = "index_in_progress";
 
 #[derive(Debug, Clone, Copy, Default)]
 pub struct IndexOptions {
     /// Re-index every document regardless of hashes.
     pub force: bool,
+    /// Overrides `index.jobs` from the configuration (`Some(0)` = automatic).
+    pub jobs: Option<usize>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
@@ -89,9 +91,17 @@ impl IndexReport {
 }
 
 /// Orchestrates indexing of a corpus described by a [`Config`].
+#[derive(Clone)]
 pub struct Indexer {
     config: Config,
     extractor: Arc<dyn PdfExtractor>,
+}
+
+/// Outcome of preparing one source, persisted later by the single writer.
+enum Prepared {
+    Skipped(DocumentReport),
+    Empty(Box<Document>, IndexAction),
+    Processed(Box<Processed>),
 }
 
 struct Processed {
@@ -227,13 +237,35 @@ impl Indexer {
             }
         }
 
+        // Up to `jobs` sources are hashed and extracted concurrently; this task is the single
+        // writer and persists them strictly in manifest order, so the output does not depend on
+        // `jobs` and at most `jobs` prepared documents are held in memory.
+        let jobs = match options.jobs {
+            Some(n) => bg_spec_core::config::IndexConfig { jobs: n }.effective_jobs(),
+            None => self.config.index.effective_jobs(),
+        };
+        info!(jobs, "indexing sources");
+        let root = Arc::new(root);
+        let mut window: std::collections::VecDeque<tokio::task::JoinHandle<Result<Prepared>>> =
+            std::collections::VecDeque::new();
         for source in &manifest.sources {
-            let _doc_timer = Timer::start("indexer.index_source");
-            let report = self
-                .index_source(&root, source, &catalog, &writer, full_rebuild)
-                .await?;
-            info!(source_id = %report.source_id, action = ?report.action, records = report.records, "document processed");
-            reports.push(report);
+            let previous = if full_rebuild {
+                None
+            } else {
+                catalog.document_state(&source.id).await?
+            };
+            let (indexer, root, source) = (self.clone(), Arc::clone(&root), source.clone());
+            window.push_back(tokio::spawn(async move {
+                let _doc_timer = Timer::start("indexer.prepare_source");
+                indexer.prepare_source(&root, &source, previous).await
+            }));
+            if window.len() >= jobs {
+                let next = window.pop_front().expect("window is not empty");
+                reports.push(self.persist(next, &catalog, &writer).await?);
+            }
+        }
+        while let Some(next) = window.pop_front() {
+            reports.push(self.persist(next, &catalog, &writer).await?);
         }
 
         let generation = meta.index_generation.unwrap_or(0) + 1;
@@ -305,6 +337,40 @@ impl Indexer {
         }
     }
 
+    async fn persist(
+        &self,
+        prepared: tokio::task::JoinHandle<Result<Prepared>>,
+        catalog: &SqliteCatalog,
+        writer: &TantivyWriter,
+    ) -> Result<DocumentReport> {
+        let _timer = Timer::start("indexer.persist_source");
+        let report = match prepared.await.map_err(join_err)?? {
+            Prepared::Skipped(report) => report,
+            Prepared::Empty(document, action) => {
+                self.store_empty(catalog, writer, *document, action).await?
+            }
+            Prepared::Processed(processed) => {
+                catalog
+                    .replace_document(&processed.document, &processed.bundle)
+                    .await?;
+                writer.delete_source(&processed.document.source_id);
+                for d in &processed.search_docs {
+                    writer.add(d)?;
+                }
+                DocumentReport {
+                    source_id: processed.document.source_id.clone(),
+                    action: IndexAction::Indexed,
+                    status: Some(processed.document.status),
+                    sha256: processed.document.sha256.clone(),
+                    records: processed.search_docs.len(),
+                    diagnostics: processed.document.diagnostics,
+                }
+            }
+        };
+        info!(source_id = %report.source_id, action = ?report.action, records = report.records, "document processed");
+        Ok(report)
+    }
+
     async fn store_empty(
         &self,
         catalog: &SqliteCatalog,
@@ -326,14 +392,14 @@ impl Indexer {
         })
     }
 
-    async fn index_source(
+    /// Hashes, change-checks and extracts one source without touching the stores. `previous` is
+    /// the catalog state of the source (`None` on a full rebuild).
+    async fn prepare_source(
         &self,
         root: &CorpusRoot,
         source: &ManifestSource,
-        catalog: &SqliteCatalog,
-        writer: &TantivyWriter,
-        full_rebuild: bool,
-    ) -> Result<DocumentReport> {
+        previous: Option<(Option<String>, String, DocumentStatus)>,
+    ) -> Result<Prepared> {
         let path = match root.resolve(&source.path) {
             Ok(Some(p)) => p,
             Ok(None) => {
@@ -346,9 +412,7 @@ impl Indexer {
                         source.path
                     ),
                 ));
-                return self
-                    .store_empty(catalog, writer, doc, IndexAction::Missing)
-                    .await;
+                return Ok(Prepared::Empty(Box::new(doc), IndexAction::Missing));
             }
             Err(e) => {
                 let mut doc = self.base_document(source, None, None, DocumentStatus::Failed);
@@ -357,9 +421,7 @@ impl Indexer {
                     "path_rejected",
                     e.to_string(),
                 ));
-                return self
-                    .store_empty(catalog, writer, doc, IndexAction::Failed)
-                    .await;
+                return Ok(Prepared::Empty(Box::new(doc), IndexAction::Failed));
             }
         };
 
@@ -376,21 +438,19 @@ impl Indexer {
         .map_err(join_err)??;
 
         let fingerprint = self.fingerprint(source);
-        if !full_rebuild
-            && let Some((Some(old_sha), old_fp, status)) =
-                catalog.document_state(&source.id).await?
+        if let Some((Some(old_sha), old_fp, status)) = previous
             && old_sha == sha
             && old_fp == fingerprint
             && matches!(status, DocumentStatus::Indexed | DocumentStatus::Partial)
         {
-            return Ok(DocumentReport {
+            return Ok(Prepared::Skipped(DocumentReport {
                 source_id: source.id.clone(),
                 action: IndexAction::Skipped,
                 status: Some(status),
                 sha256: Some(sha),
                 records: 0,
                 diagnostics: vec![],
-            });
+            }));
         }
 
         let document = self.base_document(source, Some(sha), Some(size), DocumentStatus::Indexed);
@@ -407,26 +467,10 @@ impl Indexer {
                     "processing_failed",
                     e.to_string(),
                 ));
-                return self
-                    .store_empty(catalog, writer, doc, IndexAction::Failed)
-                    .await;
+                return Ok(Prepared::Empty(Box::new(doc), IndexAction::Failed));
             }
         };
-        catalog
-            .replace_document(&processed.document, &processed.bundle)
-            .await?;
-        writer.delete_source(&source.id);
-        for d in &processed.search_docs {
-            writer.add(d)?;
-        }
-        Ok(DocumentReport {
-            source_id: source.id.clone(),
-            action: IndexAction::Indexed,
-            status: Some(processed.document.status),
-            sha256: processed.document.sha256.clone(),
-            records: processed.search_docs.len(),
-            diagnostics: processed.document.diagnostics,
-        })
+        Ok(Prepared::Processed(Box::new(processed)))
     }
 
     async fn process(

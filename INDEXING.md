@@ -35,7 +35,19 @@ Sources removed from the manifest are deleted from both stores. Each run increme
 `index_generation` and works on a staging copy of the published generation; only a completed run is
 published (`data/generations/<n>/`, selected by `data/CURRENT`), so an interrupted or failed run never affects
 readers and its staging directory is removed by the next run. The current and previous generations are
-kept. A legacy-layout catalog whose `index_in_progress` flag is still set triggers a full rebuild. `--force` always rebuilds everything, as does a missing or incompatible Tantivy schema.
+kept.
+
+### Parallelism
+
+Up to `[index] jobs` sources (default `0` = automatic, `min(CPUs, 8)`; `bg-spec index --jobs N` overrides)
+are hashed, extracted, normalised and chunked concurrently. One writer persists the prepared sources in
+manifest order, so SQLite rows, Tantivy documents and the published generation are identical for every
+`jobs` value; `parallel_indexing_output_is_identical_to_sequential` enforces this. To keep PDF extraction
+independent of the order in which documents are processed, the indexer disables `pdf_oxide`'s process-wide
+font cache. Each document still caches its own fonts. INDEXER_FORMAT_VERSION 6 introduced this, so run
+`bg-spec index --force` once after upgrading.
+
+A legacy-layout catalog whose `index_in_progress` flag is still set triggers a full rebuild. `--force` always rebuilds everything, as does a missing or incompatible Tantivy schema.
 
 ## PDF
 

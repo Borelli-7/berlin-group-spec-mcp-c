@@ -28,7 +28,34 @@ pub struct Config {
     #[serde(default)]
     pub search: SearchConfig,
     #[serde(default)]
+    pub index: IndexConfig,
+    #[serde(default)]
     pub log: LogConfig,
+}
+
+/// Upper bound for `index.jobs`.
+pub const MAX_INDEX_JOBS: usize = 64;
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct IndexConfig {
+    /// Sources hashed, extracted and normalised concurrently. `0` (default) uses the available
+    /// parallelism, capped at 8. Output is identical for every value.
+    #[serde(default)]
+    pub jobs: usize,
+}
+
+impl IndexConfig {
+    /// Effective number of concurrent jobs.
+    pub fn effective_jobs(&self) -> usize {
+        match self.jobs {
+            0 => std::thread::available_parallelism()
+                .map(|n| n.get())
+                .unwrap_or(1)
+                .min(8),
+            n => n.min(MAX_INDEX_JOBS),
+        }
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -161,6 +188,11 @@ impl Config {
             return Err(CoreError::Config(
                 "chunking.overlap_chars must be < max_chars / 2".into(),
             ));
+        }
+        if self.index.jobs > MAX_INDEX_JOBS {
+            return Err(CoreError::Config(format!(
+                "index.jobs must be <= {MAX_INDEX_JOBS} (0 = automatic)"
+            )));
         }
         if self.search.default_limit == 0 || self.search.max_limit < self.search.default_limit {
             return Err(CoreError::Config(

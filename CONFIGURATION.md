@@ -26,6 +26,9 @@ overlap_chars = 500    # < max_chars / 2
 [pdf]
 min_chars_per_page = 16   # pages with fewer non-whitespace characters are marked ocr_required
 
+[index]
+jobs = 0               # sources prepared concurrently; 0 = automatic (min(CPUs, 8)), max 64; `bg-spec index --jobs N` overrides
+
 [search]
 default_limit = 10
 max_limit     = 50

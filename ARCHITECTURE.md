@@ -125,7 +125,8 @@ manifest.yaml ─► validate ─► for each source:
    resolve path inside corpus root (reject .., absolute, escaping symlinks)
    sha256(file) + fingerprint(format version, manifest entry, chunking, extractor)
    unchanged & indexed? ─► skip
-   else extract (spawn_blocking) ─► normalize/chunk ─► SQLite txn replace ─► Tantivy delete+add
+   else extract (spawn_blocking) ─► normalize/chunk      (up to [index] jobs sources concurrently)
+   single writer, manifest order ─► SQLite txn replace ─► Tantivy delete+add
 removed from manifest ─► delete from both stores
 requirements.yaml ─► validate ─► replace requirement tables
 commit Tantivy, checkpoint SQLite, bump index_generation

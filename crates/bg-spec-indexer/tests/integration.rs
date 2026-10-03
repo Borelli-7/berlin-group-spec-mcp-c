@@ -89,7 +89,13 @@ async fn incremental_indexing_skips_unchanged_and_reindexes_changed() {
     assert_eq!(changed.count(IndexAction::Indexed), 1);
     assert_eq!(changed.count(IndexAction::Skipped), 5);
 
-    let forced = indexer.run(IndexOptions { force: true }).await.unwrap();
+    let forced = indexer
+        .run(IndexOptions {
+            force: true,
+            ..Default::default()
+        })
+        .await
+        .unwrap();
     assert_eq!(forced.count(IndexAction::Indexed), 6);
 
     let svc = services(&env).await;
@@ -1098,4 +1104,89 @@ async fn cached_reads_are_identical_and_counted() {
                 .is_err()
         );
     }
+}
+
+/// Everything an index run produces that readers can observe, minus wall-clock timestamps.
+async fn index_fingerprint(config: &bg_spec_core::config::Config) -> Value {
+    use bg_spec_core::ports::CatalogRepository;
+    let (catalog, _) = bg_spec_store::open_read_only(config).await.unwrap();
+    let svc = {
+        let (c, s) = bg_spec_store::open_read_only(config).await.unwrap();
+        Services::new(c, s, ServiceSettings::from_config(config))
+    };
+    let mut docs = Vec::new();
+    for d in catalog.list_documents().await.unwrap() {
+        let pages = d.page_count.unwrap_or(0);
+        let mut chunks = Vec::new();
+        for p in 1..=pages {
+            chunks.push(
+                serde_json::to_value(catalog.chunks_for_page(&d.source_id, p).await.unwrap())
+                    .unwrap(),
+            );
+        }
+        let page_records = catalog
+            .get_pages(&d.source_id, 1, pages.max(1))
+            .await
+            .unwrap();
+        let mut doc = serde_json::to_value(&d).unwrap();
+        doc.as_object_mut().unwrap().remove("indexed_at_unix");
+        docs.push(serde_json::json!({
+            "document": doc,
+            "pages": serde_json::to_value(page_records).unwrap(),
+            "chunks": chunks,
+        }));
+    }
+    let mut searches = Vec::new();
+    for q in [
+        "transactions",
+        "consent",
+        "PSU-ID",
+        "TransactionsResponse200Json",
+        "balances",
+    ] {
+        let mut r = serde_json::to_value(
+            svc.specification
+                .search(q, None, None, None, Some(20))
+                .await
+                .unwrap(),
+        )
+        .unwrap();
+        r.as_object_mut().unwrap().remove("timing_ms");
+        searches.push(r);
+    }
+    serde_json::json!({
+        "documents": docs,
+        "requirements": serde_json::to_value(catalog.list_requirements().await.unwrap()).unwrap(),
+        "stats": serde_json::to_value(catalog.stats().await.unwrap()).unwrap(),
+        "search": searches,
+    })
+}
+
+#[tokio::test]
+async fn parallel_indexing_output_is_identical_to_sequential() {
+    let mut prints = Vec::new();
+    let mut dirs = Vec::new();
+    for jobs in [1, 4] {
+        let dir = tempfile::tempdir().unwrap();
+        let config = testing::stage_example_corpus(dir.path()).unwrap();
+        let report = Indexer::new(config.clone())
+            .run(IndexOptions {
+                force: true,
+                jobs: Some(jobs),
+            })
+            .await
+            .unwrap();
+        let actions: Vec<_> = report
+            .documents
+            .iter()
+            .map(|d| (d.source_id.clone(), d.action, d.records))
+            .collect();
+        prints.push((actions, index_fingerprint(&config).await));
+        dirs.push(dir);
+    }
+    assert_eq!(prints[0].0, prints[1].0);
+    assert!(
+        prints[0].1 == prints[1].1,
+        "parallel indexing changed the index"
+    );
 }
