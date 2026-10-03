@@ -1,10 +1,12 @@
 //! Application services. They orchestrate repositories and pure domain logic; they never
 //! interpret requirements or produce verdicts.
 
+mod cache;
 mod compatibility;
 mod requirement;
 mod specification;
 
+pub use cache::{CACHE_CAPACITY, CacheStats};
 pub use compatibility::*;
 pub use requirement::*;
 pub use specification::*;

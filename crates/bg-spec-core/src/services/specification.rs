@@ -386,6 +386,15 @@ pub struct SpecificationService {
     catalog: Arc<dyn CatalogRepository>,
     search: Arc<dyn SearchRepository>,
     settings: Arc<ServiceSettings>,
+    caches: Arc<super::cache::ServiceCaches>,
+}
+
+/// Hit/miss counters of the per-generation caches.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub struct ServiceCacheStats {
+    pub operations: super::CacheStats,
+    pub schema_closures: super::CacheStats,
+    pub requirement_sources: super::CacheStats,
 }
 
 pub(crate) fn provenance(doc: &Document, locator: String, sha256: String) -> Provenance {
@@ -402,6 +411,19 @@ impl SpecificationService {
             catalog,
             search,
             settings,
+            caches: Arc::new(super::cache::ServiceCaches::new(super::CACHE_CAPACITY)),
+        }
+    }
+
+    pub(crate) fn caches(&self) -> &super::cache::ServiceCaches {
+        &self.caches
+    }
+
+    pub fn cache_stats(&self) -> ServiceCacheStats {
+        ServiceCacheStats {
+            operations: self.caches.operations.stats(),
+            schema_closures: self.caches.closures.stats(),
+            requirement_sources: self.caches.requirement_sources.stats(),
         }
     }
 
@@ -444,14 +466,30 @@ impl SpecificationService {
         keys
     }
 
-    async fn known_versions(&self) -> Result<BTreeSet<String>> {
-        Ok(self
-            .catalog
-            .list_documents()
-            .await?
-            .into_iter()
-            .map(|d| d.version.to_string())
-            .collect())
+    async fn known_versions(&self) -> Result<Arc<BTreeSet<String>>> {
+        if let Some(known) = self
+            .caches
+            .known_versions
+            .lock()
+            .unwrap_or_else(|e| e.into_inner())
+            .clone()
+        {
+            return Ok(known);
+        }
+        let known: Arc<BTreeSet<String>> = Arc::new(
+            self.catalog
+                .list_documents()
+                .await?
+                .into_iter()
+                .map(|d| d.version.to_string())
+                .collect(),
+        );
+        *self
+            .caches
+            .known_versions
+            .lock()
+            .unwrap_or_else(|e| e.into_inner()) = Some(known.clone());
+        Ok(known)
     }
 
     /// Ensures the version exists in the catalog, returning a helpful error otherwise.
@@ -462,7 +500,7 @@ impl SpecificationService {
         } else {
             Err(CoreError::InvalidInput(format!(
                 "unknown version '{v}'; indexed versions: {}",
-                known.into_iter().collect::<Vec<_>>().join(", ")
+                known.iter().cloned().collect::<Vec<_>>().join(", ")
             )))
         }
     }
@@ -803,6 +841,24 @@ impl SpecificationService {
         let _timer = crate::timing::Timer::start("specification.lookup_operation");
         let method = normalize_method(method)?;
         let path = validate_path(path)?;
+        let key = (version.to_string(), method.clone(), path.clone());
+        if let Some(hit) = self.caches.operations.get(&key) {
+            return Ok(hit);
+        }
+        let lookup = self
+            .lookup_operation_uncached(version, &method, &path)
+            .await?;
+        self.caches.operations.insert(key, lookup.clone());
+        Ok(lookup)
+    }
+
+    async fn lookup_operation_uncached(
+        &self,
+        version: &SpecificationVersion,
+        method: &str,
+        path: &str,
+    ) -> Result<Option<OperationLookup>> {
+        let (method, path) = (method.to_owned(), path.to_owned());
         let mut ops = Vec::new();
         for key in self.candidate_path_keys(version, &path) {
             ops = self.catalog.find_operations(version, &method, &key).await?;
@@ -928,6 +984,24 @@ impl SpecificationService {
         roots: impl IntoIterator<Item = String>,
     ) -> Result<SchemaClosure> {
         let _timer = crate::timing::Timer::start("specification.schema_closure");
+        let roots: Vec<String> = roots.into_iter().collect();
+        let key = (source_id.to_owned(), version.to_string(), roots.clone());
+        if let Some(hit) = self.caches.closures.get(&key) {
+            return Ok(hit);
+        }
+        let closure = self
+            .schema_closure_uncached(source_id, version, roots)
+            .await?;
+        self.caches.closures.insert(key, closure.clone());
+        Ok(closure)
+    }
+
+    async fn schema_closure_uncached(
+        &self,
+        source_id: &str,
+        version: &SpecificationVersion,
+        roots: Vec<String>,
+    ) -> Result<SchemaClosure> {
         let mut closure = SchemaClosure::default();
         // Each reference is resolved in the source of the schema/operation that made it.
         // Breadth-first, one level at a time: each level is fetched with one query per referencing

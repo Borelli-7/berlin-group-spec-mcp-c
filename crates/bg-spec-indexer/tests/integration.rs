@@ -1042,3 +1042,60 @@ async fn index_runs_publish_generations_atomically() {
         .count();
     assert_eq!(entries, layout::KEEP_GENERATIONS);
 }
+
+#[tokio::test]
+async fn cached_reads_are_identical_and_counted() {
+    let env = indexed().await;
+    let svc = services(&env).await;
+    let mut first = Vec::new();
+    let mut second = Vec::new();
+    for out in [&mut first, &mut second] {
+        out.push(serde_json::to_value(
+            svc.specification
+                .read_endpoint(Some("openfinance-v2"), ENDPOINT, "get")
+                .await
+                .unwrap(),
+        ));
+        out.push(serde_json::to_value(
+            svc.specification
+                .read_schema(Some("openfinance-v2"), "TransactionsResponse200Json")
+                .await
+                .unwrap(),
+        ));
+        out.push(serde_json::to_value(
+            svc.requirements
+                .endpoint_requirements(Some("openfinance-v2"), ENDPOINT, "GET", None)
+                .await
+                .unwrap(),
+        ));
+        let id = svc
+            .requirements
+            .find("transactions", None, Some(1))
+            .await
+            .unwrap()
+            .requirements[0]
+            .requirement_id
+            .clone();
+        out.push(serde_json::to_value(
+            svc.requirements.trace(&id).await.unwrap(),
+        ));
+    }
+    let first: Vec<Value> = first.into_iter().map(Result::unwrap).collect();
+    let second: Vec<Value> = second.into_iter().map(Result::unwrap).collect();
+    assert_eq!(first, second);
+
+    let stats = svc.specification.cache_stats();
+    assert!(stats.operations.hits >= 2, "{stats:?}");
+    assert!(stats.schema_closures.hits >= 2, "{stats:?}");
+    assert!(stats.requirement_sources.hits >= 1, "{stats:?}");
+
+    // Errors are not cached.
+    for _ in 0..2 {
+        assert!(
+            svc.specification
+                .read_endpoint(Some("openfinance-v2"), "/nope", "GET")
+                .await
+                .is_err()
+        );
+    }
+}

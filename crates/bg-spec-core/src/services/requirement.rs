@@ -308,7 +308,8 @@ fn dedupe_conflicts(conflicts: &mut Vec<Conflict>) {
     conflicts.sort_by(|a, b| (a.kind, &a.description).cmp(&(b.kind, &b.description)));
 }
 
-struct ResolvedSources {
+#[derive(Clone)]
+pub(crate) struct ResolvedSources {
     sources: Vec<TracedSource>,
     conflicts: Vec<Conflict>,
 }
@@ -341,8 +342,19 @@ impl RequirementService {
         }
     }
 
-    /// Resolves every curated source citation and derives source-level conflicts.
+    /// Resolves every curated source citation and derives source-level conflicts (cached per
+    /// requirement for the lifetime of this index generation).
     async fn resolve_sources(&self, rec: &RequirementRecord) -> Result<ResolvedSources> {
+        let cache = &self.spec.caches().requirement_sources;
+        if let Some(hit) = cache.get(&rec.requirement.id) {
+            return Ok(hit);
+        }
+        let resolved = self.resolve_sources_uncached(rec).await?;
+        cache.insert(rec.requirement.id.clone(), resolved.clone());
+        Ok(resolved)
+    }
+
+    async fn resolve_sources_uncached(&self, rec: &RequirementRecord) -> Result<ResolvedSources> {
         let _timer = crate::timing::Timer::start("requirement.resolve_sources");
         let req = &rec.requirement;
         let mut sources = Vec::new();

@@ -147,6 +147,12 @@ handles (calls already running finish on the old ones), so a re-index is picked 
 new generation cannot be opened, the server logs a warning and keeps serving the previous one. `health` shows
 the catalog's `index_generation` and the `published_generation` being served.
 
+Each `Services` instance serves one immutable generation and keeps bounded (512 entries each, least recently
+used evicted) in-memory caches for the known versions, endpoint lookups, schema closures and resolved
+requirement sources. Because a new generation gets a new `Services` instance, the caches never serve data from
+another generation and need no invalidation. Only successful results are cached, and cached values are clones of
+the uncached result, so responses are unchanged. `SpecificationService::cache_stats` exposes hit/miss counters.
+
 ## 6. Services
 
 * **SpecificationService**: `search`, `read_source`, `read_endpoint`, `read_schema` (with the transitive
