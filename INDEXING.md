@@ -85,7 +85,10 @@ page → section (heading) → paragraph → sentence → chunk
 * Chunks **never cross pages**, so every chunk has an exact `page:N` citation.
 * Headings are detected in these forms: numbered (`4.2.1 Read Transaction List`, depth ≤ 6), `Annex`/`Appendix`,
   and Markdown `#`. The current section carries over to the following pages.
-* Paragraphs are packed up to `max_chars` (6000). A paragraph that is too long is split at **sentence**
+* A heading stack is kept per document. A numbered heading is nested under the open headings whose number is a
+  strict prefix (`4.2.1` under `4.2` under `4`); `Annex`/`Appendix` restarts at the top level; Markdown nests by
+  `#` depth. Each chunk stores the resulting `section_path` (outermost first; its last entry equals `section`).
+* Paragraphs are packed up to `max_chars` (6000). Sizes are counted in characters, not bytes. A paragraph that is too long is split at **sentence**
   boundaries. A sentence, including any normative MUST/SHALL/REQUIRED statement, is only
   hard-split if it alone exceeds `max_chars`.
 * The overlap (500) is sentence-aligned and taken from the tail of the previous chunk.
@@ -122,6 +125,8 @@ Each chunk, operation, and schema is one search document.
 | `page` | `u64 INDEXED \| STORED` |
 | `title`, `content` | `TEXT \| STORED` (BM25) |
 | `identifiers` | exact, lower-cased identifiers (`bg_ident` tokenizer), not stored |
+| `section_path` | `STORED` only: the chunk's full heading path, returned with hits |
+| `section_context` | `TEXT`, not stored: the chunk's *enclosing* headings (the innermost one is already in `title`) |
 
 `identifiers` holds, per record type:
 
@@ -130,7 +135,7 @@ Each chunk, operation, and schema is one search document.
 * chunk: code-like tokens of the text (`PSU-IP-Address`, `E-07`, `bookingStatus`, `/v2/...` paths and
   `METHOD /path` pairs), at most 256 per chunk.
 
-Queries combine BM25 over `title` and `content` with boosted exact `identifiers` terms (the whole query and each
+Queries combine BM25 over `title` (boost 2), `section_context` (boost 0.5) and `content` with boosted exact `identifiers` terms (the whole query and each
 token) and `TermQuery` filters on `version`, `kind`, and `source_id`. Every hit carries `source_id` and `locator`, so the exact record can be fetched from SQLite with `read_source`.
 
 ## SQLite

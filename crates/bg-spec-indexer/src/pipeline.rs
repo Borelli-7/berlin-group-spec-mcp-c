@@ -41,7 +41,7 @@ use std::{
 use tracing::{info, warn};
 
 /// Bumped when extraction/normalization output changes, forcing re-indexing.
-pub const INDEXER_FORMAT_VERSION: u32 = 4;
+pub const INDEXER_FORMAT_VERSION: u32 = 5;
 const META_IN_PROGRESS: &str = "index_in_progress";
 
 #[derive(Debug, Clone, Copy, Default)]
@@ -673,6 +673,7 @@ fn process_paged(
                 chunk_id,
                 page: Some(c.page),
                 section: c.section,
+                section_path: c.section_path,
                 ordinal: c.ordinal,
                 text: c.text,
                 provenance,
@@ -698,6 +699,7 @@ fn process_paged(
             content: c.text.clone(),
             sha256: c.provenance.sha256.clone(),
             identifiers: bg_spec_core::identifiers::from_text(&c.text),
+            section_path: c.section_path.clone(),
         })
         .collect();
     let ocr = records
@@ -779,6 +781,7 @@ fn process_openapi(mut document: Document, path: &Path, prefix: Option<&str>) ->
         content,
         sha256,
         identifiers,
+        section_path: Vec::new(),
     };
     for op in &api.operations {
         let (title, content) = operation_search_text(op);

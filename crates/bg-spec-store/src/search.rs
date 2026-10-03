@@ -26,12 +26,14 @@ use tantivy::{
 };
 
 /// Bumped whenever the Tantivy schema changes; mismatches force a rebuild by the indexer.
-pub const SEARCH_SCHEMA_VERSION: u32 = 2;
+pub const SEARCH_SCHEMA_VERSION: u32 = 3;
 const MARKER_FILE: &str = "bg-spec-search.version";
 const TOKENIZER: &str = "en_stem";
 const IDENT_TOKENIZER: &str = "bg_ident";
 /// Exact identifier matches outweigh stemmed prose matches of the same terms.
 const IDENT_BOOST: f32 = 3.0;
+/// Enclosing (ancestor) headings of a chunk; the innermost heading is scored via the title.
+const SECTION_CONTEXT_BOOST: f32 = 0.5;
 const SNIPPET_CHARS: usize = 400;
 const WRITER_HEAP_BYTES: usize = 64 * 1024 * 1024;
 
@@ -54,6 +56,8 @@ struct Fields {
     content: Field,
     sha256: Field,
     identifiers: Field,
+    section_path: Field,
+    section_context: Field,
 }
 
 fn build_schema() -> (Schema, Fields) {
@@ -76,6 +80,15 @@ fn build_schema() -> (Schema, Fields) {
         locator: b.add_text_field("locator", STRING | STORED),
         page: b.add_u64_field("page", INDEXED | STORED),
         title: b.add_text_field("title", text.clone()),
+        section_path: b.add_text_field("section_path", STORED),
+        section_context: b.add_text_field(
+            "section_context",
+            TextOptions::default().set_indexing_options(
+                TextFieldIndexing::default()
+                    .set_tokenizer(TOKENIZER)
+                    .set_index_option(IndexRecordOption::WithFreqsAndPositions),
+            ),
+        ),
         content: b.add_text_field("content", text),
         sha256: b.add_text_field("sha256", STRING | STORED),
         identifiers: b.add_text_field(
@@ -106,6 +119,8 @@ fn fields_of(schema: &Schema) -> Result<Fields> {
         content: f("content")?,
         sha256: f("sha256")?,
         identifiers: f("identifiers")?,
+        section_path: f("section_path")?,
+        section_context: f("section_context")?,
     })
 }
 
@@ -143,6 +158,8 @@ pub struct SearchDocument {
     pub sha256: String,
     /// Code-like identifiers matched exactly (see `bg_spec_core::identifiers`).
     pub identifiers: Vec<String>,
+    /// Enclosing headings of a chunk, outermost first (empty for OpenAPI records).
+    pub section_path: Vec<String>,
 }
 
 /// Index writer used by the indexer. Holds the Tantivy writer lock while alive.
@@ -218,6 +235,15 @@ impl TantivyWriter {
         for id in &doc.identifiers {
             d.add_text(f.identifiers, bg_spec_core::identifiers::normalize(id));
         }
+        for heading in &doc.section_path {
+            d.add_text(f.section_path, heading);
+        }
+        // The innermost heading is already part of the title; index only the enclosing ones.
+        if let Some((_, ancestors)) = doc.section_path.split_last() {
+            for heading in ancestors {
+                d.add_text(f.section_context, heading);
+            }
+        }
         self.writer.add_document(d).map_err(search_err)?;
         Ok(())
     }
@@ -275,8 +301,10 @@ impl TantivySearch {
 
     fn build_query(&self, q: &SearchQuery) -> Result<Box<dyn Query>> {
         let f = &self.fields;
-        let mut parser = QueryParser::for_index(&self.index, vec![f.title, f.content]);
+        let mut parser =
+            QueryParser::for_index(&self.index, vec![f.title, f.section_context, f.content]);
         parser.set_field_boost(f.title, 2.0);
+        parser.set_field_boost(f.section_context, SECTION_CONTEXT_BOOST);
         let (text_query, _errors) = parser.parse_query_lenient(&q.text);
         let mut matching: Vec<(Occur, Box<dyn Query>)> = vec![(Occur::Should, text_query)];
         for id in bg_spec_core::identifiers::query_terms(&q.text) {
@@ -364,6 +392,10 @@ impl TantivySearch {
                 relevance: (score * 1000.0).round() / 1000.0,
                 sha256: text(f.sha256),
                 classification: EvidenceClass::DiscoveredEvidence,
+                section_path: doc
+                    .get_all(f.section_path)
+                    .filter_map(|v| v.as_str().map(str::to_owned))
+                    .collect(),
                 also_found_in: Vec::new(),
             });
         }

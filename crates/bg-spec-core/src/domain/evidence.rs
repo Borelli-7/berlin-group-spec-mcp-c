@@ -20,6 +20,9 @@ pub struct EvidenceChunk {
     pub chunk_id: String,
     pub page: Option<u32>,
     pub section: Option<String>,
+    /// Enclosing headings, outermost first (the last one equals `section`).
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub section_path: Vec<String>,
     /// Position of the chunk within its page.
     pub ordinal: u32,
     pub text: String,
@@ -86,6 +89,9 @@ pub struct SearchResult {
     /// SHA-256 of the matched record content.
     pub sha256: String,
     pub classification: EvidenceClass,
+    /// Enclosing document headings of a chunk hit, outermost first.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub section_path: Vec<String>,
     /// Lower-ranked hits collapsed into this one (identical content or the same page).
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub also_found_in: Vec<CollapsedHit>,
@@ -173,6 +179,7 @@ mod tests {
             relevance: 1.0,
             sha256: sha.into(),
             classification: EvidenceClass::DiscoveredEvidence,
+            section_path: Vec::new(),
             also_found_in: Vec::new(),
         }
     }

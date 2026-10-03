@@ -84,7 +84,16 @@ async fn evaluate(official: bool) {
             found += 1;
             reciprocal_rank += 1.0 / (rank + 1) as f64;
         }
-        assert!(rank.is_some(), "missing gold evidence for {}", case.query);
+        assert!(
+            rank.is_some(),
+            "missing gold evidence for {}; top hits: {:#?}",
+            case.query,
+            response
+                .results
+                .iter()
+                .map(|h| (h.locator.as_str(), h.relevance, &h.section_path))
+                .collect::<Vec<_>>()
+        );
         if let (Some(rank), Some(max)) = (rank, case.max_rank) {
             assert!(rank < max, "{} ranked {} (max {max})", case.query, rank + 1);
         }

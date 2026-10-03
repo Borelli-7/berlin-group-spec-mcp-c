@@ -75,8 +75,9 @@ Input: `query` (required, ≤1000 chars, phrases in quotes), `version?`, `kind?`
 
 Output: `{query, filters, notice, total, results:[{record_id, record_type(chunk|operation|schema),
 source_id, document_id, version, kind, authority, title, locator, page, evidence, relevance, sha256,
-classification, also_found_in?[{record_id, source_id, locator, page, relevance, sha256, reason}]}]}`.
-See [06](examples/responses/06-search_specification.json).
+classification, section_path?, also_found_in?[{record_id, source_id, locator, page, relevance, sha256, reason}]}]}`.
+`section_path` lists a chunk's enclosing headings, outermost first (also on chunks returned by `read_source` and in
+`related_evidence`). See [06](examples/responses/06-search_specification.json).
 
 ## `find_requirement`
 
