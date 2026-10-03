@@ -113,7 +113,12 @@ cannot be resolved omits the affected element and is listed in `unresolved_refer
 
 Input: `version?`, `name`.
 Output: `{version, name, schema:{schema (verbatim JSON), referenced_schemas, json_pointer, provenance},
-referenced_schemas, transitive_referenced_schemas, unresolved_references, alternatives}`.
+referenced_schemas, transitive_referenced_schemas, unresolved_references, alternatives,
+cross_source_references?[{name, referenced_from, resolved (provenance), candidates}], cyclic_schemas?, truncated?}`.
+References are resolved in the source of the referencing schema. Only when that source does not define the
+name is the highest-precedence schema of the same version used, and every such fallback is listed in
+`cross_source_references`. `cyclic_schemas` lists closure members on a reference cycle; `truncated` is set
+when the closure hit its size cap.
 See [08](examples/responses/08-read_openapi_schema.json).
 
 ## `get_endpoint_requirements` (primary Requirements Agent tool)
@@ -124,7 +129,7 @@ summary, split operationId, literal path segments, and tags) → citations → c
 
 Input: `version?`, `path`, `method`, `evidence_limit?`.
 Output: `{endpoint:{version, method, requested_path, found, matched_path, matched_by, ambiguous?, other_templates?}, notice, openapi,
-requirements, schemas, unresolved_schemas, related_evidence, conflicts, sources}`. `sources` is the
+requirements, schemas, unresolved_schemas, cross_source_schemas?, related_evidence, conflicts, sources}`. `sources` is the
 deduplicated list of citations. If the endpoint does not exist, `found` is `false`. That is not an error.
 See [01](examples/responses/01-get_endpoint_requirements.json).
 
@@ -143,7 +148,7 @@ See [03](examples/responses/03-trace_requirement.json). The conflicts example is
 Structural, deterministic diff. It **never returns a compatibility verdict**.
 
 Input: `path`, `method`, `from_version?` (defaults to the baseline), `to_version?` (defaults to the target).
-Output: `{method, path, from:{version, found, matched_by, unresolved_schemas, ambiguous?}, to:{…}, notice,
+Output: `{method, path, from:{version, found, matched_by, unresolved_schemas, ambiguous?, cross_source_schemas?}, to:{…}, notice,
 v1_operation, v2_operation, changes:[{area, side, change(added|removed|modified|unchanged), subject,
 before?, after?}], schema_changes:[{schema_name, pointer, kind(schema_added|schema_removed|
 property_added|property_removed|type_changed|format_changed|nullable_changed|required_added|

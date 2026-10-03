@@ -201,6 +201,27 @@ pub struct SchemaResponse {
     pub transitive_referenced_schemas: Vec<String>,
     pub unresolved_references: Vec<String>,
     pub alternatives: Vec<Provenance>,
+    /// References resolved in another source of the same version.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub cross_source_references: Vec<CrossSourceReference>,
+    /// Schemas of the closure that take part in a reference cycle.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub cyclic_schemas: Vec<String>,
+    /// True when the closure stopped at its size cap.
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub truncated: bool,
+}
+
+/// A schema name the referencing source does not define, resolved in another source instead.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
+pub struct CrossSourceReference {
+    pub name: String,
+    /// Source whose operation or schema referenced the name.
+    pub referenced_from: String,
+    /// The schema that was used (highest precedence in the version).
+    pub resolved: Provenance,
+    /// Number of sources of the version defining the name.
+    pub candidates: usize,
 }
 
 /// Transitive closure of schemas reachable from a set of roots.
@@ -208,6 +229,8 @@ pub struct SchemaResponse {
 pub struct SchemaClosure {
     pub schemas: BTreeMap<String, OpenApiSchema>,
     pub unresolved: BTreeSet<String>,
+    pub cross_source: Vec<CrossSourceReference>,
+    pub truncated: bool,
 }
 
 impl SchemaClosure {
@@ -216,6 +239,69 @@ impl SchemaClosure {
             .iter()
             .map(|(k, v)| (k.clone(), v.schema.clone()))
             .collect()
+    }
+
+    /// Schemas of the closure that lie on a reference cycle (Tarjan SCC; size > 1 or self-loop).
+    pub fn cyclic(&self) -> BTreeSet<String> {
+        struct Tarjan<'a> {
+            graph: &'a BTreeMap<String, OpenApiSchema>,
+            index: BTreeMap<&'a str, (usize, usize)>,
+            stack: Vec<&'a str>,
+            on_stack: BTreeSet<&'a str>,
+            next: usize,
+            out: BTreeSet<String>,
+        }
+        impl<'a> Tarjan<'a> {
+            fn visit(&mut self, v: &'a str) {
+                self.index.insert(v, (self.next, self.next));
+                self.next += 1;
+                self.stack.push(v);
+                self.on_stack.insert(v);
+                for w in &self.graph[v].referenced_schemas {
+                    let w = w.as_str();
+                    let Some((wk, _)) = self.graph.get_key_value(w) else {
+                        continue;
+                    };
+                    let w = wk.as_str();
+                    if !self.index.contains_key(w) {
+                        self.visit(w);
+                        let low = self.index[v].1.min(self.index[w].1);
+                        self.index.get_mut(v).unwrap().1 = low;
+                    } else if self.on_stack.contains(w) {
+                        let low = self.index[v].1.min(self.index[w].0);
+                        self.index.get_mut(v).unwrap().1 = low;
+                    }
+                }
+                if self.index[v].0 == self.index[v].1 {
+                    let mut scc = Vec::new();
+                    while let Some(w) = self.stack.pop() {
+                        self.on_stack.remove(w);
+                        scc.push(w);
+                        if w == v {
+                            break;
+                        }
+                    }
+                    let self_loop = self.graph[v].referenced_schemas.iter().any(|r| r == v);
+                    if scc.len() > 1 || self_loop {
+                        self.out.extend(scc.into_iter().map(str::to_owned));
+                    }
+                }
+            }
+        }
+        let mut t = Tarjan {
+            graph: &self.schemas,
+            index: BTreeMap::new(),
+            stack: Vec::new(),
+            on_stack: BTreeSet::new(),
+            next: 0,
+            out: BTreeSet::new(),
+        };
+        for k in self.schemas.keys() {
+            if !t.index.contains_key(k.as_str()) {
+                t.visit(k);
+            }
+        }
+        t.out
     }
 }
 
@@ -759,14 +845,17 @@ impl SpecificationService {
                 .filter(|k| *k != &schema.name)
                 .cloned()
                 .collect(),
+            cyclic_schemas: closure.cyclic().into_iter().collect(),
             unresolved_references: closure.unresolved.into_iter().collect(),
             alternatives: found.iter().map(|s| s.provenance.clone()).collect(),
+            cross_source_references: closure.cross_source,
+            truncated: closure.truncated,
             schema,
         })
     }
 
-    /// Breadth-first transitive closure. References are resolved in the same source
-    /// first, then anywhere in the same version.
+    /// Breadth-first transitive closure. Each reference is resolved in the source of the
+    /// referencing schema first, then (reported in `cross_source`) by precedence in the version.
     pub async fn schema_closure(
         &self,
         source_id: &str,
@@ -775,26 +864,43 @@ impl SpecificationService {
     ) -> Result<SchemaClosure> {
         let _timer = crate::timing::Timer::start("specification.schema_closure");
         let mut closure = SchemaClosure::default();
-        let mut queue: VecDeque<String> = roots.into_iter().collect();
-        while let Some(name) = queue.pop_front() {
+        // Each reference is resolved in the source of the schema/operation that made it.
+        let mut queue: VecDeque<(String, String)> = roots
+            .into_iter()
+            .map(|n| (n, source_id.to_owned()))
+            .collect();
+        while let Some((name, from)) = queue.pop_front() {
             if closure.schemas.contains_key(&name) || closure.unresolved.contains(&name) {
                 continue;
             }
             if closure.schemas.len() >= MAX_SCHEMA_CLOSURE {
+                closure.truncated = true;
                 break;
             }
-            let schema = match self.catalog.get_source_schema(source_id, &name).await? {
+            let schema = match self.catalog.get_source_schema(&from, &name).await? {
                 Some(s) => Some(s),
-                None => self
-                    .catalog
-                    .find_schemas(version, &name)
-                    .await?
-                    .into_iter()
-                    .next(),
+                None => {
+                    let mut all = self.catalog.find_schemas(version, &name).await?;
+                    let candidates = all.len();
+                    (!all.is_empty()).then(|| {
+                        let s = all.remove(0);
+                        closure.cross_source.push(CrossSourceReference {
+                            name: name.clone(),
+                            referenced_from: from.clone(),
+                            resolved: s.provenance.clone(),
+                            candidates,
+                        });
+                        s
+                    })
+                }
             };
             match schema {
                 Some(s) => {
-                    queue.extend(s.referenced_schemas.iter().cloned());
+                    queue.extend(
+                        s.referenced_schemas
+                            .iter()
+                            .map(|r| (r.clone(), s.provenance.source_id.clone())),
+                    );
                     closure.schemas.insert(name, s);
                 }
                 None => {

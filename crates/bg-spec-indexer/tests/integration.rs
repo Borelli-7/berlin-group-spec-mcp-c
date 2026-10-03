@@ -785,3 +785,79 @@ async fn colliding_templates_are_reported_and_not_cross_linked() {
         .unwrap();
     assert_eq!(ids(&other), vec!["OFV2-RESOURCE-001".to_owned()]);
 }
+
+#[tokio::test]
+async fn schema_closure_reports_cross_source_references_and_cycles() {
+    let env = indexed().await;
+    let root = &env.config.corpus_root;
+    std::fs::write(
+        root.join("openapi/v2/extra.yaml"),
+        r##"openapi: 3.0.3
+info: {title: Extra, version: "2.0"}
+paths:
+  /extras/{extraId}:
+    get:
+      operationId: getExtra
+      parameters:
+        - {name: extraId, in: path, required: true, schema: {type: string}}
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/Node'}
+components:
+  schemas:
+    Node:
+      type: object
+      properties:
+        children: {type: array, items: {$ref: '#/components/schemas/Node'}}
+        amount: {$ref: '#/components/schemas/Amount'}
+"##,
+    )
+    .unwrap();
+    let manifest = root.join("manifest.yaml");
+    let mut text = std::fs::read_to_string(&manifest).unwrap();
+    text = text.replacen(
+        "sources:\n",
+        "sources:\n  - id: bg-openfinance-v2-extra\n    kind: openapi\n    version: openfinance-v2\n    authority: technical\n    precedence: 80\n    path: openapi/v2/extra.yaml\n    title: Extra\n\n",
+        1,
+    );
+    std::fs::write(&manifest, text).unwrap();
+    Indexer::new(env.config.clone())
+        .run(IndexOptions::default())
+        .await
+        .unwrap();
+    let svc = services(&env).await;
+
+    let node = svc
+        .specification
+        .read_schema(Some("openfinance-v2"), "Node")
+        .await
+        .unwrap();
+    assert_eq!(node.cyclic_schemas, vec!["Node".to_owned()]);
+    assert!(!node.truncated);
+    assert_eq!(node.cross_source_references.len(), 1);
+    let x = &node.cross_source_references[0];
+    assert_eq!(x.name, "Amount");
+    assert_eq!(x.referenced_from, "bg-openfinance-v2-extra");
+    assert_eq!(x.resolved.source_id, "bg-openfinance-v2-openapi");
+    assert_eq!(x.candidates, 1);
+
+    let bundle = svc
+        .requirements
+        .endpoint_requirements(Some("openfinance-v2"), "/extras/{extraId}", "GET", None)
+        .await
+        .unwrap();
+    assert_eq!(bundle.cross_source_schemas.len(), 1);
+    assert!(bundle.unresolved_schemas.is_empty());
+
+    // Schemas of the main source resolve within that source and report nothing.
+    let main = svc
+        .specification
+        .read_schema(Some("openfinance-v2"), "TransactionsResponse200Json")
+        .await
+        .unwrap();
+    assert!(main.cross_source_references.is_empty());
+    assert!(main.cyclic_schemas.is_empty());
+}

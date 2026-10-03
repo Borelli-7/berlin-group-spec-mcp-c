@@ -1,4 +1,4 @@
-use super::{COMPARISON_NOTICE, MatchedBy, SpecificationService};
+use super::{COMPARISON_NOTICE, CrossSourceReference, MatchedBy, SpecificationService};
 use crate::{
     CoreError, Result,
     diff::{CompatibilityFact, derive_facts, diff_operations},
@@ -30,6 +30,9 @@ pub struct ComparedSide {
     /// True when the requested path fits several templates equally and precedence decided.
     #[serde(default, skip_serializing_if = "std::ops::Not::not")]
     pub ambiguous: bool,
+    /// Schema references resolved in another source of the same version.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub cross_source_schemas: Vec<CrossSourceReference>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
@@ -147,6 +150,7 @@ impl CompatibilityService {
                 matched_by: a.as_ref().map(|l| l.matched_by),
                 ambiguous: a.as_ref().is_some_and(|l| l.ambiguous),
                 unresolved_schemas: closure_a.unresolved.into_iter().collect(),
+                cross_source_schemas: closure_a.cross_source,
             },
             to: ComparedSide {
                 version: to,
@@ -154,6 +158,7 @@ impl CompatibilityService {
                 matched_by: b.as_ref().map(|l| l.matched_by),
                 ambiguous: b.as_ref().is_some_and(|l| l.ambiguous),
                 unresolved_schemas: closure_b.unresolved.into_iter().collect(),
+                cross_source_schemas: closure_b.cross_source,
             },
             notice: COMPARISON_NOTICE.to_owned(),
             v1_operation: a.map(|l| l.primary),

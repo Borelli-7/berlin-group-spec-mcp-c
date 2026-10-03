@@ -1,5 +1,6 @@
 use super::{
-    EVIDENCE_NOTICE, MatchedBy, SourceContent, SpecificationService, specification::provenance,
+    CrossSourceReference, EVIDENCE_NOTICE, MatchedBy, SourceContent, SpecificationService,
+    specification::provenance,
 };
 use crate::{
     CoreError, Result,
@@ -229,6 +230,9 @@ pub struct EndpointEvidenceBundle {
     /// Transitive closure of schemas referenced by the operation.
     pub schemas: Vec<OpenApiSchema>,
     pub unresolved_schemas: Vec<String>,
+    /// Schema references resolved in another source of the same version.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub cross_source_schemas: Vec<CrossSourceReference>,
     pub related_evidence: Vec<SearchResult>,
     pub conflicts: Vec<Conflict>,
     pub sources: Vec<SourceCitation>,
@@ -982,7 +986,7 @@ impl RequirementService {
         }
 
         // 2. Referenced schemas (transitive).
-        let (schemas, unresolved) = match &lookup {
+        let (schemas, unresolved, cross_source_schemas) = match &lookup {
             Some(l) => {
                 let c = self
                     .spec
@@ -995,9 +999,10 @@ impl RequirementService {
                 (
                     c.schemas.into_values().collect::<Vec<_>>(),
                     c.unresolved.into_iter().collect::<Vec<_>>(),
+                    c.cross_source,
                 )
             }
-            None => (Vec::new(), Vec::new()),
+            None => (Vec::new(), Vec::new(), Vec::new()),
         };
         citations.extend(
             schemas
@@ -1167,6 +1172,7 @@ impl RequirementService {
             requirements,
             schemas,
             unresolved_schemas: unresolved,
+            cross_source_schemas,
             related_evidence,
             conflicts,
             sources: citations,
