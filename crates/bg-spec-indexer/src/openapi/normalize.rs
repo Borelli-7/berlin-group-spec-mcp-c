@@ -2,9 +2,10 @@ use super::{Dialect, detect_dialect};
 use bg_spec_core::{
     Result,
     domain::{
-        Diagnostic, Document, MediaTypeSchema, NormalizedParameter, NormalizedRequestBody,
-        NormalizedResponse, OpenApiOperation, OpenApiSchema, Provenance, SchemaSlot,
-        SecurityOrigin, SecurityRequirement, Severity, collect_schema_refs, schema_ref_name,
+        Diagnostic, Document, MediaTypeSchema, NormalizedHeader, NormalizedParameter,
+        NormalizedRequestBody, NormalizedResponse, OpenApiOperation, OpenApiSchema, Provenance,
+        SchemaSlot, SecurityOrigin, SecurityRequirement, Severity, UnresolvedReference,
+        collect_schema_refs, schema_ref_name,
     },
     hash::sha256_hex,
     openapi_path,
@@ -122,6 +123,8 @@ struct Projector<'a> {
     doc: &'a Document,
     resolver: Resolver<'a>,
     diagnostics: Vec<Diagnostic>,
+    /// Unresolved references of the operation being projected.
+    unresolved: Vec<UnresolvedReference>,
 }
 
 impl Projector<'_> {
@@ -130,11 +133,54 @@ impl Projector<'_> {
             .push(Diagnostic::new(Severity::Warning, code, msg).at(locator));
     }
 
+    fn unresolved_ref(&mut self, location: String, reason: String, locator: &str) {
+        self.warn(
+            "unresolved_ref",
+            format!("{location}: {reason}"),
+            locator.to_owned(),
+        );
+        self.unresolved
+            .push(UnresolvedReference { location, reason });
+    }
+
+    fn header(
+        &mut self,
+        name: &str,
+        raw: &Value,
+        location: String,
+        locator: &str,
+    ) -> Option<NormalizedHeader> {
+        let (h, component) = match self.resolver.resolve(raw) {
+            Ok(r) => r,
+            Err(e) => {
+                self.unresolved_ref(location, e, locator);
+                return None;
+            }
+        };
+        let schema = h.get("schema").map(schema_slot).or_else(|| {
+            media_types(h.get("content"))
+                .into_iter()
+                .next()
+                .and_then(|m| m.schema)
+        });
+        Some(NormalizedHeader {
+            name: name.to_owned(),
+            required: h.get("required").and_then(Value::as_bool).unwrap_or(false),
+            deprecated: h
+                .get("deprecated")
+                .and_then(Value::as_bool)
+                .unwrap_or(false),
+            description: str_field(h, "description"),
+            schema,
+            component,
+        })
+    }
+
     fn parameter(&mut self, raw: &Value, locator: &str) -> Option<NormalizedParameter> {
         let (p, component) = match self.resolver.resolve(raw) {
             Ok(r) => r,
             Err(e) => {
-                self.warn("unresolved_ref", e, locator.to_owned());
+                self.unresolved_ref("parameters".to_owned(), e, locator);
                 return None;
             }
         };
@@ -194,7 +240,7 @@ impl Projector<'_> {
         let (body, component) = match self.resolver.resolve(raw?) {
             Ok(r) => r,
             Err(e) => {
-                self.warn("unresolved_ref", e, locator.to_owned());
+                self.unresolved_ref("requestBody".to_owned(), e, locator);
                 return None;
             }
         };
@@ -218,20 +264,33 @@ impl Projector<'_> {
             let (resp, component) = match self.resolver.resolve(raw) {
                 Ok(r) => r,
                 Err(e) => {
-                    self.warn("unresolved_ref", e, locator.to_owned());
+                    self.unresolved_ref(format!("responses/{status}"), e, locator);
                     continue;
                 }
             };
-            let mut headers: Vec<String> = resp
+            let mut raw_headers: Vec<(&String, &Value)> = resp
                 .get("headers")
                 .and_then(Value::as_object)
-                .map(|h| h.keys().cloned().collect())
+                .map(|h| h.iter().collect())
                 .unwrap_or_default();
-            headers.sort();
+            raw_headers.sort_by(|a, b| a.0.cmp(b.0));
+            let headers = raw_headers.iter().map(|(n, _)| (*n).clone()).collect();
+            let header_definitions = raw_headers
+                .into_iter()
+                .filter_map(|(name, h)| {
+                    self.header(
+                        name,
+                        h,
+                        format!("responses/{status}/headers/{name}"),
+                        locator,
+                    )
+                })
+                .collect();
             out.push(NormalizedResponse {
                 status: status.clone(),
                 description: str_field(resp, "description"),
                 headers,
+                header_definitions,
                 content: media_types(resp.get("content")),
                 component,
             });
@@ -249,6 +308,7 @@ impl Projector<'_> {
     ) -> OpenApiOperation {
         let method_upper = method.to_ascii_uppercase();
         let locator = format!("op:{method_upper} {path}");
+        self.unresolved.clear();
         let parameters =
             self.parameters(path_item.get("parameters"), raw.get("parameters"), &locator);
         let request_body = self.request_body(raw.get("requestBody"), &locator);
@@ -294,6 +354,7 @@ impl Projector<'_> {
             security,
             security_origin,
             referenced_schemas: refs.into_iter().collect(),
+            unresolved_references: std::mem::take(&mut self.unresolved),
             json_pointer: format!("/paths/{}/{method}", pointer_escape(path)),
             provenance: Provenance::for_document(
                 self.doc,
@@ -396,6 +457,7 @@ pub fn normalize(root: &Value, doc: &Document) -> Result<NormalizedApi> {
     let mut projector = Projector {
         doc,
         resolver: Resolver { root },
+        unresolved: Vec::new(),
         diagnostics,
     };
     let global_security = root.get("security");
@@ -529,6 +591,8 @@ paths:
           description: OK
           headers:
             X-Request-ID: {schema: {type: string}}
+            ASPSP-SCA-Approach:
+              $ref: '#/components/headers/ScaApproach'
           content:
             application/json:
               schema: {$ref: '#/components/schemas/TransactionsResponse'}
@@ -544,6 +608,11 @@ paths:
       responses:
         '201': {description: Created}
 components:
+  headers:
+    ScaApproach:
+      description: SCA approach chosen by the ASPSP
+      required: true
+      schema: {$ref: '#/components/schemas/ScaApproach'}
   parameters:
     AccountId: {name: accountId, in: path, required: true, schema: {type: string}}
   responses:
@@ -562,6 +631,7 @@ components:
         items: {type: array, items: {$ref: '#/components/schemas/Transaction'}}
     Transaction: {type: object, required: [amount], properties: {amount: {type: string}}}
     Error: {type: object}
+    ScaApproach: {type: string, enum: [REDIRECT, EMBEDDED]}
 "##;
 
     #[test]
@@ -600,11 +670,32 @@ components:
         );
         let statuses: Vec<_> = get.responses.iter().map(|r| r.status.as_str()).collect();
         assert_eq!(statuses, vec!["200", "400"]);
-        assert_eq!(get.responses[0].headers, vec!["X-Request-ID"]);
+        assert_eq!(
+            get.responses[0].headers,
+            vec!["ASPSP-SCA-Approach", "X-Request-ID"]
+        );
+        let sca = &get.responses[0].header_definitions[0];
+        assert_eq!(sca.name, "ASPSP-SCA-Approach");
+        assert!(sca.required);
+        assert_eq!(
+            sca.component.as_deref(),
+            Some("#/components/headers/ScaApproach")
+        );
+        assert_eq!(
+            sca.schema.as_ref().and_then(|s| s.schema_ref.as_deref()),
+            Some("ScaApproach")
+        );
+        assert!(!get.responses[0].header_definitions[1].required);
+        assert!(get.unresolved_references.is_empty());
         assert_eq!(get.responses[1].description.as_deref(), Some("Bad request"));
         assert_eq!(
             get.referenced_schemas,
-            vec!["BookingStatus", "Error", "TransactionsResponse"]
+            vec![
+                "BookingStatus",
+                "Error",
+                "ScaApproach",
+                "TransactionsResponse"
+            ]
         );
         assert_eq!(get.security_origin, SecurityOrigin::Global);
         assert_eq!(get.security.len(), 1);
@@ -612,7 +703,7 @@ components:
         assert_eq!(post.security_origin, SecurityOrigin::Operation);
         assert!(post.security.is_empty());
         assert!(post.request_body.as_ref().unwrap().required);
-        assert_eq!(api.schemas.len(), 4);
+        assert_eq!(api.schemas.len(), 5);
         let resp = api
             .schemas
             .iter()
@@ -645,6 +736,11 @@ components:
         let root = parse_document(&yaml, "api.yaml").unwrap();
         let api = normalize(&root, &test_doc()).unwrap();
         assert!(api.diagnostics.iter().any(|d| d.code == "unresolved_ref"));
+        let get = &api.operations[0];
+        assert_eq!(get.unresolved_references.len(), 1);
+        assert_eq!(get.unresolved_references[0].location, "responses/400");
+        assert!(get.unresolved_references[0].reason.contains("Missing"));
+        assert!(api.operations[1].unresolved_references.is_empty());
     }
 
     #[test]

@@ -47,16 +47,43 @@ pub struct NormalizedRequestBody {
     pub component: Option<String>,
 }
 
+/// A response header with its `$ref` resolved.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
+pub struct NormalizedHeader {
+    pub name: String,
+    pub required: bool,
+    pub deprecated: bool,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub schema: Option<SchemaSlot>,
+    /// `#/components/headers/<name>` when the header was referenced.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub component: Option<String>,
+}
+
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
 pub struct NormalizedResponse {
     /// Status code (`200`, `4XX`) or `default`.
     pub status: String,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
+    /// Header names (sorted); full definitions are in `header_definitions`.
     pub headers: Vec<String>,
+    /// Header definitions in the order of `headers`.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub header_definitions: Vec<NormalizedHeader>,
     pub content: Vec<MediaTypeSchema>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub component: Option<String>,
+}
+
+/// A `$ref` inside an operation that could not be resolved; the referencing element is omitted.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
+pub struct UnresolvedReference {
+    /// Where the reference occurs, e.g. `parameters`, `responses/404`, `responses/200/headers/X-Request-ID`.
+    pub location: String,
+    pub reason: String,
 }
 
 /// One security requirement alternative: scheme name -> scopes.
@@ -94,6 +121,9 @@ pub struct OpenApiOperation {
     pub security_origin: SecurityOrigin,
     /// Component schemas directly referenced by this operation.
     pub referenced_schemas: Vec<String>,
+    /// References that could not be resolved (the affected elements are omitted above).
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub unresolved_references: Vec<UnresolvedReference>,
     /// JSON pointer of the operation inside the source document.
     pub json_pointer: String,
     pub provenance: Provenance,

@@ -81,8 +81,9 @@ page → section (heading) → paragraph → sentence → chunk
 * Records are projected from the raw JSON tree, so schema JSON is **verbatim**:
   * **Operations**, one per path and method, with the locator `op:GET /path`. They include `operationId`, summary,
     description, tags, deprecated, path-level and operation-level parameters with `$ref` resolved, the request body,
-    responses (content, headers), the security requirement with `security_origin` (operation or global), the referenced
-    schema names, and a JSON pointer.
+    responses (content, header names and full header definitions with `$ref` resolved), the security requirement with
+    `security_origin` (operation or global), the referenced schema names, the `unresolved_references` (location and
+    reason; the affected element is omitted and an `unresolved_ref` diagnostic is recorded), and a JSON pointer.
   * **Schemas**, one per `components.schemas` entry, with the locator `schema:Name` and their direct `$ref` names.
 * `path_key` is the canonical path: the version prefix is stripped and parameters are replaced with `{}`. It enables
   cross-version matching (`/v1/accounts/{account-id}` ≡ `/v2/accounts/{account-id}` ≡ `/accounts/{accountId}`).

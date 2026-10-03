@@ -100,11 +100,14 @@ status. The server never substitutes invented text. See [04](examples/responses/
 Input: `version?` (defaults to the target), `path`, `method`.
 Output: `{version, requested_method, requested_path, matched_by, operation:{path, method, operation_id,
 summary, description, tags, deprecated, parameters[{name, location, required, schema, component}],
-request_body (only when declared), responses[{status, description, headers, content}], security, security_origin
-(operation|global), referenced_schemas, json_pointer, provenance}, alternatives, ambiguous?, other_templates?}`.
+request_body (only when declared), responses[{status, description, headers, header_definitions?[{name, required,
+deprecated, description, schema, component}], content}], security, security_origin (operation|global),
+referenced_schemas, unresolved_references?[{location, reason}], json_pointer, provenance}, alternatives, ambiguous?,
+other_templates?}`.
 `alternatives` lists other sources of the same template; `other_templates` lists different templates with the same canonical key.
-`$ref` values are resolved for parameters, request bodies, and responses. Schemas remain `$ref` values,
-and their names are listed in `referenced_schemas`. See [02](examples/responses/02-read_openapi_endpoint.json).
+`$ref` values are resolved for parameters, request bodies, responses, and response headers. Schemas remain
+`$ref` values, and their names (including header schemas) are listed in `referenced_schemas`. A reference that
+cannot be resolved omits the affected element and is listed in `unresolved_references`. See [02](examples/responses/02-read_openapi_endpoint.json).
 
 ## `read_openapi_schema`
 

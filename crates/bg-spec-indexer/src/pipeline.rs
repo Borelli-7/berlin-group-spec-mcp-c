@@ -40,7 +40,7 @@ use std::{
 use tracing::{info, warn};
 
 /// Bumped when extraction/normalization output changes, forcing re-indexing.
-pub const INDEXER_FORMAT_VERSION: u32 = 2;
+pub const INDEXER_FORMAT_VERSION: u32 = 3;
 const META_IN_PROGRESS: &str = "index_in_progress";
 
 #[derive(Debug, Clone, Copy, Default)]

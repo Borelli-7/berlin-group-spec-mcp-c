@@ -116,6 +116,19 @@ expression: stable(&ep)
         "headers": [
           "X-Request-ID"
         ],
+        "header_definitions": [
+          {
+            "name": "X-Request-ID",
+            "required": false,
+            "deprecated": false,
+            "schema": {
+              "schema": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          }
+        ],
         "content": [
           {
             "media_type": "application/json",

@@ -56,6 +56,18 @@ pub fn operation_search_text(op: &OpenApiOperation) -> (String, String) {
             r.status,
             r.description.as_deref().unwrap_or_default()
         );
+        for h in &r.header_definitions {
+            let _ = writeln!(
+                s,
+                "Response header {} ({}){}",
+                h.name,
+                if h.required { "required" } else { "optional" },
+                h.description
+                    .as_deref()
+                    .map(|d| format!(": {d}"))
+                    .unwrap_or_default()
+            );
+        }
     }
     if !op.referenced_schemas.is_empty() {
         let _ = writeln!(s, "Schemas: {}", op.referenced_schemas.join(", "));
