@@ -4,7 +4,7 @@ use crate::{
     domain::{
         Document, DocumentAuthority, DocumentKind, DocumentStatus, EvidenceChunk, EvidenceClass,
         OpenApiOperation, OpenApiSchema, PageStatus, Provenance, SearchQuery, SearchResult,
-        SourceLocator, SpecificationVersion,
+        SourceLocator, SpecificationVersion, collapse_duplicates,
     },
     openapi_path::{normalize_method, path_key, template_score, validate_path},
     ports::{CatalogRepository, CatalogStats, IndexMeta, SearchRepository},
@@ -18,6 +18,11 @@ use std::{
 
 const MAX_QUERY_CHARS: usize = 1000;
 const MAX_SCHEMA_CLOSURE: usize = 2000;
+
+/// Hits fetched before duplicates are collapsed, so the requested number of distinct hits remains.
+fn overfetch(limit: usize) -> usize {
+    limit.saturating_mul(3).max(limit.saturating_add(10))
+}
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize, JsonSchema)]
 pub struct SearchFilters {
@@ -447,9 +452,9 @@ impl SpecificationService {
             version: version.clone(),
             kinds: kinds.clone(),
             source_id: source_id.map(str::to_owned),
-            limit: self.clamp_limit(limit),
+            limit: overfetch(self.clamp_limit(limit)),
         };
-        let results = self.search.search(&q).await?;
+        let results = collapse_duplicates(self.search.search(&q).await?, self.clamp_limit(limit));
         Ok(SearchResponse {
             query: text.to_owned(),
             filters: SearchFilters {
@@ -483,15 +488,18 @@ impl SpecificationService {
         if words.is_empty() || limit == 0 {
             return Ok(Vec::new());
         }
-        self.search
+        let limit = limit.min(self.settings.max_limit);
+        let hits = self
+            .search
             .search(&SearchQuery {
                 text: words.join(" "),
                 version: Some(version.clone()),
                 kinds: vec![DocumentKind::Pdf, DocumentKind::Text],
                 source_id: None,
-                limit: limit.min(self.settings.max_limit),
+                limit: overfetch(limit),
             })
-            .await
+            .await?;
+        Ok(collapse_duplicates(hits, limit))
     }
 
     pub async fn list_sources(

@@ -66,16 +66,20 @@ async fn evaluate(official: bool) {
     let k = 5;
     let mut found = 0;
     let mut reciprocal_rank = 0.0;
+    let mut duplicates = 0;
     for case in &gold.searches {
         let response = svc
             .specification
             .search(&case.query, Some(&case.version), None, None, Some(k))
             .await
             .unwrap();
-        let rank = response
-            .results
-            .iter()
-            .position(|hit| hit.source_id == case.source_id && hit.locator == case.locator);
+        let rank = response.results.iter().position(|hit| {
+            (hit.source_id == case.source_id && hit.locator == case.locator)
+                || hit
+                    .also_found_in
+                    .iter()
+                    .any(|d| d.source_id == case.source_id && d.locator == case.locator)
+        });
         if let Some(rank) = rank {
             found += 1;
             reciprocal_rank += 1.0 / (rank + 1) as f64;
@@ -83,6 +87,22 @@ async fn evaluate(official: bool) {
         assert!(rank.is_some(), "missing gold evidence for {}", case.query);
         if let (Some(rank), Some(max)) = (rank, case.max_rank) {
             assert!(rank < max, "{} ranked {} (max {max})", case.query, rank + 1);
+        }
+        // Hits repeating earlier evidence: identical content, or another chunk of the same page section.
+        let mut seen = std::collections::BTreeSet::new();
+        for hit in &response.results {
+            let content = (hit.version.to_string(), hit.sha256.clone());
+            let page = (
+                hit.source_id.clone(),
+                hit.page
+                    .map(|p| format!("{p}|{}", hit.title))
+                    .unwrap_or_else(|| hit.locator.clone()),
+            );
+            let fresh_content = seen.insert(content);
+            let fresh_page = seen.insert(page);
+            if !fresh_content || !fresh_page {
+                duplicates += 1;
+            }
         }
         for hit in &response.results {
             let evidence = svc
@@ -104,7 +124,7 @@ async fn evaluate(official: bool) {
     let precision = found as f64 / (n * k as f64);
     let mrr = reciprocal_rank / n;
     assert_eq!(recall, 1.0);
-    assert!(mrr >= if official { 0.75 } else { 1.0 });
+    assert!(mrr >= if official { 0.8 } else { 1.0 });
     assert_eq!(precision, 0.2);
     for case in &gold.endpoints {
         let response = svc
@@ -125,7 +145,8 @@ async fn evaluate(official: bool) {
     }
     println!(
         "recall@{k}={recall:.3} judged_precision@{k}={precision:.3} \
-         MRR@{k}={mrr:.3} exact_lookup_accuracy=1.000 source_resolution_accuracy=1.000"
+         MRR@{k}={mrr:.3} duplicate_hits@{k}={duplicates} \
+         exact_lookup_accuracy=1.000 source_resolution_accuracy=1.000"
     );
 }
 

@@ -65,13 +65,18 @@ BM25 full-text search over PDF and text chunks, OpenAPI operations, and schemas.
 **discovered evidence** and are never authoritative requirements.
 Code-like identifiers (`operationId`, `METHOD /path`, header and schema names, codes such as `E-07`)
 also match exactly and rank the defining record first.
+Hits repeating better-ranked evidence are collapsed into it and listed in `also_found_in`
+(`reason`: `identical_content` = same version and sha256, e.g. a schema repeated in several sources;
+`same_page` = another chunk of the same page and section). Every collapsed hit stays addressable with
+`read_source`, and `limit` counts distinct hits.
 
 Input: `query` (required, ≤1000 chars, phrases in quotes), `version?`, `kind?` (`pdf|openapi|text`),
 `source_id?`, `limit?` (clamped to `search.max_limit`).
 
 Output: `{query, filters, notice, total, results:[{record_id, record_type(chunk|operation|schema),
 source_id, document_id, version, kind, authority, title, locator, page, evidence, relevance, sha256,
-classification}]}`. See [06](examples/responses/06-search_specification.json).
+classification, also_found_in?[{record_id, source_id, locator, page, relevance, sha256, reason}]}]}`.
+See [06](examples/responses/06-search_specification.json).
 
 ## `find_requirement`
 

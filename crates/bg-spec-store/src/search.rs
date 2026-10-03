@@ -364,6 +364,7 @@ impl TantivySearch {
                 relevance: (score * 1000.0).round() / 1000.0,
                 sha256: text(f.sha256),
                 classification: EvidenceClass::DiscoveredEvidence,
+                also_found_in: Vec::new(),
             });
         }
         results.sort_by(|a, b| {
