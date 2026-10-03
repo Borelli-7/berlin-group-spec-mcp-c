@@ -51,6 +51,11 @@ impl SqliteCatalog {
     }
 }
 
+/// JSON array bound to `json_each(?)`, so `IN` lists keep a static SQL text.
+fn json_array(values: &[String]) -> Result<String> {
+    serde_json::to_string(values).map_err(|e| bg_spec_core::CoreError::Storage(e.to_string()))
+}
+
 #[async_trait]
 impl CatalogRepository for SqliteCatalog {
     async fn list_documents(&self) -> Result<Vec<Document>> {
@@ -71,6 +76,21 @@ impl CatalogRepository for SqliteCatalog {
             )
             .await?;
         rows.first().map(|s| from_json(s)).transpose()
+    }
+
+    async fn get_documents(&self, source_ids: &[String]) -> Result<Vec<Document>> {
+        if source_ids.is_empty() {
+            return Ok(Vec::new());
+        }
+        let ids = json_array(source_ids)?;
+        let rows = self
+            .json_rows(
+                "SELECT json FROM documents WHERE source_id IN (SELECT value FROM json_each(?1)) \
+                 ORDER BY source_id",
+                &[&ids],
+            )
+            .await?;
+        decode_all(rows)
     }
 
     async fn get_pages(&self, source_id: &str, from: u32, to: u32) -> Result<Vec<PageRecord>> {
@@ -222,6 +242,45 @@ impl CatalogRepository for SqliteCatalog {
         rows.first().map(|s| from_json(s)).transpose()
     }
 
+    async fn get_source_schemas(
+        &self,
+        source_id: &str,
+        names: &[String],
+    ) -> Result<Vec<OpenApiSchema>> {
+        if names.is_empty() {
+            return Ok(Vec::new());
+        }
+        let names = json_array(names)?;
+        let rows = self
+            .json_rows(
+                "SELECT json FROM openapi_schemas WHERE source_id = ?1 \
+                 AND name IN (SELECT value FROM json_each(?2)) ORDER BY name",
+                &[source_id, &names],
+            )
+            .await?;
+        decode_all(rows)
+    }
+
+    async fn find_schemas_by_names(
+        &self,
+        version: &SpecificationVersion,
+        names: &[String],
+    ) -> Result<Vec<OpenApiSchema>> {
+        if names.is_empty() {
+            return Ok(Vec::new());
+        }
+        let names = json_array(names)?;
+        let rows = self
+            .json_rows(
+                "SELECT s.json FROM openapi_schemas s JOIN documents d ON d.source_id = s.source_id \
+                 WHERE s.version = ?1 AND s.name IN (SELECT value FROM json_each(?2)) \
+                 ORDER BY s.name, d.precedence DESC, s.source_id",
+                &[version.as_str(), &names],
+            )
+            .await?;
+        decode_all(rows)
+    }
+
     async fn list_requirements(&self) -> Result<Vec<RequirementRecord>> {
         let rows = self
             .json_rows("SELECT json FROM requirements ORDER BY id", &[])
@@ -241,8 +300,7 @@ impl CatalogRepository for SqliteCatalog {
         target: &str,
         ids: &[String],
     ) -> Result<Vec<RequirementRecord>> {
-        let ids = serde_json::to_string(ids)
-            .map_err(|e| bg_spec_core::CoreError::Storage(e.to_string()))?;
+        let ids = json_array(ids)?;
         let rows = self
             .json_rows(
                 "SELECT json FROM requirements r WHERE id IN (SELECT value FROM json_each(?1)) \

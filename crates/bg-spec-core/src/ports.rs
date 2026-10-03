@@ -36,6 +36,8 @@ pub struct IndexMeta {
 pub trait CatalogRepository: Send + Sync {
     async fn list_documents(&self) -> Result<Vec<Document>>;
     async fn get_document(&self, source_id: &str) -> Result<Option<Document>>;
+    /// Documents with any of these source ids (unknown ids are skipped).
+    async fn get_documents(&self, source_ids: &[String]) -> Result<Vec<Document>>;
     async fn get_pages(&self, source_id: &str, from: u32, to: u32) -> Result<Vec<PageRecord>>;
     async fn get_chunk(&self, chunk_id: &str) -> Result<Option<EvidenceChunk>>;
     async fn chunks_for_page(&self, source_id: &str, page: u32) -> Result<Vec<EvidenceChunk>>;
@@ -71,6 +73,19 @@ pub trait CatalogRepository: Send + Sync {
     ) -> Result<Vec<OpenApiSchema>>;
     async fn get_source_schema(&self, source_id: &str, name: &str)
     -> Result<Option<OpenApiSchema>>;
+    /// Schemas of one source with any of these names (missing names are skipped).
+    async fn get_source_schemas(
+        &self,
+        source_id: &str,
+        names: &[String],
+    ) -> Result<Vec<OpenApiSchema>>;
+    /// Schemas of a version with any of these names, grouped by name and highest precedence first
+    /// within a name (the order of [`Self::find_schemas`]).
+    async fn find_schemas_by_names(
+        &self,
+        version: &SpecificationVersion,
+        names: &[String],
+    ) -> Result<Vec<OpenApiSchema>>;
     async fn list_requirements(&self) -> Result<Vec<RequirementRecord>>;
     async fn get_requirement(&self, id: &str) -> Result<Option<RequirementRecord>>;
     /// Requirements with one of the `ids`, plus every requirement whose `conflicts_with` names

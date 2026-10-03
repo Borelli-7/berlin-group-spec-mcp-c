@@ -348,6 +348,17 @@ impl RequirementService {
         let mut sources = Vec::new();
         let mut conflicts = Vec::new();
         let mut cited_docs: BTreeMap<String, DocumentRef> = BTreeMap::new();
+        let mut ids: Vec<String> = req.sources.iter().map(|s| s.source_id.clone()).collect();
+        ids.sort();
+        ids.dedup();
+        let documents: BTreeMap<String, crate::domain::Document> = self
+            .spec
+            .catalog()
+            .get_documents(&ids)
+            .await?
+            .into_iter()
+            .map(|d| (d.source_id.clone(), d))
+            .collect();
         for s in &req.sources {
             let citation = Citation {
                 source_id: s.source_id.clone(),
@@ -363,7 +374,7 @@ impl RequirementService {
                 provenance: Vec::new(),
                 detail: None,
             };
-            let Some(doc) = self.spec.catalog().get_document(&s.source_id).await? else {
+            let Some(doc) = documents.get(&s.source_id) else {
                 traced.status = SourceResolution::UnknownSource;
                 traced.detail = Some("source_id is not declared in the manifest / catalog".into());
                 conflicts.push(Conflict {
@@ -403,7 +414,11 @@ impl RequirementService {
                 continue;
             }
             cited_docs.insert(doc.source_id.clone(), dref);
-            match self.spec.read_source(&s.source_id, &s.locator).await {
+            let read = match s.locator.parse::<SourceLocator>() {
+                Ok(locator) => self.spec.read_loaded_source(doc.clone(), locator).await,
+                Err(e) => Err(e),
+            };
+            match read {
                 Ok(read) => {
                     traced.excerpt = Some(excerpt(&content_text(&read.content)));
                     traced.provenance = read.provenance;
@@ -420,7 +435,7 @@ impl RequirementService {
                         requirement_ids: vec![req.id.clone()],
                         citations: vec![citation.clone()],
                         provenance: vec![provenance(
-                            &doc,
+                            doc,
                             "document".into(),
                             doc.sha256.clone().unwrap_or_default(),
                         )],
@@ -442,7 +457,7 @@ impl RequirementService {
                         ),
                         requirement_ids: vec![req.id.clone()],
                         citations: vec![citation],
-                        provenance: vec![provenance(&doc, "document".into(), actual.to_owned())],
+                        provenance: vec![provenance(doc, "document".into(), actual.to_owned())],
                     });
                 }
             }

@@ -923,3 +923,60 @@ async fn indexed_requirement_lookups_match_full_scans() {
         trace.conflicts
     );
 }
+
+#[tokio::test]
+async fn batched_catalog_reads_match_single_lookups() {
+    use bg_spec_core::ports::CatalogRepository;
+    let env = indexed().await;
+    let (catalog, _) = bg_spec_store::open_read_only(&env.config).await.unwrap();
+
+    let all = catalog.list_documents().await.unwrap();
+    let mut ids: Vec<String> = all.iter().map(|d| d.source_id.clone()).collect();
+    ids.push("no-such-source".into());
+    let got: Vec<String> = catalog
+        .get_documents(&ids)
+        .await
+        .unwrap()
+        .into_iter()
+        .map(|d| d.source_id)
+        .collect();
+    let mut expected: Vec<String> = all.into_iter().map(|d| d.source_id).collect();
+    expected.sort();
+    assert_eq!(got, expected);
+    assert!(catalog.get_documents(&[]).await.unwrap().is_empty());
+
+    let source = "bg-openfinance-v2-openapi";
+    let names: Vec<String> = ["TransactionsResponse200Json", "Amount", "NoSuchSchema"]
+        .map(String::from)
+        .to_vec();
+    let batched = catalog.get_source_schemas(source, &names).await.unwrap();
+    let mut single = Vec::new();
+    for n in &names {
+        single.extend(catalog.get_source_schema(source, n).await.unwrap());
+    }
+    let key = |s: &bg_spec_core::domain::OpenApiSchema| s.name.clone();
+    let mut b: Vec<String> = batched.iter().map(key).collect();
+    let mut s: Vec<String> = single.iter().map(key).collect();
+    b.sort();
+    s.sort();
+    assert_eq!(b, s);
+    assert_eq!(b.len(), 2);
+
+    let version = single[0].version.clone();
+    let mut sorted = names.clone();
+    sorted.sort();
+    let mut expected = Vec::new();
+    for n in &sorted {
+        expected.extend(catalog.find_schemas(&version, n).await.unwrap());
+    }
+    let got = catalog
+        .find_schemas_by_names(&version, &names)
+        .await
+        .unwrap();
+    let ident =
+        |s: &bg_spec_core::domain::OpenApiSchema| (s.name.clone(), s.provenance.source_id.clone());
+    assert_eq!(
+        got.iter().map(ident).collect::<Vec<_>>(),
+        expected.iter().map(ident).collect::<Vec<_>>()
+    );
+}

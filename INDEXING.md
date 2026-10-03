@@ -151,6 +151,12 @@ locator, then matches paths exactly; declared conflicts load the requirement's c
 directions. Catalog schema 2 (migration `0002_requirement_link_indexes.sql`) adds the indexes; `bg-spec index`
 applies it to an existing catalog, and the read-only MCP refuses a catalog that has not been migrated.
 
+Reads are batched as well. `read_openapi_schema` and `get_endpoint_requirements` compute the schema closure one
+breadth-first level at a time: one query per referencing source (`get_source_schemas`) and one query for the
+names that need a cross-source fallback (`find_schemas_by_names`), instead of one query per schema. Requirement
+source resolution loads every cited document in one query (`get_documents`) and reads each locator from it. The
+results, ordering, truncation and cycle reports are unchanged.
+
 ## Diagnostics
 
 `file_missing`, `path_rejected`, `processing_failed`, `page_extraction_failed`, `ocr_required`, `low_quality_text`,

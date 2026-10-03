@@ -12,7 +12,7 @@ use crate::{
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use std::{
-    collections::{BTreeMap, BTreeSet, VecDeque},
+    collections::{BTreeMap, BTreeSet},
     sync::Arc,
 };
 
@@ -589,6 +589,15 @@ impl SpecificationService {
         let _timer = crate::timing::Timer::start("specification.read_source");
         let locator: SourceLocator = locator.parse()?;
         let doc = self.indexed_document(source_id.trim()).await?;
+        self.read_loaded_source(doc, locator).await
+    }
+
+    /// [`Self::read_source`] for a document the caller has already loaded.
+    pub(crate) async fn read_loaded_source(
+        &self,
+        doc: Document,
+        locator: SourceLocator,
+    ) -> Result<ReadSourceResponse> {
         let listing = SourceListing::from(&doc);
         if !matches!(locator, SourceLocator::Document)
             && matches!(doc.status, DocumentStatus::Missing | DocumentStatus::Failed)
@@ -917,48 +926,77 @@ impl SpecificationService {
         let _timer = crate::timing::Timer::start("specification.schema_closure");
         let mut closure = SchemaClosure::default();
         // Each reference is resolved in the source of the schema/operation that made it.
-        let mut queue: VecDeque<(String, String)> = roots
+        // Breadth-first, one level at a time: each level is fetched with one query per referencing
+        // source plus one for cross-source fallbacks, then applied in FIFO order.
+        let mut level: Vec<(String, String)> = roots
             .into_iter()
             .map(|n| (n, source_id.to_owned()))
             .collect();
-        while let Some((name, from)) = queue.pop_front() {
-            if closure.schemas.contains_key(&name) || closure.unresolved.contains(&name) {
-                continue;
+        while !level.is_empty() {
+            let pending: Vec<&(String, String)> = level
+                .iter()
+                .filter(|(n, _)| {
+                    !closure.schemas.contains_key(n) && !closure.unresolved.contains(n)
+                })
+                .collect();
+            let mut by_source: BTreeMap<&str, Vec<String>> = BTreeMap::new();
+            for (name, from) in &pending {
+                by_source.entry(from).or_default().push(name.clone());
             }
-            if closure.schemas.len() >= MAX_SCHEMA_CLOSURE {
-                closure.truncated = true;
-                break;
+            let mut local: BTreeMap<(String, String), OpenApiSchema> = BTreeMap::new();
+            for (from, names) in by_source {
+                for s in self.catalog.get_source_schemas(from, &names).await? {
+                    local.insert((from.to_owned(), s.name.clone()), s);
+                }
             }
-            let schema = match self.catalog.get_source_schema(&from, &name).await? {
-                Some(s) => Some(s),
-                None => {
-                    let mut all = self.catalog.find_schemas(version, &name).await?;
-                    let candidates = all.len();
-                    (!all.is_empty()).then(|| {
-                        let s = all.remove(0);
+            let mut misses: Vec<String> = pending
+                .iter()
+                .filter(|(n, f)| !local.contains_key(&(f.clone(), n.clone())))
+                .map(|(n, _)| n.clone())
+                .collect();
+            misses.sort();
+            misses.dedup();
+            let mut fallback: BTreeMap<String, Vec<OpenApiSchema>> = BTreeMap::new();
+            for s in self.catalog.find_schemas_by_names(version, &misses).await? {
+                fallback.entry(s.name.clone()).or_default().push(s);
+            }
+            let mut next = Vec::new();
+            for (name, from) in std::mem::take(&mut level) {
+                if closure.schemas.contains_key(&name) || closure.unresolved.contains(&name) {
+                    continue;
+                }
+                if closure.schemas.len() >= MAX_SCHEMA_CLOSURE {
+                    closure.truncated = true;
+                    return Ok(closure);
+                }
+                let schema = match local.remove(&(from.clone(), name.clone())) {
+                    Some(s) => Some(s),
+                    None => fallback.get(&name).and_then(|all| {
+                        let s = all.first()?.clone();
                         closure.cross_source.push(CrossSourceReference {
                             name: name.clone(),
                             referenced_from: from.clone(),
                             resolved: s.provenance.clone(),
-                            candidates,
+                            candidates: all.len(),
                         });
-                        s
-                    })
-                }
-            };
-            match schema {
-                Some(s) => {
-                    queue.extend(
-                        s.referenced_schemas
-                            .iter()
-                            .map(|r| (r.clone(), s.provenance.source_id.clone())),
-                    );
-                    closure.schemas.insert(name, s);
-                }
-                None => {
-                    closure.unresolved.insert(name);
+                        Some(s)
+                    }),
+                };
+                match schema {
+                    Some(s) => {
+                        next.extend(
+                            s.referenced_schemas
+                                .iter()
+                                .map(|r| (r.clone(), s.provenance.source_id.clone())),
+                        );
+                        closure.schemas.insert(name, s);
+                    }
+                    None => {
+                        closure.unresolved.insert(name);
+                    }
                 }
             }
+            level = next;
         }
         Ok(closure)
     }
