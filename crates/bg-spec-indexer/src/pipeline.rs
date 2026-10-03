@@ -8,7 +8,10 @@
 use crate::{
     chunk::{ChunkSettings, PageText, chunk_pages},
     discover::{CorpusRoot, orphan_files},
-    openapi::{normalize, operation_search_text, parse_document, schema_search_text},
+    openapi::{
+        normalize, operation_identifiers, operation_search_text, parse_document,
+        schema_identifiers, schema_search_text,
+    },
     pdf::{ExtractedPage, PdfExtractor, PdfOxideExtractor},
 };
 use bg_spec_core::{
@@ -37,7 +40,7 @@ use std::{
 use tracing::{info, warn};
 
 /// Bumped when extraction/normalization output changes, forcing re-indexing.
-pub const INDEXER_FORMAT_VERSION: u32 = 1;
+pub const INDEXER_FORMAT_VERSION: u32 = 2;
 const META_IN_PROGRESS: &str = "index_in_progress";
 
 #[derive(Debug, Clone, Copy, Default)]
@@ -647,6 +650,7 @@ fn process_paged(
             },
             content: c.text.clone(),
             sha256: c.provenance.sha256.clone(),
+            identifiers: bg_spec_core::identifiers::from_text(&c.text),
         })
         .collect();
     let ocr = records
@@ -698,7 +702,8 @@ fn process_openapi(mut document: Document, path: &Path, prefix: Option<&str>) ->
                 locator: String,
                 title: String,
                 content: String,
-                sha256: String| SearchDocument {
+                sha256: String,
+                identifiers: Vec<String>| SearchDocument {
         record_id,
         record_type,
         source_id: document.source_id.clone(),
@@ -711,6 +716,7 @@ fn process_openapi(mut document: Document, path: &Path, prefix: Option<&str>) ->
         title,
         content,
         sha256,
+        identifiers,
     };
     for op in &api.operations {
         let (title, content) = operation_search_text(op);
@@ -721,6 +727,7 @@ fn process_openapi(mut document: Document, path: &Path, prefix: Option<&str>) ->
             title,
             content,
             op.provenance.sha256.clone(),
+            operation_identifiers(op),
         ));
     }
     for schema in &api.schemas {
@@ -732,6 +739,7 @@ fn process_openapi(mut document: Document, path: &Path, prefix: Option<&str>) ->
             title,
             content,
             schema.provenance.sha256.clone(),
+            schema_identifiers(schema),
         ));
     }
     let operations = api

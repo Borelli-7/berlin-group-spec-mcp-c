@@ -60,6 +60,8 @@ reports which one was used in `matched_by`.
 
 BM25 full-text search over PDF and text chunks, OpenAPI operations, and schemas. Results are
 **discovered evidence** and are never authoritative requirements.
+Code-like identifiers (`operationId`, `METHOD /path`, header and schema names, codes such as `E-07`)
+also match exactly and rank the defining record first.
 
 Input: `query` (required, ≤1000 chars, phrases in quotes), `version?`, `kind?` (`pdf|openapi|text`),
 `source_id?`, `limit?` (clamped to `search.max_limit`).

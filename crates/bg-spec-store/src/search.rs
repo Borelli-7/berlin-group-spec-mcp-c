@@ -16,18 +16,22 @@ use std::{
 use tantivy::{
     Index, IndexReader, IndexWriter, ReloadPolicy, TantivyDocument, Term,
     collector::TopDocs,
-    query::{BooleanQuery, Occur, Query, QueryParser, TermQuery},
+    query::{BooleanQuery, BoostQuery, Occur, Query, QueryParser, TermQuery},
     schema::{
         Field, INDEXED, IndexRecordOption, STORED, STRING, Schema, TextFieldIndexing, TextOptions,
         Value,
     },
     snippet::SnippetGenerator,
+    tokenizer::{LowerCaser, RawTokenizer, TextAnalyzer},
 };
 
 /// Bumped whenever the Tantivy schema changes; mismatches force a rebuild by the indexer.
-pub const SEARCH_SCHEMA_VERSION: u32 = 1;
+pub const SEARCH_SCHEMA_VERSION: u32 = 2;
 const MARKER_FILE: &str = "bg-spec-search.version";
 const TOKENIZER: &str = "en_stem";
+const IDENT_TOKENIZER: &str = "bg_ident";
+/// Exact identifier matches outweigh stemmed prose matches of the same terms.
+const IDENT_BOOST: f32 = 3.0;
 const SNIPPET_CHARS: usize = 400;
 const WRITER_HEAP_BYTES: usize = 64 * 1024 * 1024;
 
@@ -49,6 +53,7 @@ struct Fields {
     title: Field,
     content: Field,
     sha256: Field,
+    identifiers: Field,
 }
 
 fn build_schema() -> (Schema, Fields) {
@@ -73,6 +78,14 @@ fn build_schema() -> (Schema, Fields) {
         title: b.add_text_field("title", text.clone()),
         content: b.add_text_field("content", text),
         sha256: b.add_text_field("sha256", STRING | STORED),
+        identifiers: b.add_text_field(
+            "identifiers",
+            TextOptions::default().set_indexing_options(
+                TextFieldIndexing::default()
+                    .set_tokenizer(IDENT_TOKENIZER)
+                    .set_index_option(IndexRecordOption::WithFreqs),
+            ),
+        ),
     };
     (b.build(), fields)
 }
@@ -92,7 +105,18 @@ fn fields_of(schema: &Schema) -> Result<Fields> {
         title: f("title")?,
         content: f("content")?,
         sha256: f("sha256")?,
+        identifiers: f("identifiers")?,
     })
+}
+
+/// Identifiers are indexed whole and lower-cased (no splitting on `-`, no stemming).
+fn register_tokenizers(index: &Index) {
+    index.tokenizers().register(
+        IDENT_TOKENIZER,
+        TextAnalyzer::builder(RawTokenizer::default())
+            .filter(LowerCaser)
+            .build(),
+    );
 }
 
 fn marker_ok(dir: &Path) -> bool {
@@ -117,6 +141,8 @@ pub struct SearchDocument {
     pub title: String,
     pub content: String,
     pub sha256: String,
+    /// Code-like identifiers matched exactly (see `bg_spec_core::identifiers`).
+    pub identifiers: Vec<String>,
 }
 
 /// Index writer used by the indexer. Holds the Tantivy writer lock while alive.
@@ -145,6 +171,7 @@ impl TantivyWriter {
                 .map_err(|e| CoreError::io(dir.display().to_string(), e))?;
             (index, true)
         };
+        register_tokenizers(&index);
         let fields = fields_of(&index.schema())?;
         let writer = index
             .writer_with_num_threads(1, WRITER_HEAP_BYTES)
@@ -188,6 +215,9 @@ impl TantivyWriter {
         d.add_text(f.title, &doc.title);
         d.add_text(f.content, &doc.content);
         d.add_text(f.sha256, &doc.sha256);
+        for id in &doc.identifiers {
+            d.add_text(f.identifiers, bg_spec_core::identifiers::normalize(id));
+        }
         self.writer.add_document(d).map_err(search_err)?;
         Ok(())
     }
@@ -224,6 +254,7 @@ impl TantivySearch {
             )));
         }
         let index = Index::open_in_dir(dir).map_err(search_err)?;
+        register_tokenizers(&index);
         let fields = fields_of(&index.schema())?;
         let reader = index
             .reader_builder()
@@ -247,7 +278,16 @@ impl TantivySearch {
         let mut parser = QueryParser::for_index(&self.index, vec![f.title, f.content]);
         parser.set_field_boost(f.title, 2.0);
         let (text_query, _errors) = parser.parse_query_lenient(&q.text);
-        let mut clauses: Vec<(Occur, Box<dyn Query>)> = vec![(Occur::Must, text_query)];
+        let mut matching: Vec<(Occur, Box<dyn Query>)> = vec![(Occur::Should, text_query)];
+        for id in bg_spec_core::identifiers::query_terms(&q.text) {
+            let exact: Box<dyn Query> = Box::new(TermQuery::new(
+                Term::from_field_text(f.identifiers, &id),
+                IndexRecordOption::WithFreqs,
+            ));
+            matching.push((Occur::Should, Box::new(BoostQuery::new(exact, IDENT_BOOST))));
+        }
+        let mut clauses: Vec<(Occur, Box<dyn Query>)> =
+            vec![(Occur::Must, Box::new(BooleanQuery::new(matching)))];
         let term = |field: Field, value: &str| -> Box<dyn Query> {
             Box::new(TermQuery::new(
                 Term::from_field_text(field, value),

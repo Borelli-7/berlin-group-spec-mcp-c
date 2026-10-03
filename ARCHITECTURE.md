@@ -97,9 +97,13 @@ checkpoint at the end of each run. The MCP opens it `read_only(true)`, checks `s
 | `record_id`, `record_type`, `source_id`, `document_id`, `version`, `kind`, `authority`, `locator`, `sha256` | `STRING \| STORED`. These are exact-match filters. |
 | `page` | `u64`, indexed and stored |
 | `title`, `content` | `TEXT` with `en_stem`, stored. Titles get a 2× boost. |
+| `identifiers` | Indexed only, with the `bg_ident` tokenizer (whole value, lower-cased; no splitting or stemming). |
 
 The index holds chunk, OpenAPI operation, and OpenAPI schema records. Queries are parsed leniently
-(`parse_query_lenient`). Filters are `TermQuery` must-clauses. Results are ordered by BM25 score, then
+(`parse_query_lenient`). The whole query and each of its tokens are also looked up as exact `identifiers` terms
+(3× boost), so `GET /v2/accounts/{account-id}/balances`, `PSU-IP-Address` or `getAccountTransactionList` rank the
+record that defines them above prose that merely mentions their parts. Normalisation is shared through
+`bg_spec_core::identifiers`. Filters are `TermQuery` must-clauses. Results are ordered by BM25 score, then
 `record_id`, so the order is stable. A marker file `bg-spec-search.version` guards schema compatibility.
 
 ## 5. Flows

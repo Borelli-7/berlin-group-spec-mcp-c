@@ -11,6 +11,7 @@ pub mod diff;
 pub mod domain;
 pub mod error;
 pub mod hash;
+pub mod identifiers;
 pub mod manifest;
 pub mod openapi_path;
 pub mod ports;

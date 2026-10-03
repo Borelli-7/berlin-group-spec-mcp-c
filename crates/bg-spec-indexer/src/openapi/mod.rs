@@ -12,7 +12,9 @@ mod normalize;
 mod text;
 
 pub use normalize::{NormalizedApi, normalize};
-pub use text::{operation_search_text, schema_search_text};
+pub use text::{
+    operation_identifiers, operation_search_text, schema_identifiers, schema_search_text,
+};
 
 use bg_spec_core::{CoreError, Result};
 use serde_json::Value;

@@ -4,6 +4,16 @@ searches:
     version: openfinance-v2
     source_id: bg-openfinance-v2-openapi-ais
     locator: "op:GET /v2/accounts/{account-id}/transactions"
+  - query: GET /v2/accounts/{account-id}/balances
+    version: openfinance-v2
+    source_id: bg-openfinance-v2-openapi-ais
+    locator: "op:GET /v2/accounts/{account-id}/balances"
+    max_rank: 1
+  - query: getAccountTransactionList
+    version: openfinance-v2
+    source_id: bg-openfinance-v2-openapi-ais
+    locator: "op:GET /v2/accounts/{account-id}/transactions"
+    max_rank: 1
 endpoints:
   - version: openfinance-v2
     path: /accounts/{account-id}/transactions

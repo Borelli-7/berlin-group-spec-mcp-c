@@ -16,6 +16,16 @@ searches:
     version: nextgenpsd2-v1.3
     source_id: bg-nextgenpsd2-v1.3-openapi
     locator: "schema:BookingStatus"
+  - query: GET /accounts/{accountId}/balances
+    version: openfinance-v2
+    source_id: bg-openfinance-v2-openapi
+    locator: "op:GET /accounts/{accountId}/balances"
+    max_rank: 1
+  - query: E-07
+    version: openfinance-v2
+    source_id: bg-openfinance-v2-errata
+    locator: "chunk:bg-openfinance-v2-errata:p1:c1"
+    max_rank: 1
 endpoints:
   - version: openfinance-v2
     path: /v2/accounts/{accountId}/transactions

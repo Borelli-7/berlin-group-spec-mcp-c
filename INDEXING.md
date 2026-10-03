@@ -100,9 +100,17 @@ Each chunk, operation, and schema is one search document.
 | `record_id`, `record_type`, `source_id`, `document_id`, `version`, `kind`, `authority`, `locator`, `sha256` | `STRING \| STORED` (exact filters) |
 | `page` | `u64 INDEXED \| STORED` |
 | `title`, `content` | `TEXT \| STORED` (BM25) |
+| `identifiers` | exact, lower-cased identifiers (`bg_ident` tokenizer), not stored |
 
-Queries combine BM25 over `title` and `content` with `TermQuery` filters on `version`, `kind`, and
-`source_id`. Every hit carries `source_id` and `locator`, so the exact record can be fetched from SQLite with `read_source`.
+`identifiers` holds, per record type:
+
+* operation: `operationId`, path, `METHOD path`, parameter names and response header names;
+* schema: the component name;
+* chunk: code-like tokens of the text (`PSU-IP-Address`, `E-07`, `bookingStatus`, `/v2/...` paths and
+  `METHOD /path` pairs), at most 256 per chunk.
+
+Queries combine BM25 over `title` and `content` with boosted exact `identifiers` terms (the whole query and each
+token) and `TermQuery` filters on `version`, `kind`, and `source_id`. Every hit carries `source_id` and `locator`, so the exact record can be fetched from SQLite with `read_source`.
 
 ## SQLite
 

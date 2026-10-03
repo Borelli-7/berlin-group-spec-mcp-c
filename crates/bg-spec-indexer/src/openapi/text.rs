@@ -97,3 +97,20 @@ pub fn schema_search_text(schema: &OpenApiSchema) -> (String, String) {
     collect_text(&schema.schema, None, &mut s);
     (format!("Schema {}", schema.name), s)
 }
+
+/// Exact-match identifiers of an operation: operationId, path, `METHOD path`, parameter and
+/// response header names.
+pub fn operation_identifiers(op: &OpenApiOperation) -> Vec<String> {
+    let mut ids: Vec<String> = vec![op.path.clone(), format!("{} {}", op.method, op.path)];
+    ids.extend(op.operation_id.iter().cloned());
+    ids.extend(op.parameters.iter().map(|p| p.name.clone()));
+    ids.extend(op.responses.iter().flat_map(|r| r.headers.iter().cloned()));
+    ids.sort();
+    ids.dedup();
+    ids
+}
+
+/// Exact-match identifiers of a component schema: its name.
+pub fn schema_identifiers(schema: &OpenApiSchema) -> Vec<String> {
+    vec![schema.name.clone()]
+}

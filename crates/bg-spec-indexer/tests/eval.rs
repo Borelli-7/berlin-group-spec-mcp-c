@@ -18,6 +18,9 @@ struct SearchCase {
     version: String,
     source_id: String,
     locator: String,
+    /// Worst acceptable 1-based rank; defaults to the evaluation cut-off.
+    #[serde(default)]
+    max_rank: Option<usize>,
 }
 
 #[derive(Deserialize)]
@@ -78,6 +81,9 @@ async fn evaluate(official: bool) {
             reciprocal_rank += 1.0 / (rank + 1) as f64;
         }
         assert!(rank.is_some(), "missing gold evidence for {}", case.query);
+        if let (Some(rank), Some(max)) = (rank, case.max_rank) {
+            assert!(rank < max, "{} ranked {} (max {max})", case.query, rank + 1);
+        }
         for hit in &response.results {
             let evidence = svc
                 .specification
@@ -98,7 +104,7 @@ async fn evaluate(official: bool) {
     let precision = found as f64 / (n * k as f64);
     let mrr = reciprocal_rank / n;
     assert_eq!(recall, 1.0);
-    assert!(mrr >= if official { 1.0 / 3.0 } else { 1.0 });
+    assert!(mrr >= if official { 0.75 } else { 1.0 });
     assert_eq!(precision, 0.2);
     for case in &gold.endpoints {
         let response = svc
