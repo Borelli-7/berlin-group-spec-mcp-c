@@ -54,14 +54,19 @@ The MSRV is Rust 1.91 (edition 2024), and `rust-toolchain.toml` tracks stable.
 
 ## Fixtures
 
-The corpus in `corpus/` is **synthetic**. Never commit copyrighted Berlin Group documents.
-To regenerate the fixture PDFs, which are deterministic minimal PDFs that include one blank page simulating a scanned page:
+`corpus/` contains the official Berlin Group publications, redistributed unmodified under their
+published licences (see [README.md](README.md#corpus)). Do not edit those files. Project clarifications
+belong in `corpus/text/v2/errata.md`, and curated mappings in `corpus/requirements/requirements.yaml`.
+
+Tests use the **synthetic** fixture corpus in `crates/bg-spec-indexer/tests/fixtures/corpus/`.
+To regenerate its PDFs, which are deterministic minimal PDFs that include one blank page simulating a scanned page:
 
 ```bash
-cargo run -p bg-spec-indexer --example generate_fixtures -- corpus
+cargo run -p bg-spec-indexer --example generate_fixtures -- crates/bg-spec-indexer/tests/fixtures/corpus
 ```
 
-After changing the corpus, re-run the snapshots and recapture the example responses:
+After changing the fixture corpus, re-run the snapshots. After changing `corpus/`, re-run the ignored
+real-corpus and evaluation tests, then recapture the example responses:
 
 ```bash
 cargo build --release && ./target/release/bg-spec index --config config/config.toml
