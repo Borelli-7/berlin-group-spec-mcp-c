@@ -483,6 +483,24 @@ impl RequirementService {
 
     /// Declared conflicts in both directions. Citations list the curated sources of every
     /// requirement involved so the conflict can be verified with `read_source`.
+    /// Everything [`Self::declared_conflicts`] needs: the requirement, the requirements it declares
+    /// conflicts with and those declaring a conflict with it, loaded by indexed query.
+    async fn conflict_partners(&self, rec: &RequirementRecord) -> Result<Vec<RequirementRecord>> {
+        let mut ids: Vec<String> = rec
+            .requirement
+            .conflicts_with
+            .iter()
+            .map(|c| c.requirement_id.clone())
+            .collect();
+        ids.push(rec.requirement.id.clone());
+        ids.sort();
+        ids.dedup();
+        self.spec
+            .catalog()
+            .requirement_conflict_partners(&rec.requirement.id, &ids)
+            .await
+    }
+
     fn declared_conflicts(
         &self,
         rec: &RequirementRecord,
@@ -608,7 +626,10 @@ impl RequirementService {
             .map(SpecificationVersion::new)
             .transpose()?;
         let limit = self.spec.clamp_limit(limit);
-        let all = self.spec.catalog().list_requirements().await?;
+        let all = match &version {
+            Some(v) => self.spec.catalog().requirements_by_version(v).await?,
+            None => self.spec.catalog().list_requirements().await?,
+        };
         let q_upper = q.to_ascii_uppercase();
         let q_tokens = tokens(q);
         let mut matches: Vec<(u8, RequirementMatch)> = Vec::new();
@@ -736,7 +757,7 @@ impl RequirementService {
     pub async fn trace(&self, requirement_id: &str) -> Result<RequirementTrace> {
         let _timer = crate::timing::Timer::start("requirement.trace");
         let rec = self.requirement(requirement_id).await?;
-        let all = self.spec.catalog().list_requirements().await?;
+        let all = self.conflict_partners(&rec).await?;
         let req = &rec.requirement;
         let resolved = self.resolve_sources(&rec).await?;
         let mut conflicts = resolved.conflicts;
@@ -1010,10 +1031,14 @@ impl RequirementService {
                 .map(|s| cite(CitationRole::OpenapiSchema, &s.provenance)),
         );
 
-        // 3. Curated requirements linked to this endpoint.
-        let all = self.spec.catalog().list_requirements().await?;
+        // 3. Curated requirements linked to this endpoint (indexed candidates, exact match below).
+        let candidates = self
+            .spec
+            .catalog()
+            .requirements_for_method(&version, &method)
+            .await?;
         let mut requirements = Vec::new();
-        for rec in &all {
+        for rec in &candidates {
             let r = &rec.requirement;
             if r.version != version {
                 continue;
@@ -1044,7 +1069,8 @@ impl RequirementService {
             linked_via.dedup();
             let resolved = self.resolve_sources(rec).await?;
             conflicts.extend(resolved.conflicts);
-            conflicts.extend(self.declared_conflicts(rec, &all));
+            let partners = self.conflict_partners(rec).await?;
+            conflicts.extend(self.declared_conflicts(rec, &partners));
             for s in &resolved.sources {
                 if s.provenance.is_empty() {
                     citations.push(SourceCitation {

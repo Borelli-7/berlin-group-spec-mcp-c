@@ -236,6 +236,56 @@ impl CatalogRepository for SqliteCatalog {
         rows.first().map(|s| from_json(s)).transpose()
     }
 
+    async fn requirement_conflict_partners(
+        &self,
+        target: &str,
+        ids: &[String],
+    ) -> Result<Vec<RequirementRecord>> {
+        let ids = serde_json::to_string(ids)
+            .map_err(|e| bg_spec_core::CoreError::Storage(e.to_string()))?;
+        let rows = self
+            .json_rows(
+                "SELECT json FROM requirements r WHERE id IN (SELECT value FROM json_each(?1)) \
+                 OR EXISTS (SELECT 1 FROM json_each(r.json, '$.requirement.conflicts_with') c \
+                            WHERE json_extract(c.value, '$.requirement_id') = ?2) \
+                 ORDER BY id",
+                &[&ids, target],
+            )
+            .await?;
+        decode_all(rows)
+    }
+
+    async fn requirements_by_version(
+        &self,
+        version: &SpecificationVersion,
+    ) -> Result<Vec<RequirementRecord>> {
+        let rows = self
+            .json_rows(
+                "SELECT json FROM requirements WHERE version = ?1 ORDER BY id",
+                &[version.as_str()],
+            )
+            .await?;
+        decode_all(rows)
+    }
+
+    async fn requirements_for_method(
+        &self,
+        version: &SpecificationVersion,
+        method: &str,
+    ) -> Result<Vec<RequirementRecord>> {
+        let rows = self
+            .json_rows(
+                "SELECT json FROM requirements WHERE version = ?1 AND id IN ( \
+                   SELECT requirement_id FROM requirement_endpoints WHERE method = ?2 \
+                   UNION SELECT requirement_id FROM requirement_sources \
+                     WHERE locator LIKE '%op:%' OR locator LIKE '%path:%' \
+                 ) ORDER BY id",
+                &[version.as_str(), method],
+            )
+            .await?;
+        decode_all(rows)
+    }
+
     async fn stats(&self) -> Result<CatalogStats> {
         Ok(CatalogStats {
             documents: self.count("SELECT COUNT(*) FROM documents").await?,

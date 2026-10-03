@@ -13,7 +13,7 @@ use sqlx::{
 use std::{path::Path, time::Duration};
 
 /// Version of the catalog layout; bumped with incompatible migrations.
-pub const CATALOG_SCHEMA_VERSION: u32 = 1;
+pub const CATALOG_SCHEMA_VERSION: u32 = 2;
 
 static MIGRATOR: sqlx::migrate::Migrator = sqlx::migrate!("./migrations");
 

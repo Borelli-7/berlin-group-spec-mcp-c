@@ -144,6 +144,13 @@ Migrations are embedded from `crates/bg-spec-store/migrations/`. The main tables
 `openapi_operations`, `openapi_schemas`, `requirements`, `requirement_sources`, `requirement_endpoints`,
 and `index_meta`. The database is in WAL mode, and the MCP opens it read-only and checks the `schema_version`.
 
+Requirement lookups use these tables instead of loading every requirement: `find_requirement` with a `version`
+filters by the `requirements_version` index; `get_endpoint_requirements` loads only requirements of the version
+that declare an endpoint with the requested method (`requirement_endpoints_route`) or cite an `op:`/`path:`
+locator, then matches paths exactly; declared conflicts load the requirement's conflict partners in both
+directions. Catalog schema 2 (migration `0002_requirement_link_indexes.sql`) adds the indexes; `bg-spec index`
+applies it to an existing catalog, and the read-only MCP refuses a catalog that has not been migrated.
+
 ## Diagnostics
 
 `file_missing`, `path_rejected`, `processing_failed`, `page_extraction_failed`, `ocr_required`, `low_quality_text`,

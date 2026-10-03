@@ -861,3 +861,65 @@ components:
     assert!(main.cross_source_references.is_empty());
     assert!(main.cyclic_schemas.is_empty());
 }
+
+#[tokio::test]
+async fn indexed_requirement_lookups_match_full_scans() {
+    use bg_spec_core::{domain::SourceLocator, ports::CatalogRepository};
+    let env = indexed().await;
+    let svc = services(&env).await;
+    let (catalog, _) = bg_spec_store::open_read_only(&env.config).await.unwrap();
+    let all = catalog.list_requirements().await.unwrap();
+    assert!(!all.is_empty());
+    for rec in &all {
+        let r = &rec.requirement;
+        let mut methods: Vec<String> = r.endpoints.iter().map(|e| e.method.clone()).collect();
+        methods.extend(r.sources.iter().filter_map(|s| match s.locator.parse() {
+            Ok(SourceLocator::Operation { method, .. }) => Some(method),
+            Ok(SourceLocator::Path(_)) => Some("GET".to_owned()),
+            _ => None,
+        }));
+        for method in methods {
+            let candidates = catalog
+                .requirements_for_method(&r.version, &method)
+                .await
+                .unwrap();
+            assert!(
+                candidates.iter().any(|c| c.requirement.id == r.id),
+                "{} missing from {method} candidates",
+                r.id
+            );
+        }
+        let by_version = catalog.requirements_by_version(&r.version).await.unwrap();
+        let expected: Vec<&str> = all
+            .iter()
+            .filter(|x| x.requirement.version == r.version)
+            .map(|x| x.requirement.id.as_str())
+            .collect();
+        let got: Vec<&str> = by_version
+            .iter()
+            .map(|x| x.requirement.id.as_str())
+            .collect();
+        assert_eq!(got, expected);
+    }
+
+    // Declared conflicts are reported on both ends, including the requirement that is only named.
+    let (declaring, target) = all
+        .iter()
+        .find_map(|rec| {
+            rec.requirement
+                .conflicts_with
+                .first()
+                .map(|c| (rec.requirement.id.clone(), c.requirement_id.clone()))
+        })
+        .expect("fixture declares a conflict");
+    let trace = svc.requirements.trace(&target).await.unwrap();
+    let reverse = format!("{declaring} declares a conflict with {target}");
+    assert!(
+        trace
+            .conflicts
+            .iter()
+            .any(|c| c.kind == ConflictKind::Declared && c.description.starts_with(&reverse)),
+        "{:#?}",
+        trace.conflicts
+    );
+}

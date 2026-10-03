@@ -73,6 +73,26 @@ pub trait CatalogRepository: Send + Sync {
     -> Result<Option<OpenApiSchema>>;
     async fn list_requirements(&self) -> Result<Vec<RequirementRecord>>;
     async fn get_requirement(&self, id: &str) -> Result<Option<RequirementRecord>>;
+    /// Requirements with one of the `ids`, plus every requirement whose `conflicts_with` names
+    /// `target`; ordered by id. Unknown ids are skipped.
+    async fn requirement_conflict_partners(
+        &self,
+        target: &str,
+        ids: &[String],
+    ) -> Result<Vec<RequirementRecord>>;
+    /// Requirements of one version, ordered by id.
+    async fn requirements_by_version(
+        &self,
+        version: &SpecificationVersion,
+    ) -> Result<Vec<RequirementRecord>>;
+    /// Requirements of `version` that may link an endpoint with this (normalised) method: a declared
+    /// endpoint with the method, or any `op:`/`path:` source locator. A superset; callers match
+    /// paths exactly.
+    async fn requirements_for_method(
+        &self,
+        version: &SpecificationVersion,
+        method: &str,
+    ) -> Result<Vec<RequirementRecord>>;
     async fn stats(&self) -> Result<CatalogStats>;
     async fn index_meta(&self) -> Result<IndexMeta>;
 }
