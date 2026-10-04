@@ -104,6 +104,9 @@ pub enum DuplicateReason {
     IdenticalContent,
     /// Another chunk of the same page and section (title) of the same source.
     SamePage,
+    /// A schema of the same name and version in another OpenAPI file (e.g. a service file
+    /// embedding a copy of a data-dictionary schema with cosmetic differences).
+    SameSchema,
 }
 
 /// A search hit collapsed into a better-ranked one; still addressable with `read_source`.
@@ -127,19 +130,30 @@ pub fn collapse_duplicates(results: Vec<SearchResult>, limit: usize) -> Vec<Sear
         let target = out.iter().position(|kept| {
             kept.version == hit.version && !hit.sha256.is_empty() && kept.sha256 == hit.sha256
         });
+        let same_page = || {
+            out.iter().position(|kept| {
+                hit.record_type == RecordType::Chunk
+                    && kept.record_type == RecordType::Chunk
+                    && hit.page.is_some()
+                    && kept.page == hit.page
+                    && kept.source_id == hit.source_id
+                    && kept.title == hit.title
+            })
+        };
+        let same_schema = || {
+            out.iter().position(|kept| {
+                hit.record_type == RecordType::Schema
+                    && kept.record_type == RecordType::Schema
+                    && kept.version == hit.version
+                    && kept.locator == hit.locator
+            })
+        };
         let (target, reason) = match target {
             Some(i) => (Some(i), DuplicateReason::IdenticalContent),
-            None => (
-                out.iter().position(|kept| {
-                    hit.record_type == RecordType::Chunk
-                        && kept.record_type == RecordType::Chunk
-                        && hit.page.is_some()
-                        && kept.page == hit.page
-                        && kept.source_id == hit.source_id
-                        && kept.title == hit.title
-                }),
-                DuplicateReason::SamePage,
-            ),
+            None => match same_page() {
+                Some(i) => (Some(i), DuplicateReason::SamePage),
+                None => (same_schema(), DuplicateReason::SameSchema),
+            },
         };
         match target {
             Some(i) => out[i].also_found_in.push(CollapsedHit {
@@ -213,5 +227,27 @@ mod tests {
         // A duplicate ranked after the cut-off is still attached to its kept hit.
         assert_eq!(out[2].also_found_in[0].record_id, "h");
         assert!(out[3].also_found_in.is_empty());
+    }
+
+    #[test]
+    fn collapses_same_schema_name_of_the_same_version() {
+        let schema = |id: &str, source: &str, sha: &str, locator: &str| {
+            let mut h = hit(id, source, None, sha, RecordType::Schema);
+            h.locator = locator.into();
+            h
+        };
+        let mut other_version = schema("d", "v1", "q", "schema:transactions");
+        other_version.version = SpecificationVersion::new("nextgenpsd2-v1.3").unwrap();
+        let hits = vec![
+            schema("a", "ais", "x", "schema:transactions"),
+            schema("b", "dd", "y", "schema:transactions"),
+            schema("c", "dd", "z", "schema:balances"),
+            other_version,
+        ];
+        let out = collapse_duplicates(hits, 10);
+        let ids: Vec<_> = out.iter().map(|h| h.record_id.as_str()).collect();
+        assert_eq!(ids, vec!["a", "c", "d"]);
+        assert_eq!(out[0].also_found_in[0].record_id, "b");
+        assert_eq!(out[0].also_found_in[0].reason, DuplicateReason::SameSchema);
     }
 }

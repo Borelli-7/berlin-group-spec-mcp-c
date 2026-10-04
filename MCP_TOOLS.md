@@ -67,7 +67,8 @@ Code-like identifiers (`operationId`, `METHOD /path`, header and schema names, c
 also match exactly and rank the defining record first.
 Hits repeating better-ranked evidence are collapsed into it and listed in `also_found_in`
 (`reason`: `identical_content` = same version and sha256, e.g. a schema repeated in several sources;
-`same_page` = another chunk of the same page and section). Every collapsed hit stays addressable with
+`same_page` = another chunk of the same page and section; `same_schema` = a schema of the same name
+and version in another OpenAPI file, e.g. a service file's copy of a data-dictionary schema). Every collapsed hit stays addressable with
 `read_source`, and `limit` counts distinct hits.
 
 Input: `query` (required, ≤1000 chars, phrases in quotes), `version?`, `kind?` (`pdf|openapi|text`),
