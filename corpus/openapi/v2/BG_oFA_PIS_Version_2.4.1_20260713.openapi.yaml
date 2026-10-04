@@ -14,21 +14,18 @@ info:
     name: Creative Commons Attribution 4.0 International Public License
     url: https://creativecommons.org/licenses/by/4.0/
   title: openFinance API Framework XS2A API as PSD2 Interface Implementation Guidelines - Payment Initiation Service
-  version: "2.3"
+  version: "2.4.1"
   x-references:
     documents:
       - document:
         title: openFinance API Framework Data Dictionary
-        version: "2.3.1"
+        version: "2.4"
       - document:
         title: openFinance API Framework Implementation Guidelines Protocol Functions and Security Measures
-        version: "2.3"
-      - document:
-        title: openFinance API Framework Payment Formats and Domestic AIS/PIS Definitions for Version 2.x
-        version: "2.0"
+        version: "2.4"
       - document:
         title: openFinance API Framework XS2A API as PSD2 Interface Implementation Guidelines
-        version: "2.3"
+        version: "2.4.1"
 
 externalDocs:
   description: |
@@ -284,7 +281,6 @@ paths:
                 json_standingorderType:
                   type: object
                   required:
-                    - startDate
                     - frequency
                   properties:
                     startDate:
@@ -292,6 +288,13 @@ paths:
                         The first applicable day of execution starting from this date is the first payment. 
                       allOf:
                         - $ref: '#/components/schemas/ISODate'
+                    startDateTime:
+                      description: |
+                        The first applicable day and time of execution starting from this timestamp.
+                        This attribute is only applicable to instant payments. Seconds and milli seconds might be ignored by the ASPSP.
+                        The ASPSP might restrict the implementation to startDate. This restriction will be part of the ASPSP documentation
+                      allOf:
+                        - $ref: '#/components/schemas/ISODateTime'
                     executionRule:
                       description: |
                          \"following\" or \"preceding\" supported as values. This data attribute defines the behavior when recurring payment dates falls 
@@ -303,6 +306,15 @@ paths:
                         The last applicable day of execution\r\n If not given, it is an infinite standing order.
                       allOf:
                         - $ref: '#/components/schemas/ISODate'
+                    endDateTime:
+                      description: |
+                        The last applicable day and time of requested execution. 
+                        This attribute is only applicable to instant payments.
+                        If none of the attributes is given, it is an infinite standing order.
+                        The ASPSP might restrict the implementation to endDate. 
+                        This restriction will be part of the ASPSP documentation
+                      allOf:
+                        - $ref: '#/components/schemas/ISODateTime'
                     frequency:
                       description: |
                         Frequency of the recurring payment resulting from this standing order. 
@@ -1154,7 +1166,7 @@ components:
           description: |
             An alias to access a payment account via a registered mobile phone number.
           allOf:
-            - $ref: '#/components/schemas/Max35Text'
+            - $ref: '#/components/schemas/MSISDN'
         other:
           description: |
             An alias with a proprietary coding
@@ -1293,7 +1305,7 @@ components:
         Message codes defined for payment cancelations within PIS for HTTP Error code 405 (METHOD NOT ALLOWED)
       anyOf:
         - $ref: '#/components/schemas/MessageCode_ServiceUnspecific_405'
-        - $ref: '#/components/schemas/MessageCode_PisSpecific_405'
+        - $ref: '#/components/schemas/MessageCode_PisAndRtpSpecific_405'
     messageCode_SigningBasketSpecific:
       description: |
         See document \"openFinance API Framework Data Dictionary\", section \"Signing Basket Specific Error Codes\" for more details.
@@ -1459,7 +1471,7 @@ components:
       description: Message codes defined for PIS for HTTP Error code 400 (BAD_REQUEST).
       anyOf:
         - $ref: '#/components/schemas/MessageCode_ServiceUnspecific_400'
-        - $ref: '#/components/schemas/MessageCode_PisSpecific_400'
+        - $ref: '#/components/schemas/MessageCode_PisAndRtpSpecific_400'
     error_NG_409_PIS: 
       type: object
       properties:
@@ -1525,7 +1537,7 @@ components:
             Name of the party.
           allOf:
             - $ref: '#/components/schemas/Max140Text'
-        postaladdress:
+        postalAddress:
           description: |
             Postal Address of the party.
           allOf:
@@ -1934,6 +1946,7 @@ components:
             - debtorAccount
             - frequency
             - startDate
+            - startDateTime
           properties:
             debtorAccount:
               description: |
@@ -1950,6 +1963,13 @@ components:
                 The first applicable day of execution starting from this date is the first payment. 
               allOf:
                 - $ref: '#/components/schemas/ISODate'
+            startDateTime:
+              description: |
+                The first applicable day and time of execution starting from this timestamp.
+                This attribute is only applicable to instant payments. Seconds and milli seconds might be ignored by the ASPSP.
+                The ASPSP might restrict the implementation to startDate. This restriction will be part of the ASPSP documentation
+              allOf:
+                - $ref: '#/components/schemas/ISODateTime'
             executionRule:
               description: |
                  \"following\" or \"preceding\" supported as values. This data attribute defines the behavior when recurring payment dates falls 
@@ -1961,6 +1981,15 @@ components:
                 The last applicable day of execution. If not given, it is an infinite standing order.
               allOf:
                 - $ref: '#/components/schemas/ISODate'
+            endDateTime:
+              description: |
+                The last applicable day and time of requested execution. 
+                This attribute is only applicable to instant payments.
+                If none of the attributes is given, it is an infinite standing order.
+                The ASPSP might restrict the implementation to endDate. 
+                This restriction will be part of the ASPSP documentation
+              allOf:
+                - $ref: '#/components/schemas/ISODateTime'
             frequency:
               description: |
                 The frequency of the recurring payment resulting from this standing order.
@@ -2139,7 +2168,7 @@ components:
       description: Message codes defined for PIS for HTTP Error code 404 (NOT FOUND).
       anyOf:
         - $ref: '#/components/schemas/MessageCode_ServiceUnspecific_404'
-        - $ref: '#/components/schemas/MessageCode_PisSpecific_404'
+        - $ref: '#/components/schemas/MessageCode_PisAndRtpSpecific_404'
     securitiesAccountFee:
       description: |
         See document \"openFinance API Framework Data Dictionary\", section \"Securities Account Fee\" for more details.
@@ -2249,6 +2278,7 @@ components:
       enum:
         - ACCC
         - ACCP
+        - ACFW
         - ACSC
         - ACSP
         - ACTC
@@ -2270,11 +2300,11 @@ components:
       description: |
         See document \"openFinance API Framework Data Dictionary\", section \"PIS Specific Error Codes\" for more details.
       oneOf:
-        - $ref: '#/components/schemas/MessageCode_PisSpecific_400'
-        - $ref: '#/components/schemas/MessageCode_PisSpecific_401'
-        - $ref: '#/components/schemas/MessageCode_PisSpecific_403'
-        - $ref: '#/components/schemas/MessageCode_PisSpecific_404'
-        - $ref: '#/components/schemas/MessageCode_PisSpecific_405'
+        - $ref: '#/components/schemas/MessageCode_PisAndRtpSpecific_400'
+        - $ref: '#/components/schemas/MessageCode_PisAndRtpSpecific_401'
+        - $ref: '#/components/schemas/MessageCode_PisAndRtpSpecific_403'
+        - $ref: '#/components/schemas/MessageCode_PisAndRtpSpecific_404'
+        - $ref: '#/components/schemas/MessageCode_PisAndRtpSpecific_405'
     LanguageCode:
       description: |
         See document \"openFinance API Framework Data Dictionary\", section \"Other ISO-related basic Types\" for more details.
@@ -2313,6 +2343,7 @@ components:
         - $ref: '#/components/schemas/MessageCode_ServiceUnspecific_404'
         - $ref: '#/components/schemas/MessageCode_ServiceUnspecific_405'
         - $ref: '#/components/schemas/MessageCode_ServiceUnspecific_409'
+        - $ref: '#/components/schemas/MessageCode_ServiceUnspecific_422'
     partyDescription:
       description: |
         See document \"openFinance API Framework Data Dictionary\", section \"Party Description\" for more details.
@@ -2323,7 +2354,7 @@ components:
             Name of the party.
           allOf:
             - $ref: '#/components/schemas/Max140Text'
-        postaladdress:
+        postalAddress:
           description: |
             Postal Address of the party.
           allOf:
@@ -3407,7 +3438,7 @@ components:
       description: Message codes defined defined for PIS for PIS for HTTP Error code 403 (FORBIDDEN).
       anyOf:
         - $ref: '#/components/schemas/MessageCode_ServiceUnspecific_403'
-        - $ref: '#/components/schemas/MessageCode_PisSpecific_403'
+        - $ref: '#/components/schemas/MessageCode_PisAndRtpSpecific_403'
     proxyAccountIdentification:
       description: |
         See document \"openFinance API Framework Data Dictionary\", section \"Proxy Account Identification\" for more details.
@@ -3440,6 +3471,18 @@ components:
         earlyPaymentAllowed:
           description: |
             Indicates if the debtor is allowed to pay before the requested execution date.
+          type: boolean
+        latePaymentAllowed:
+          description: |
+            Indicates if the debtor is allowed to pay later than the requested execution date.
+          type: boolean
+        remittanceInformationModificationAllowed:
+          description: |
+            Indicates if the debtor is allowed to change the remittance information.
+          type: boolean
+        creditorAccountModificationAllowed:
+          description: |
+            Indicates if the debtor is allowed to modify the requested creditor account.
           type: boolean
     StatusReasonCode:
       description: |
@@ -3728,7 +3771,7 @@ components:
             An alias to access a payment account via a registered mobile phone number. This alias might be needed e.g. in the payment initiation services.
             The support of this alias must be explicitly documented by the ASPSP for the corresponding API Calls.
           allOf:
-            - $ref: '#/components/schemas/Max35Text'
+            - $ref: '#/components/schemas/MSISDN'
         other:
           description: |
             An alias with a proprietary coding
@@ -4171,8 +4214,6 @@ components:
         - type: object
           description: |
             Payment data model for periodic Payments
-          required:
-            - startDate
           properties:
             debtorAccount:
               description: |
@@ -4189,6 +4230,13 @@ components:
                 The first applicable day of execution starting from this date is the first payment. 
               allOf:
                 - $ref: '#/components/schemas/ISODate'
+            startDateTime:
+              description: |
+                The first applicable day and time of execution starting from this timestamp.
+                This attribute is only applicable to instant payments. Seconds and milli seconds might be ignored by the ASPSP.
+                The ASPSP might restrict the implementation to startDate. This restriction will be part of the ASPSP documentation
+              allOf:
+                - $ref: '#/components/schemas/ISODateTime'
             executionRule:
               description: |
                  \"following\" or \"preceding\" supported as values. This data attribute defines the behavior when recurring payment dates falls 
@@ -4200,6 +4248,15 @@ components:
                 The last applicable day of execution. If not given, it is an infinite standing order.
               allOf:
                 - $ref: '#/components/schemas/ISODate'
+            endDateTime:
+              description: |
+                The last applicable day and time of requested execution. 
+                This attribute is only applicable to instant payments.
+                If none of the attributes is given, it is an infinite standing order.
+                The ASPSP might restrict the implementation to endDate. 
+                This restriction will be part of the ASPSP documentation
+              allOf:
+                - $ref: '#/components/schemas/ISODateTime'
             frequency:
               description: |
                 The frequency of the recurring payment resulting from this standing order.
@@ -4329,6 +4386,31 @@ components:
         href:
           description: |
           type: string
+    originalTransactionReference:
+      description: |
+        See document \"openFinance API Framework Data Dictionary\", section \"Original Transaction Reference\" for more details.
+      type: object
+      properties:
+        instructedAmount:
+          description: |
+          allOf:
+            - $ref: '#/components/schemas/amount'
+        equivalentAmount:
+          description: |
+          allOf:
+            - $ref: '#/components/schemas/equivalentAmount'
+        creditor:
+          description: |
+          allOf:
+            - $ref: '#/components/schemas/partyDescription'
+        creditorAccount:
+          description: |
+          allOf:
+            - $ref: '#/components/schemas/accountReference'
+        ultimateCreditor:
+          description: |
+          allOf:
+            - $ref: '#/components/schemas/partyDescription'
     error_RFC7807_405_PIS_CANC: 
       description: |
         Standardised definition of reporting error information according to [RFC7807].
@@ -4385,31 +4467,6 @@ components:
                 $ref: '#/components/schemas/MessageCode_405_PIS_CANC'
         _links:
           $ref: '#/components/schemas/links'
-    originalTransactionReference:
-      description: |
-        See document \"openFinance API Framework Data Dictionary\", section \"Original Transaction Reference\" for more details.
-      type: object
-      properties:
-        instructedAmount:
-          description: |
-          allOf:
-            - $ref: '#/components/schemas/amount'
-        equivalentAmount:
-          description: |
-          allOf:
-            - $ref: '#/components/schemas/equivalentAmount'
-        creditor:
-          description: |
-          allOf:
-            - $ref: '#/components/schemas/partyDescription'
-        creditorAccount:
-          description: |
-          allOf:
-            - $ref: '#/components/schemas/accountReference'
-        ultimateCreditor:
-          description: |
-          allOf:
-            - $ref: '#/components/schemas/partyDescription'
     PartyNameMatchCode:
       description: |
         See document \"openFinance API Framework Extended Services Verification of Party (VOP) \", 
@@ -4433,6 +4490,20 @@ components:
       type: string
       pattern: '[A-Z]{2,2}[0-9]{2,2}[a-zA-Z0-9]{1,30}'
       example: 'FR7612345987650123456789014'
+    MessageCode_PisAndRtpSpecific_404:
+      description: |
+        See document \"openFinance API Framework Data Dictionary\", section \"PIS and RTP Specific HTTP Error Codes\" for more details.
+      type: string
+      enum: 
+        - PRODUCT_UNKNOWN
+      example: 'PRODUCT_UNKNOWN'
+    MessageCode_PisAndRtpSpecific_403:
+      description: |
+        See document \"openFinance API Framework Data Dictionary\", section \"PIS and RTP Specific HTTP Error Codes\" for more details.
+      type: string
+      enum: 
+        - PRODUCT_INVALID
+      example: 'PRODUCT_INVALID'
     index:
       description: |
         See document \"openFinance API Framework Data Dictionary\", section \"Index\" for more details.
@@ -4461,6 +4532,13 @@ components:
             Explanations e.g. to specify index = \"other\".
           allOf:
             - $ref: '#/components/schemas/Max500Text'
+    MessageCode_PisAndRtpSpecific_405:
+      description: |
+        See document \"openFinance API Framework Data Dictionary\", section \"PIS and RTP Specific HTTP Error Codes\" for more details.
+      type: string
+      enum: 
+        - CANCELLATION_INVALID
+      example: 'CANCELLATION_INVALID'
     error_RFC7807_405_PIS: 
       description: |
         Standardised definition of reporting error information according to [RFC7807].
@@ -4544,6 +4622,21 @@ components:
             Issuer of the identification
           allOf:
             - $ref: '#/components/schemas/Max35Text'
+    MessageCode_PisAndRtpSpecific_400:
+      description: |
+        See document \"openFinance API Framework Data Dictionary\", section \"PIS and RTP Specific HTTP Error Codes\" for more details.
+      type: string
+      enum: 
+        - PAYMENT_FAILED
+        - EXECUTION_DATE_INVALID
+      example: 'PAYMENT_FAILED'
+    MessageCode_ServiceUnspecific_422:
+      description: |
+        See document \"openFinance API Framework Data Dictionary\", section \"Service Unspecific HTTP Error Codes\" for more details.
+      type: string
+      enum: 
+        - ADDRESSING_VARIANT_INVALID
+      example: 'ADDRESSING_VARIANT_INVALID'
     genericOrganisationIdentification:
       description: |
         See document \"openFinance API Framework Data Dictionary\", section \"Generic Organisation Identification\" for more details.
@@ -4599,6 +4692,13 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/personIdentification'
+    MessageCode_PisAndRtpSpecific_401:
+      description: |
+        See document \"openFinance API Framework Data Dictionary\", section \"PIS and RTP Specific HTTP Error Codes\" for more details.
+      type: string
+      enum: 
+        - KID_MISSING
+      example: 'KID_MISSING'
     error_NG_400_PIS: 
       type: object
       properties:
@@ -4674,21 +4774,6 @@ components:
                 $ref: '#/components/schemas/MessageCode_ServiceUnspecific_401'
         _links:
           $ref: '#/components/schemas/links'
-    MessageCode_PisSpecific_400:
-      description: |
-        See document \"openFinance API Framework Data Dictionary\", section \"PIS Specific HTTP Error Codes\" for more details.
-      type: string
-      enum: 
-        - PAYMENT_FAILED
-        - EXECUTION_DATE_INVALID
-      example: 'PAYMENT_FAILED'
-    MessageCode_PisSpecific_401:
-      description: |
-        See document \"openFinance API Framework Data Dictionary\", section \"PIS Specific HTTP Error Codes\" for more details.
-      type: string
-      enum: 
-        - KID_MISSING
-      example: 'KID_MISSING'
     clientMessageInformation_409_PIS:
       type: object
       required:
@@ -4749,27 +4834,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/genericOrganisationIdentification'
-    MessageCode_PisSpecific_403:
-      description: |
-        See document \"openFinance API Framework Data Dictionary\", section \"PIS Specific HTTP Error Codes\" for more details.
-      type: string
-      enum: 
-        - PRODUCT_INVALID
-      example: 'PRODUCT_INVALID'
-    MessageCode_PisSpecific_404:
-      description: |
-        See document \"openFinance API Framework Data Dictionary\", section \"PIS Specific HTTP Error Codes\" for more details.
-      type: string
-      enum: 
-        - PRODUCT_UNKNOWN
-      example: 'PRODUCT_UNKNOWN'
-    MessageCode_PisSpecific_405:
-      description: |
-        See document \"openFinance API Framework Data Dictionary\", section \"PIS Specific HTTP Error Codes\" for more details.
-      type: string
-      enum: 
-        - CANCELLATION_INVALID
-      example: 'CANCELLATION_INVALID'
     BICFI:
       description: |
         See document \"openFinance API Framework Data Dictionary\", section \"Other ISO-related basic Types\" for more details.
@@ -4968,6 +5032,7 @@ components:
       enum: 
         - CERTIFICATE_INVALID
         - CERTIFICATE_EXPIRED
+        - ROLE_INVALID
         - CERTIFICATE_BLOCKED
         - CERTIFICATE_REVOKED
         - CERTIFICATE_MISSING
@@ -4976,7 +5041,6 @@ components:
         - API_CONTRACT_ID_INVALID
         - SIGNATURE_INVALID
         - SIGNATURE_MISSING
-        - ROLE_INVALID
         - PSU_CREDENTIALS_INVALID
         - CORPORATE_ID_INVALID
         - CONSENT_INVALID
@@ -5092,7 +5156,7 @@ components:
       description: Message codes defined for PIS for HTTP Error code 401 (UNAUTHORIZED).
       anyOf:
         - $ref: '#/components/schemas/MessageCode_ServiceUnspecific_401'
-        - $ref: '#/components/schemas/MessageCode_PisSpecific_401'
+        - $ref: '#/components/schemas/MessageCode_PisAndRtpSpecific_401'
     SCAStatus:
       description: |
         See document \"openFinance API Framework Data Dictionary\", section \"SCA Status\" for more details.
@@ -5245,6 +5309,11 @@ components:
         status:
           description: |
             A link to retrieve the status of the transaction resource.
+          allOf:
+            - $ref: '#/components/schemas/hrefType'
+        changedVersion?{inChange=true}:
+          description: |
+            A link to retrieve the changed version of a resource that was created due to a Change Transaction Resource Request. The link can be used to retrieve the related ETag of the changed version.
           allOf:
             - $ref: '#/components/schemas/hrefType'
         transactionfees:
@@ -5650,6 +5719,21 @@ components:
       enum: 
         - ACCESS_EXCEEDED
       example: 'ACCESS_EXCEEDED'
+    PartyIdentificationMatchCode:
+      description: |
+        See document \"openFinance API Framework Extended Services Verification of Party (VOP) \", 
+        section \"Party Identification Match Code\" for more details.
+        Code    Desription
+         MTCH     Match
+         NMTC     No match
+         NOAP     Validation check is not applicable
+         NOTC     Validation check has not been carried out.        
+      type: string
+      enum:
+        - MTCH
+        - NMTC
+        - NOAP
+      example: 'MTCH'
     PeriodicPayment_Target2_Core:
       allOf:
         - $ref: '#/components/schemas/minimum_Target2_Core'
@@ -5660,6 +5744,7 @@ components:
             - debtorAccount
             - frequency
             - startDate
+            - startDateTime
           properties:
             debtorAccount:
               description: |
@@ -5676,6 +5761,13 @@ components:
                 The first applicable day of execution starting from this date is the first payment. 
               allOf:
                 - $ref: '#/components/schemas/ISODate'
+            startDateTime:
+              description: |
+                The first applicable day and time of execution starting from this timestamp.
+                This attribute is only applicable to instant payments. Seconds and milli seconds might be ignored by the ASPSP.
+                The ASPSP might restrict the implementation to startDate. This restriction will be part of the ASPSP documentation
+              allOf:
+                - $ref: '#/components/schemas/ISODateTime'
             executionRule:
               description: |
                  \"following\" or \"preceding\" supported as values. This data attribute defines the behavior when recurring payment dates falls 
@@ -5687,6 +5779,15 @@ components:
                 The last applicable day of execution. If not given, it is an infinite standing order.
               allOf:
                 - $ref: '#/components/schemas/ISODate'
+            endDateTime:
+              description: |
+                The last applicable day and time of requested execution. 
+                This attribute is only applicable to instant payments.
+                If none of the attributes is given, it is an infinite standing order.
+                The ASPSP might restrict the implementation to endDate. 
+                This restriction will be part of the ASPSP documentation
+              allOf:
+                - $ref: '#/components/schemas/ISODateTime'
             frequency:
               description: |
                 The frequency of the recurring payment resulting from this standing order.
@@ -5713,21 +5814,11 @@ components:
 #               type: array
 #               items:
 #                 $ref: '#/components/schemas/clientMessageInformation'
-    PartyIdentificationMatchCode:
-      description: |
-        See document \"openFinance API Framework Extended Services Verification of Party (VOP) \", 
-        section \"Party Identification Match Code\" for more details.
-        Code    Desription
-         MTCH     Match
-         NMTC     No match
-         NOAP     Validation check is not applicable
-         NOTC     Validation check has not been carried out.        
+    MSISDN:
       type: string
-      enum:
-        - MTCH
-        - NMTC
-        - NOAP
-      example: 'MTCH'
+      pattern: \+[0-9]{1,3}-[0-9()+\-]{1,30}
+      description: See document "openFinance API Framework Data Dictionary", section
+        "Other ISO-related basic Types" for more details.
     messageCode_PiisSpecific:
       description: |
         See document \"openFinance API Framework Data Dictionary\", section \"PIIS Specific Error Codes\" for more details.
@@ -6528,6 +6619,7 @@ components:
             - debtorAccount
             - frequency
             - startDate
+            - startDateTime
           properties:
             debtorAccount:
               description: |
@@ -6544,6 +6636,13 @@ components:
                 The first applicable day of execution starting from this date is the first payment. 
               allOf:
                 - $ref: '#/components/schemas/ISODate'
+            startDateTime:
+              description: |
+                The first applicable day and time of execution starting from this timestamp.
+                This attribute is only applicable to instant payments. Seconds and milli seconds might be ignored by the ASPSP.
+                The ASPSP might restrict the implementation to startDate. This restriction will be part of the ASPSP documentation
+              allOf:
+                - $ref: '#/components/schemas/ISODateTime'
             executionRule:
               description: |
                  \"following\" or \"preceding\" supported as values. This data attribute defines the behavior when recurring payment dates falls 
@@ -6555,6 +6654,15 @@ components:
                 The last applicable day of execution. If not given, it is an infinite standing order.
               allOf:
                 - $ref: '#/components/schemas/ISODate'
+            endDateTime:
+              description: |
+                The last applicable day and time of requested execution. 
+                This attribute is only applicable to instant payments.
+                If none of the attributes is given, it is an infinite standing order.
+                The ASPSP might restrict the implementation to endDate. 
+                This restriction will be part of the ASPSP documentation
+              allOf:
+                - $ref: '#/components/schemas/ISODateTime'
             frequency:
               description: |
                 The frequency of the recurring payment resulting from this standing order.
@@ -7274,7 +7382,6 @@ components:
           required:
             - debtorAccount
             - frequency
-            - startDate
           properties:
             debtorAccount:
               description: |
@@ -7291,6 +7398,13 @@ components:
                 The first applicable day of execution starting from this date is the first payment. 
               allOf:
                 - $ref: '#/components/schemas/ISODate'
+            startDateTime:
+              description: |
+                The first applicable day and time of execution starting from this timestamp.
+                This attribute is only applicable to instant payments. Seconds and milli seconds might be ignored by the ASPSP.
+                The ASPSP might restrict the implementation to startDate. This restriction will be part of the ASPSP documentation
+              allOf:
+                - $ref: '#/components/schemas/ISODateTime'
             executionRule:
               description: |
                  \"following\" or \"preceding\" supported as values. This data attribute defines the behavior when recurring payment dates falls 
@@ -7302,6 +7416,15 @@ components:
                 The last applicable day of execution. If not given, it is an infinite standing order.
               allOf:
                 - $ref: '#/components/schemas/ISODate'
+            endDateTime:
+              description: |
+                The last applicable day and time of requested execution. 
+                This attribute is only applicable to instant payments.
+                If none of the attributes is given, it is an infinite standing order.
+                The ASPSP might restrict the implementation to endDate. 
+                This restriction will be part of the ASPSP documentation
+              allOf:
+                - $ref: '#/components/schemas/ISODateTime'
             frequency:
               description: |
                 The frequency of the recurring payment resulting from this standing order.
@@ -7811,7 +7934,9 @@ components:
     HEADER_xRequestId:
       name: X-Request-ID
       in: header
-      description: ID of the request, unique to the call, as determined by the initiating party.
+      description: |
+        ID of the request, unique to the call, as determined by the initiating party.
+        This is the unique ID of the API Client for the payment initiation regarding PSD2 article 47 and EBA RTS article 29.
       required: true
       schema:
         type: string
@@ -7821,8 +7946,8 @@ components:
       name: PSU-IP-Address
       in: header
       description: |
-        The forwarded IP Address header field consists of the corresponding http request IP Address field between PSU and TPP.
-        If not available, the TPP shall use the IP Address used by the TPP when submitting this request.
+        The forwarded IP Address header field consists of the corresponding http request IP Address field between PSU and API-Client.
+        If not available, the API-Client shall use the IP Address used by the API-Client when submitting this request.
       schema:
         type: string
         format: ipv4
@@ -8002,6 +8127,15 @@ components:
         type: string        
       required: false
       example: 'status=SCA'
+    ASPSP-VOP-Supported:
+      description: |
+        true: The ASPSP supports the integrated VOP function. 
+        The outcome of the process is transported in additional attributes contained in the message body.
+        false: The ASPSP does not support the integrated VOP function for the addressed payment product.
+        not used: No information provided.
+      schema:
+        type: boolean       
+      required: false
     Location:
       description: |
         Location of the created resource.
@@ -8050,9 +8184,9 @@ components:
                       - $ref: '#/components/schemas/ISODate'
                   executionRule:
                     description: |
-                      \"following\" or \"preceding\" supported as values. This data attribute defines the behavior when recurring payment dates falls 
-                      on a weekend or bank holiday. The payment is then executed either the \"preceding\" or \"following\" working day.ASPSP might reject 
-                      the request due to the communicated value, if rules in Online-Banking are not supporting this execution rule. 
+                       \"following\" or \"preceding\" supported as values. This data attribute defines the behavior when recurring payment dates falls 
+                       on a weekend or bank holiday. The payment is then executed either the \"preceding\" or \"following\" working day.ASPSP might reject 
+                       the request due to the communicated value, if rules in Online-Banking are not supporting this execution rule. 
                     type: string
                   endDate:
                     description: |
@@ -8071,7 +8205,7 @@ components:
                       - $ref: '#/components/schemas/Max2Text'
                   monthsOfExecution:
                     description: |
-                      The format is following the regular expression \d{1,2}. The array is restricted to 11 entries. The values contained In the 
+                      The format is following the regular expression d{1,2}. The array is restricted to 11 entries. The values contained In the 
                       array entries shall all be different and the maximum value of one entry is 12. 
                       This attribute is contained if and only if the frequency equals \"MonthlyVariable\". 
                       Example: An execution on January, April and October each year is addressed by [\"1\". \"4\", \"10\"]. 
@@ -8174,7 +8308,7 @@ components:
                   _links:
                     description: |
                       A list of hyperlinks to be recognised by the API Client. The actual hyperlinks used in the response depend on the dynamical decisions of the ASPSP 
-                      when processing the request. The potential links for this response message are generically defined in [oFA SMPF] for all Transaction Initiation 
+                      when processing the request. The potential links for this response message are generically defined in [oFA-PFSM] for all Transaction Initiation 
                       Response messages. These links will also be contained in the related Open API files. 
                       Remark: All links can be relative or full links, to be decided by the ASPSP.
                     allOf:
@@ -8218,7 +8352,7 @@ components:
                   _links:
                     description: |
                       A list of hyperlinks to be recognised by the API Client. The actual hyperlinks used in the response depend on the dynamical decisions of the ASPSP 
-                      when processing the request. The potential links for this response message are generically defined in [oFA SMPF] for all Transaction Initiation 
+                      when processing the request. The potential links for this response message are generically defined in [oFA-PFSM] for all Transaction Initiation 
                       Response messages. These links will also be contained in the related Open API files. 
                       Remark: All links can be relative or full links, to be decided by the ASPSP.
                     allOf:
@@ -8278,7 +8412,7 @@ components:
                   _links:
                     description: |
                       A list of hyperlinks to be recognised by the API Client. The actual hyperlinks used in the response depend on the dynamical decisions of the ASPSP 
-                      when processing the request. The potential links for this response message are generically defined in [oFA SMPF] for all Transaction Initiation 
+                      when processing the request. The potential links for this response message are generically defined in [oFA-PFSM] for all Transaction Initiation 
                       Response messages. These links will also be contained in the related Open API files. 
                       Remark: All links can be relative or full links, to be decided by the ASPSP.
                     allOf:
@@ -8300,7 +8434,7 @@ components:
                   _links:
                     description: |
                       A list of hyperlinks to be recognised by the API Client. The actual hyperlinks used in the response depend on the dynamical decisions of the ASPSP 
-                      when processing the request. The potential links for this response message are generically defined in [oFA SMPF] for all Transaction Initiation 
+                      when processing the request. The potential links for this response message are generically defined in [oFA-PFSM] for all Transaction Initiation 
                       Response messages. These links will also be contained in the related Open API files. 
                       Remark: All links can be relative or full links, to be decided by the ASPSP.
                     allOf:
@@ -8317,7 +8451,7 @@ components:
                   _links:
                     description: |
                       A list of hyperlinks to be recognised by the API Client. The actual hyperlinks used in the response depend on the dynamical decisions of the ASPSP 
-                      when processing the request. The potential links for this response message are generically defined in [oFA SMPF] for all Transaction Initiation 
+                      when processing the request. The potential links for this response message are generically defined in [oFA-PFSM] for all Transaction Initiation 
                       Response messages. These links will also be contained in the related Open API files. 
                       Remark: All links can be relative or full links, to be decided by the ASPSP.
                     allOf:
@@ -8447,6 +8581,8 @@ components:
           $ref: '#/components/headers/ASPSP-Notification-Support'
         ASPSP-Notification-Content:
           $ref: '#/components/headers/ASPSP-Notification-Content'
+        ASPSP-VOP-Supported:   #optional for VOP support
+          $ref: '#/components/headers/ASPSP-VOP-Supported'
         Location:
           $ref: '#/components/headers/Location'
         X-Request-ID:
@@ -8527,7 +8663,7 @@ components:
               _links:
                 description: |
                   A list of hyperlinks to be recognised by the API Client. The actual hyperlinks used in the response depend on the dynamical decisions of the ASPSP 
-                  when processing the request. The potential links for this response message are generically defined in [oFA SMPF] for all Transaction Initiation 
+                  when processing the request. The potential links for this response message are generically defined in [oFA-PFSM] for all Transaction Initiation 
                   Response messages. These links will also be contained in the related Open API files. 
                   Remark: All links can be relative or full links, to be decided by the ASPSP.
                 allOf:
@@ -8541,6 +8677,12 @@ components:
                 type: array
                 items:
                   $ref: '#/components/schemas/clientMessageInformation'
+              originalTransactionInformationAndVopStatus:
+                description: |
+                  Information about VOP result of the addressed transactions.
+                type: array
+                items:
+                  $ref: '#/components/schemas/originalTransactionInformationAndVOPStatus'
     decline_409_PIS:
       headers:
         X-Reference-API-Name:
@@ -8749,7 +8891,7 @@ components:
               _links:
                 description: |
                   A list of hyperlinks to be recognised by the API Client. The actual hyperlinks used in the response depend on the dynamical decisions of the ASPSP 
-                  when processing the request. The potential links for this response message are generically defined in [oFA SMPF] for all Transaction Initiation 
+                  when processing the request. The potential links for this response message are generically defined in [oFA-PFSM] for all Transaction Initiation 
                   Response messages. These links will also be contained in the related Open API files. 
                   Remark: All links can be relative or full links, to be decided by the ASPSP.
                 allOf:
@@ -9033,49 +9175,49 @@ components:
       content:
         application/json:
            schema:
-            description: |
-              In case of HTTP code 202, the following body is used: 
-            type: object
-            required:
-              - transactionStatus
-            properties:
-              transactionStatus:
-                $ref: '#/components/schemas/TransactionStatus'
-              scaMethods:
-                description: |
-                  This data element might be contained, if SCA is required and if the PSU has a choice between different
-                  authentication methods.
-                  Depending on the risk management of the ASPSP this choice might be offered before or after the PSU
-                  has been identified with the first relevant factor, or if an access token is transported.
-                  If this data element is contained, then there is also a hyperlink of type \"startAuthorisationWithAuthenticationMethodSelection\"
-                  contained in the response body.
-                  These methods shall be presented towards the PSU for selection by the TPP.
-                type: array
-                items:
-                  $ref: '#/components/schemas/authenticationObject'
-              chosenScaMethod:
-                description: |
-                  This data element is only contained in the response if the ASPSP has chosen the Embedded SCA Approach, if the PSU is already identified e.g. 
-                  with the first relevant factor or alternatively an access token, if SCA is required and if the authentication method is implicitly selected.
-                allOf:
-                  - $ref: '#/components/schemas/authenticationObject'
-              challengeData:
-                description: |
-                  It is contained in addition to the data element \"chosenScaMethod\" if challenge data is needed for SCA.
-                  In rare cases this attribute is also used in the context of the \"startAuthorisationWithPsuAuthentication\" or 
-                  \"startAuthorisactionWithEncryptedPsuAuthentication\" link. 
-                allOf:
-                  - $ref: '#/components/schemas/challenge'
-              _links:
-                description: |
-                  A list of hyperlinks to be recognised by the API Client. The actual hyperlinks used in the 
-                  response depend on the dynamical decisions of the ASPSP when processing the request. The 
-                  potential links for this response message are 
-                  generically defined in [oFA SMPF] for all Transaction Initiation Response messages or response message for other requests which 
-                  need authorisation. These links will also be contained in the related Open API files.
-                  Remark: All links can be relative or full links, to be decided by the ASPSP. 
-                allOf:
-                  - $ref: '#/components/schemas/_links_202_PIS_Payment'
+             description: |
+               In case of HTTP code 202, the following body is used: 
+             type: object
+             required:
+               - transactionStatus
+             properties:
+               transactionStatus:
+                 $ref: '#/components/schemas/TransactionStatus'
+               scaMethods:
+                 description: |
+                   This data element might be contained, if SCA is required and if the PSU has a choice between different
+                   authentication methods.
+                   Depending on the risk management of the ASPSP this choice might be offered before or after the PSU
+                   has been identified with the first relevant factor, or if an access token is transported.
+                   If this data element is contained, then there is also a hyperlink of type \"startAuthorisationWithAuthenticationMethodSelection\"
+                   contained in the response body.
+                   These methods shall be presented towards the PSU for selection by the TPP.
+                 type: array
+                 items:
+                   $ref: '#/components/schemas/authenticationObject'
+               chosenScaMethod:
+                 description: |
+                   This data element is only contained in the response if the ASPSP has chosen the Embedded SCA Approach, if the PSU is already identified e.g. 
+                   with the first relevant factor or alternatively an access token, if SCA is required and if the authentication method is implicitly selected.
+                 allOf:
+                   - $ref: '#/components/schemas/authenticationObject'
+               challengeData:
+                 description: |
+                   It is contained in addition to the data element \"chosenScaMethod\" if challenge data is needed for SCA.
+                   In rare cases this attribute is also used in the context of the \"startAuthorisationWithPsuAuthentication\" or 
+                   \"startAuthorisactionWithEncryptedPsuAuthentication\" link. 
+                 allOf:
+                   - $ref: '#/components/schemas/challenge'
+               _links:
+                 description: |
+                   A list of hyperlinks to be recognised by the API Client. The actual hyperlinks used in the 
+                   response depend on the dynamical decisions of the ASPSP when processing the request. The 
+                   potential links for this response message are 
+                   generically defined in [oFA-PFSM] for all Transaction Initiation Response messages or response message for other requests which 
+                   need authorisation. These links will also be contained in the related Open API files.
+                   Remark: All links can be relative or full links, to be decided by the ASPSP. 
+                 allOf:
+                   - $ref: '#/components/schemas/_links_202_PIS_Payment'
     decline_406_AUTHORISATION:
       headers:
         X-Reference-API-Name:
@@ -9271,11 +9413,11 @@ components:
                 allOf:
                   - $ref: '#/components/schemas/amount'
               estimatedTotalAmount:
-               description: |
-                 The amount which is estimated to be debted from the debtor account in case of an 
-                 underlying payment initiation service. 
-                 Note: This amount includes fees.
-               allOf:
+                description: |
+                  The amount which is estimated to be debted from the debtor account in case of an 
+                  underlying payment initiation service. 
+                  Note: This amount includes fees.
+                allOf:
                   - $ref: '#/components/schemas/amount'
               estimatedInterbankSettlementAmount:
                 description: |
@@ -9290,7 +9432,7 @@ components:
                 description: |
                   List of owner names. 
                   Should only be delivered after successful SCA. 
-                      Could be restricted to the current PSU by the ASPSP. 
+                  Could be restricted to the current PSU by the ASPSP. 
                 type: array
                 items:
                   $ref: '#/components/schemas/accountOwner'
@@ -9306,6 +9448,26 @@ components:
                 type: array
                 items:
                   $ref: '#/components/schemas/clientMessageInformation'
+              originalTransactionInformationAndVopStatus:
+                description: |
+                  Provides Verification of Payee result information on the original transactions.
+                type: array
+                items:
+                  $ref: '#/components/schemas/originalTransactionInformationAndVOPStatus'
+              challengeData:
+                description: |
+                  Challenge data might be contained, if only one authentication method is available, 
+                  if the Embedded SCA approach is chosen by the ASPSP, 
+                  and if the challenge could not be transported yet via the /authorisations endpoints yet due to ongoing VOP processing.
+                allOf:
+                  - $ref: '#/components/schemas/challenge'
+              scaMethods:
+                description: |
+                  Might be contained, if several authentication methods are available and not yet selected (name, type), 
+                  and if the related information could not be provided yet via the /authorisations endpoints yet due to ongoing VOP processing.
+                type: array
+                items:
+                  $ref: '#/components/schemas/authenticationObject'
         application/xml:
           schema:
             description: |

@@ -17,15 +17,15 @@ info:
     name: Creative Commons Attribution 4.0 International Public License
     url: https://creativecommons.org/licenses/by/4.0/
   title: openFinance API Framework Implementation Guidelines Protocol Functions and Security Measures for V2.x - Resource Status Notification
-  version: "2.3"
+  version: "2.4"
   x-references:
     documents:
       - document:
         title: openFinance API Framework Data Dictionary
-        version: "2.3.1"
+        version: "2.4"
       - document:
         title: openFinance API Framework Implementation Guidelines Protocol Functions and Security Measures
-        version: "2.3"
+        version: "2.4"
 
 externalDocs:
   description: |
@@ -298,6 +298,7 @@ components:
       enum:
         - ACCC
         - ACCP
+        - ACFW
         - ACSC
         - ACSP
         - ACTC
@@ -514,7 +515,9 @@ components:
     HEADER_xRequestId:
       name: X-Request-ID
       in: header
-      description: ID of the request, unique to the call, as determined by the initiating party.
+      description: |
+        ID of the request, unique to the call, as determined by the initiating party.
+        This is the unique ID of the API Client for the payment initiation regarding PSD2 article 47 and EBA RTS article 29.
       required: true
       schema:
         type: string

@@ -18,8 +18,8 @@ async fn real_corpus_indexes_and_every_requirement_resolves() {
         .run(IndexOptions::default())
         .await
         .expect("index");
-    assert_eq!(report.count(IndexAction::Indexed), 28, "{report:#?}");
-    assert_eq!(report.requirements, 102);
+    assert_eq!(report.count(IndexAction::Indexed), 29, "{report:#?}");
+    assert_eq!(report.requirements, 103);
 
     let (catalog, search) = bg_spec_store::open_read_only(&config)
         .await
@@ -32,7 +32,7 @@ async fn real_corpus_indexes_and_every_requirement_resolves() {
         .lines()
         .filter_map(|l| l.trim().strip_prefix("- id: "))
         .collect();
-    assert_eq!(ids.len(), 102);
+    assert_eq!(ids.len(), 103);
     for id in ids {
         let trace = svc.requirements.trace(id).await.unwrap();
         for s in &trace.sources {
@@ -145,7 +145,7 @@ async fn real_corpus_indexes_and_every_requirement_resolves() {
             }
         }
     }
-    assert_eq!(checked, 45);
+    assert_eq!(checked, 50);
     assert!(
         unlinked.is_empty(),
         "operations without a curated requirement: {unlinked:#?}"

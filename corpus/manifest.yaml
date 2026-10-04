@@ -108,8 +108,8 @@ sources:
     version: openfinance-v2
     authority: technical
     precedence: 90
-    path: openapi/v2/BG_oFA_AIS_Version_2.3_20260204.openapi.yaml
-    title: openFinance XS2A API - Account Information Service OpenAPI 2.3 (2026-02-04)
+    path: openapi/v2/BG_oFA_AIS_Version_2.4.1_20260713.openapi.yaml
+    title: openFinance XS2A API - Account Information Service OpenAPI 2.4.1 (2026-07-13)
     tags: [ais]
 
   - id: bg-openfinance-v2-openapi-pis
@@ -117,8 +117,8 @@ sources:
     version: openfinance-v2
     authority: technical
     precedence: 90
-    path: openapi/v2/BG_oFA_PIS_Version_2.3_20260204.openapi.yaml
-    title: openFinance XS2A API - Payment Initiation Service OpenAPI 2.3 (2026-02-04)
+    path: openapi/v2/BG_oFA_PIS_Version_2.4.1_20260713.openapi.yaml
+    title: openFinance XS2A API - Payment Initiation Service OpenAPI 2.4.1 (2026-07-13)
     tags: [pis, authorisation]
 
   - id: bg-openfinance-v2-openapi-piis
@@ -126,8 +126,8 @@ sources:
     version: openfinance-v2
     authority: technical
     precedence: 90
-    path: openapi/v2/BG_oFA_PIIS_Version_2.3_20260107.openapi.yaml
-    title: openFinance XS2A API - Confirmation of Funds Service OpenAPI 2.3 (2026-01-07)
+    path: openapi/v2/BG_oFA_PIIS_Version_2.4.1_20260713.openapi.yaml
+    title: openFinance XS2A API - Confirmation of Funds Service OpenAPI 2.4.1 (2026-07-13)
     tags: [piis]
 
   - id: bg-openfinance-v2-openapi-consent
@@ -135,8 +135,8 @@ sources:
     version: openfinance-v2
     authority: technical
     precedence: 90
-    path: openapi/v2/BG_oFA_Consent_Version_2.1_20260204.openapi.yaml
-    title: openFinance Consent API for V2.x OpenAPI 2.1 (2026-02-04)
+    path: openapi/v2/BG_oFA_Consent_Version_2.1_20260713.openapi.yaml
+    title: openFinance Consent API for V2.x OpenAPI 2.1 (2026-07-13)
     tags: [consent, authorisation]
 
   - id: bg-openfinance-v2-openapi-signing-basket
@@ -144,8 +144,8 @@ sources:
     version: openfinance-v2
     authority: technical
     precedence: 90
-    path: openapi/v2/BG_oFA_BASK_Version_2.3_20260204.openapi.yaml
-    title: openFinance Protocol Functions and Security Measures - Signing Basket OpenAPI 2.3 (2026-02-04)
+    path: openapi/v2/BG_oFA_BASK_Version_2.4_20260713.openapi.yaml
+    title: openFinance Protocol Functions and Security Measures - Signing Basket OpenAPI 2.4 (2026-07-13)
     tags: [signing-basket, authorisation]
 
   - id: bg-openfinance-v2-openapi-push
@@ -153,8 +153,8 @@ sources:
     version: openfinance-v2
     authority: technical
     precedence: 90
-    path: openapi/v2/BG_oFA_PUSH_Version_2.3_20260204.openapi.yaml
-    title: openFinance Protocol Functions and Security Measures - Resource Status Notification OpenAPI 2.3 (2026-02-04)
+    path: openapi/v2/BG_oFA_PUSH_Version_2.4_20260713.openapi.yaml
+    title: openFinance Protocol Functions and Security Measures - Resource Status Notification OpenAPI 2.4 (2026-07-13)
     tags: [push, notification]
 
   - id: bg-openfinance-v2-openapi-data-dictionary
@@ -162,8 +162,8 @@ sources:
     version: openfinance-v2
     authority: technical
     precedence: 90
-    path: openapi/v2/BG_oFA_dataDictionary_Version_2.3.1_20260204.openapi.yaml
-    title: openFinance API Framework Data Dictionary OpenAPI 2.3.1 (2026-02-04)
+    path: openapi/v2/BG_oFA_dataDictionary_Version_2.4.0_20260713.openapi.yaml
+    title: openFinance API Framework Data Dictionary OpenAPI 2.4.0 (2026-07-13)
     description: Component schemas only (no paths).
     tags: [data-dictionary]
 
@@ -172,8 +172,8 @@ sources:
     version: openfinance-v2
     authority: normative
     precedence: 100
-    path: pdf/v2/XS2A API as PSD2 Interface implementation guide line-2.4.pdf
-    title: openFinance XS2A API as PSD2 Interface - Implementation Guidelines 2.4 (2025-10-31)
+    path: pdf/v2/11b.-Berlin-Group-openFinance-API-Framework-Core-PSD2-Compliance-V2-Suite-Compliance-Services-XS2A-API-Implementation-Guidelines-V2.4.2-20260731.pdf
+    title: openFinance XS2A API as PSD2 Interface - Implementation Guidelines 2.4.2 (2026-07-31)
     tags: [implementation-guidelines, pis, ais, piis]
 
   - id: bg-openfinance-v2-consent-api
@@ -181,8 +181,8 @@ sources:
     version: openfinance-v2
     authority: normative
     precedence: 100
-    path: pdf/v2/Consent API for V2.x-2.2.pdf
-    title: openFinance Implementation Guidelines - Consent API for V2.x 2.2 (2025-10-31)
+    path: pdf/v2/11d.-Berlin-Group-openFinance-API-Framework-Core-PSD2-Compliance-V2-Suite-Consent-API-V2.2.1-20260731.pdf
+    title: openFinance Implementation Guidelines - Consent API for V2.x 2.2.1 (2026-07-31)
     tags: [implementation-guidelines, consent]
 
   - id: bg-openfinance-v2-protocol-functions
@@ -190,26 +190,17 @@ sources:
     version: openfinance-v2
     authority: normative
     precedence: 100
-    path: pdf/v2/Protocole Function and Security mesures - 2.3.pdf
-    title: openFinance Implementation Guidelines - Protocol Functions and Security Measures 2.3 (2025-10-31)
+    path: pdf/v2/11c.-Berlin-Group-openFinance-API-Framework-Core-PSD2-Compliance-V2-Suite-Protocol-Functions-and-Security-Measures-V2.4.1-20260731.pdf
+    title: openFinance Implementation Guidelines - Protocol Functions and Security Measures 2.4.1 (2026-07-31)
     tags: [implementation-guidelines, security, authorisation, signing-basket, push]
-
-  - id: bg-openfinance-v2-administrative-services
-    kind: pdf
-    version: openfinance-v2
-    authority: normative
-    precedence: 100
-    path: pdf/v2/openFinance API Framework Implementation Guidelines for Administrative Services-1.1.pdf
-    title: openFinance Implementation Guidelines for Administrative Services 1.1 (2024-09-09)
-    tags: [implementation-guidelines, administrative-services]
 
   - id: bg-openfinance-v2-data-dictionary
     kind: pdf
     version: openfinance-v2
     authority: normative
     precedence: 95
-    path: pdf/v2/Data Dictionary-2.3.1.pdf
-    title: openFinance API Framework Data Dictionary 2.3.1 (2025-12-11)
+    path: pdf/v2/11e.-Berlin-Group-openFinance-API-Framework-Core-PSD2-Compliance-V2-Suite-Data-Dictionary-V2.4.1-20260731.pdf
+    title: openFinance API Framework Data Dictionary 2.4.1 (2026-07-31)
     tags: [data-dictionary]
 
   - id: bg-openfinance-v2-domestic-ais-pis-definitions
@@ -217,7 +208,7 @@ sources:
     version: openfinance-v2
     authority: normative
     precedence: 85
-    path: pdf/v2/openFinance API Framework Domestic AIS-PIS Definitions for Version 2.x2.1.pdf
+    path: pdf/v2/Berlin-Group-Domestic-AIS-PIS-Definitions-V2.1-Annex-Document-2025-11-10.pdf
     title: openFinance Domestic AIS/PIS Definitions for Version 2.x 2.1 (2025-10-31)
     tags: [domestic, pis, ais]
     blank_pages: [2]   # verso of the cover page: no fonts, no images
@@ -227,8 +218,8 @@ sources:
     version: openfinance-v2
     authority: normative
     precedence: 80
-    path: pdf/v2/XS2A API as PSD2 Interface Operational Rules-2.0.pdf
-    title: openFinance XS2A API as PSD2 Interface - Operational Rules 2.0 (2025-10-31)
+    path: pdf/v2/11b.-Berlin-Group-openFinance-API-Framework-Core-PSD2-Compliance-V2-Suite-Compliance-Services-XS2A-API-Operational-Rules-V2.1.1-20260731.pdf
+    title: openFinance XS2A API as PSD2 Interface - Operational Rules 2.1.1 (2026-07-31)
     tags: [operational-rules]
 
   - id: bg-openfinance-v2-consent-operational-rules
@@ -236,7 +227,7 @@ sources:
     version: openfinance-v2
     authority: normative
     precedence: 80
-    path: pdf/v2/Consent API for V2.x operational rules-2.0.pdf
+    path: pdf/v2/Berlin-Group-Consent-API-Operational-Rules-V2.0-2025-11-10.pdf
     title: openFinance Operational Rules - Consent API for V2.x 2.0 (2025-10-31)
     tags: [operational-rules, consent]
 
@@ -245,8 +236,8 @@ sources:
     version: openfinance-v2
     authority: normative
     precedence: 80
-    path: pdf/v2/Basic Operational Rules of the Framework-2.0.pdf
-    title: openFinance API Framework - Basic Operational Rules of the Framework 2.0 (2025-10-31)
+    path: pdf/v2/Berlin-Group-Basic-Operational-Rules-V2-Suite-V2.1-2026-04-29.pdf
+    title: openFinance API Framework - Basic Operational Rules of the Framework 2.1 (2026-03-31)
     tags: [operational-rules]
 
   - id: bg-openfinance-v2-guide
@@ -254,9 +245,28 @@ sources:
     version: openfinance-v2
     authority: informative
     precedence: 50
-    path: pdf/v2/A Guide to Version 2.3.pdf
-    title: openFinance API Framework - A Guide to Version 2.3 (2026-01-16)
+    path: pdf/v2/Berlin-Group-A-guide-to-the-openFinance-API-Framework-V2.4-Introduction-Document-2026-04-29.pdf
+    title: openFinance API Framework - A Guide to Version 2.4 (2026-03-31)
     tags: [introduction]
+
+  - id: bg-openfinance-v2-openapi-vop
+    kind: openapi
+    version: openfinance-v2
+    authority: technical
+    precedence: 90
+    path: openapi/v2/BG_oFA_VOP_Version_1.1_20260713.openapi.yaml
+    title: openFinance Extended Services - Verification of Party OpenAPI 1.1 (2026-07-13)
+    tags: [vop, extended-services]
+
+  - id: bg-openfinance-v2-vop
+    kind: pdf
+    version: openfinance-v2
+    authority: normative
+    precedence: 100
+    path: pdf/v2/Berlin-Group-Verification-of-Party-Services-V1.1-Implementation-Guidelines-2025-06-06.pdf
+    title: openFinance Extended Services - Verification of Party (VOP) Implementation Guidelines 1.1 (2025-06-03)
+    tags: [implementation-guidelines, vop, extended-services]
+    blank_pages: [2, 6]   # intentionally blank: no fonts, no images
 
   - id: project-openfinance-v2-errata
     kind: text

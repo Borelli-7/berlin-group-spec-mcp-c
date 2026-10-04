@@ -12,15 +12,15 @@ info:
     name: Creative Commons Attribution 4.0 International Public License
     url: https://creativecommons.org/licenses/by/4.0/
   title: openFinance API Framework XS2A API as PSD2 Interface Implementation Guidelines - Confirmation of Funds Service
-  version: "2.3"
+  version: "2.4.1"
   x-references:
     documents:
       - document:
         title: openFinance API Framework Data Dictionary
-        version: "2.3.1"
+        version: "2.4"
       - document:
         title: openFinance API Framework XS2A API as PSD2 Interface Implementation Guidelines
-        version: "2.3"
+        version: "2.4.1"
 
 externalDocs:
   description: |
@@ -363,6 +363,11 @@ components:
             A link to retrieve the status of the transaction resource.
           allOf:
             - $ref: '#/components/schemas/hrefType'
+        changedVersion?{inChange=true}:
+          description: |
+            A link to retrieve the changed version of a resource that was created due to a Change Transaction Resource Request. The link can be used to retrieve the related ETag of the changed version.
+          allOf:
+            - $ref: '#/components/schemas/hrefType'
         transactionfees:
           description: |
             The link is to the status resource.  
@@ -620,7 +625,7 @@ components:
           description: |
             An alias to access a payment account via a registered mobile phone number.
           allOf:
-            - $ref: '#/components/schemas/Max35Text'
+            - $ref: '#/components/schemas/MSISDN'
         other:
           description: |
             An alias with a proprietary coding
@@ -1051,6 +1056,11 @@ components:
                 $ref: '#/components/schemas/MessageCode_403_PIIS'
         _links:
           $ref: '#/components/schemas/links'
+    MSISDN:
+      type: string
+      pattern: \+[0-9]{1,3}-[0-9()+\-]{1,30}
+      description: See document "openFinance API Framework Data Dictionary", section
+        "Other ISO-related basic Types" for more details.
     error_RFC7807_404_PIIS: 
       description: |
         Standardised definition of reporting error information according to [RFC7807].
@@ -1117,7 +1127,7 @@ components:
             Name of the party.
           allOf:
             - $ref: '#/components/schemas/Max140Text'
-        postaladdress:
+        postalAddress:
           description: |
             Postal Address of the party.
           allOf:
@@ -1442,6 +1452,7 @@ components:
       enum: 
         - CERTIFICATE_INVALID
         - CERTIFICATE_EXPIRED
+        - ROLE_INVALID
         - CERTIFICATE_BLOCKED
         - CERTIFICATE_REVOKED
         - CERTIFICATE_MISSING
@@ -1450,7 +1461,6 @@ components:
         - API_CONTRACT_ID_INVALID
         - SIGNATURE_INVALID
         - SIGNATURE_MISSING
-        - ROLE_INVALID
         - PSU_CREDENTIALS_INVALID
         - CORPORATE_ID_INVALID
         - CONSENT_INVALID
@@ -1555,7 +1565,9 @@ components:
     HEADER_xRequestId:
       name: X-Request-ID
       in: header
-      description: ID of the request, unique to the call, as determined by the initiating party.
+      description: |
+        ID of the request, unique to the call, as determined by the initiating party.
+        This is the unique ID of the API Client for the payment initiation regarding PSD2 article 47 and EBA RTS article 29.
       required: true
       schema:
         type: string

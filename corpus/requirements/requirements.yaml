@@ -22,12 +22,12 @@ requirements:
         locator: section:4.4.4
         note: Read Transaction List
       - source_id: bg-openfinance-v2-xs2a-implementation-guidelines
-        locator: page:95-101
+        locator: page:97-103
       - source_id: bg-openfinance-v2-xs2a-operational-rules
         locator: section:4.10
         note: API Service Get transaction information for a given account
       - source_id: bg-openfinance-v2-data-dictionary
-        locator: page:200
+        locator: page:222
         note: FORMAT_ERROR
       - source_id: bg-openfinance-v2-openapi-ais
         locator: op:GET /v2/accounts/{account-id}/transactions
@@ -55,13 +55,13 @@ requirements:
       (errata E-03).
     sources:
       - source_id: bg-openfinance-v2-xs2a-implementation-guidelines
-        locator: page:96
+        locator: page:98
         note: pageSize row of the query parameter table in section 4.4.4
       - source_id: bg-openfinance-v2-data-dictionary
-        locator: page:99
+        locator: page:105
         note: supportedQueryParametersTransactions and maxPageSize
       - source_id: bg-openfinance-v2-data-dictionary
-        locator: page:200
+        locator: page:222
         note: PARAMETER_NOT_SUPPORTED
       - source_id: project-openfinance-v2-errata
         locator: section:E-03
@@ -81,9 +81,9 @@ requirements:
         locator: section:4.4.5
         note: Read Transaction Details
       - source_id: bg-openfinance-v2-xs2a-implementation-guidelines
-        locator: page:104-106
+        locator: page:106-108
       - source_id: bg-openfinance-v2-data-dictionary
-        locator: page:201
+        locator: page:223
         note: RESOURCE_UNKNOWN
       - source_id: bg-openfinance-v2-openapi-ais
         locator: op:GET /v2/accounts/{account-id}/transactions/{transactionId}
@@ -103,7 +103,7 @@ requirements:
         locator: section:4.4.3
         note: Read Balance
       - source_id: bg-openfinance-v2-xs2a-implementation-guidelines
-        locator: page:92-93
+        locator: page:94-95
       - source_id: bg-openfinance-v2-xs2a-operational-rules
         locator: section:4.9
         note: API Service Get balances for a given account (mandatory)
@@ -128,7 +128,7 @@ requirements:
         locator: section:3.4.1
         note: Consent Request for Account Information
       - source_id: bg-openfinance-v2-consent-api
-        locator: page:23-28
+        locator: page:23-63
       - source_id: bg-openfinance-v2-openapi-consent
         locator: op:POST /v2/consents/account-access
     endpoints:
@@ -153,7 +153,7 @@ requirements:
         locator: section:3.8
         note: Get Consent Status Request
       - source_id: bg-openfinance-v2-consent-api
-        locator: page:69-70
+        locator: page:70-71
       - source_id: bg-openfinance-v2-openapi-consent
         locator: op:GET /v2/consents/{consent-category}/{consentId}/status
     endpoints:
@@ -173,10 +173,10 @@ requirements:
         locator: page:25-26
         note: frequencyPerDay
       - source_id: bg-openfinance-v2-data-dictionary
-        locator: page:100
+        locator: page:106
         note: countingOfAisRequests
       - source_id: bg-openfinance-v2-data-dictionary
-        locator: page:203
+        locator: page:225
         note: ACCESS_EXCEEDED
       - source_id: project-openfinance-v2-errata
         locator: section:E-07
@@ -216,7 +216,7 @@ requirements:
         locator: section:5.2
         note: Confirmation of Funds Request
       - source_id: bg-openfinance-v2-xs2a-implementation-guidelines
-        locator: page:120-122
+        locator: page:122-124
       - source_id: bg-openfinance-v2-openapi-piis
         locator: op:POST /v2/funds-confirmations
     endpoints:
@@ -235,7 +235,7 @@ requirements:
         locator: section:8.4.2
         note: Related Response Headers
       - source_id: bg-openfinance-v2-protocol-functions
-        locator: page:95
+        locator: page:106
       - source_id: bg-openfinance-v2-consent-api
         locator: page:32
         note: Example response with ASPSP-SCA-Approach SIGNATURE
@@ -283,12 +283,12 @@ requirements:
         locator: section:4.4.1
         note: Read Account List
       - source_id: bg-openfinance-v2-xs2a-implementation-guidelines
-        locator: page:85-86
+        locator: page:87-88
       - source_id: bg-openfinance-v2-xs2a-operational-rules
         locator: section:4.7
         note: API Service Get list of addressable accounts
       - source_id: bg-openfinance-v2-xs2a-operational-rules
-        locator: page:22
+        locator: page:23
       - source_id: bg-openfinance-v2-openapi-ais
         locator: op:GET /v2/accounts
     endpoints:
@@ -313,12 +313,12 @@ requirements:
         locator: section:4.4.2
         note: Read Account Details
       - source_id: bg-openfinance-v2-xs2a-implementation-guidelines
-        locator: page:89-91
+        locator: page:91-93
       - source_id: bg-openfinance-v2-xs2a-operational-rules
         locator: section:4.8
         note: API Service Get account details of a list of accessible accounts
       - source_id: bg-openfinance-v2-xs2a-operational-rules
-        locator: page:23
+        locator: page:24
       - source_id: bg-openfinance-v2-openapi-ais
         locator: op:GET /v2/accounts/{account-id}
     endpoints:
@@ -342,12 +342,12 @@ requirements:
         locator: section:4.5.1
         note: Read Card Account List
       - source_id: bg-openfinance-v2-xs2a-implementation-guidelines
-        locator: page:107-108
+        locator: page:109-110
       - source_id: bg-openfinance-v2-xs2a-operational-rules
         locator: section:4.11
         note: API Services with access to card accounts
       - source_id: bg-openfinance-v2-xs2a-operational-rules
-        locator: page:26
+        locator: page:27
       - source_id: bg-openfinance-v2-openapi-ais
         locator: op:GET /v2/card-accounts
     endpoints:
@@ -367,7 +367,7 @@ requirements:
         locator: section:4.5.2
         note: Read Card Account Details
       - source_id: bg-openfinance-v2-xs2a-implementation-guidelines
-        locator: page:109-111
+        locator: page:111-113
       - source_id: bg-openfinance-v2-xs2a-operational-rules
         locator: section:4.11
         note: API Services with access to card accounts
@@ -390,7 +390,7 @@ requirements:
         locator: section:4.5.3
         note: Read Card Account Balance
       - source_id: bg-openfinance-v2-xs2a-implementation-guidelines
-        locator: page:112-113
+        locator: page:114-115
       - source_id: bg-openfinance-v2-xs2a-operational-rules
         locator: section:4.11
         note: API Services with access to card accounts
@@ -417,7 +417,7 @@ requirements:
         locator: section:4.5.4
         note: Read Card Account Transaction List
       - source_id: bg-openfinance-v2-xs2a-implementation-guidelines
-        locator: page:114-116
+        locator: page:116-118
       - source_id: bg-openfinance-v2-xs2a-operational-rules
         locator: section:4.11
         note: API Services with access to card accounts
@@ -444,12 +444,12 @@ requirements:
         locator: section:4.3
         note: Multi-currency Account Specifics for Account Information
       - source_id: bg-openfinance-v2-xs2a-implementation-guidelines
-        locator: page:83-84
+        locator: page:85-86
       - source_id: bg-openfinance-v2-xs2a-operational-rules
-        locator: page:16
+        locator: page:17
         note: Definition of a multicurrency account
       - source_id: bg-openfinance-v2-xs2a-operational-rules
-        locator: page:24-25
+        locator: page:25-26
       - source_id: bg-openfinance-v2-openapi-ais
         locator: op:GET /v2/accounts/{account-id}/balances
       - source_id: bg-openfinance-v2-openapi-ais
@@ -483,7 +483,7 @@ requirements:
         locator: section:4
         note: API Services supported for the core services (Table 2)
       - source_id: bg-openfinance-v2-xs2a-operational-rules
-        locator: page:14-16
+        locator: page:15-17
       - source_id: bg-openfinance-v2-openapi-pis
         locator: op:POST /v2/payments/{payment-product}
       - source_id: bg-openfinance-v2-openapi-pis
@@ -511,9 +511,9 @@ requirements:
     version: openfinance-v2
     title: Payment transaction status codes
     description: >-
-      Payment responses carry the ISO 20022 based transactionStatus. The IG names the multilevel SCA
-      status "PACT" once (page 18) and "PATC" elsewhere; the Data Dictionary and every OpenAPI enum use
-      PATC (errata E-09).
+      Payment responses carry the ISO 20022 based transactionStatus. IG 2.4 named the multilevel SCA
+      status "PACT" once; IG 2.4.2 corrects it to "PATC", which the Data Dictionary and every OpenAPI
+      enum use (errata E-09).
     sources:
       - source_id: bg-openfinance-v2-xs2a-implementation-guidelines
         locator: section:2.3.1
@@ -521,7 +521,7 @@ requirements:
       - source_id: bg-openfinance-v2-xs2a-implementation-guidelines
         locator: page:17-20
       - source_id: bg-openfinance-v2-data-dictionary
-        locator: page:223
+        locator: page:246
         note: Transaction Status code list
       - source_id: project-openfinance-v2-errata
         locator: section:E-09
@@ -548,7 +548,7 @@ requirements:
         locator: section:3.4.2
         note: Payment Initiation with pain.001 XML message as Payment Instruction
       - source_id: bg-openfinance-v2-xs2a-implementation-guidelines
-        locator: page:49-50
+        locator: page:50-51
       - source_id: bg-openfinance-v2-openapi-pis
         locator: op:POST /v2/payments/{payment-product}
     endpoints:
@@ -568,7 +568,7 @@ requirements:
         locator: section:3.4.3
         note: Payment Initiation for Bulk Payments
       - source_id: bg-openfinance-v2-xs2a-implementation-guidelines
-        locator: page:51-53
+        locator: page:52-54
       - source_id: bg-openfinance-v2-xs2a-implementation-guidelines
         locator: page:18
         note: PART status
@@ -595,7 +595,7 @@ requirements:
         locator: section:3.4.4
         note: Initiation for Standing Orders for Recurring/Periodic Payments
       - source_id: bg-openfinance-v2-xs2a-implementation-guidelines
-        locator: page:54-58
+        locator: page:55-60
       - source_id: bg-openfinance-v2-xs2a-operational-rules
         locator: section:4.4
         note: API Service Initiation of a recurring payment
@@ -619,7 +619,7 @@ requirements:
         locator: section:3.5
         note: Get Transaction Status Request
       - source_id: bg-openfinance-v2-xs2a-implementation-guidelines
-        locator: page:60-62
+        locator: page:62-64
       - source_id: bg-openfinance-v2-openapi-pis
         locator: op:GET /v2/{payment-service}/{payment-product}/{paymentId}/status
     endpoints:
@@ -641,7 +641,7 @@ requirements:
         locator: section:3.6
         note: Get Bulk Extended Status Request
       - source_id: bg-openfinance-v2-xs2a-implementation-guidelines
-        locator: page:65-67
+        locator: page:67-69
       - source_id: bg-openfinance-v2-xs2a-implementation-guidelines
         locator: page:11
       - source_id: bg-openfinance-v2-openapi-pis
@@ -663,7 +663,7 @@ requirements:
         locator: section:3.7
         note: Get Payment Request
       - source_id: bg-openfinance-v2-xs2a-implementation-guidelines
-        locator: page:69-71
+        locator: page:71-73
       # Linked via op: only; the template shares its canonical key with the authorisation sub-resource list.
       - source_id: bg-openfinance-v2-openapi-pis
         locator: op:GET /v2/{payment-service}/{payment-product}/{paymentId}
@@ -683,14 +683,14 @@ requirements:
         locator: section:3.8
         note: Payment Cancellation Request
       - source_id: bg-openfinance-v2-xs2a-implementation-guidelines
-        locator: page:71-73
+        locator: page:73-75
       - source_id: bg-openfinance-v2-xs2a-implementation-guidelines
         locator: page:20
       - source_id: bg-openfinance-v2-xs2a-operational-rules
         locator: section:4.5
         note: API Service Cancellation of payments
       - source_id: bg-openfinance-v2-xs2a-operational-rules
-        locator: page:21
+        locator: page:22
       - source_id: bg-openfinance-v2-protocol-functions
         locator: section:9.2
         note: Transaction Cancellation Endpoints e.g. for Payments
@@ -714,7 +714,7 @@ requirements:
         locator: section:9.9
         note: Update Resource with Debtor Account
       - source_id: bg-openfinance-v2-protocol-functions
-        locator: page:159-161
+        locator: page:173-175
       - source_id: bg-openfinance-v2-openapi-pis
         locator: op:PUT /v2/{resource-path}/{resourceId}
     endpoints:
@@ -857,7 +857,7 @@ requirements:
         locator: section:3.7.1
         note: Establish Consent on Document Services Request
       - source_id: bg-openfinance-v2-consent-api
-        locator: page:59-61
+        locator: page:60-62
       - source_id: bg-openfinance-v2-consent-operational-rules
         locator: section:4.4
         note: API Service Establish Consent on document service
@@ -883,7 +883,7 @@ requirements:
         locator: section:3.7.2
         note: Get Consent Request
       - source_id: bg-openfinance-v2-consent-api
-        locator: page:66-68
+        locator: page:67-69
       - source_id: bg-openfinance-v2-openapi-consent
         locator: op:GET /v2/consents/document-services/{consentId}
     endpoints:
@@ -904,7 +904,7 @@ requirements:
         locator: section:3.9
         note: Cancellation of a Consent
       - source_id: bg-openfinance-v2-consent-api
-        locator: page:70-71
+        locator: page:71-72
       - source_id: bg-openfinance-v2-consent-operational-rules
         locator: section:4.5
         note: API Service Cancellation of a Consent
@@ -931,7 +931,7 @@ requirements:
       - source_id: bg-openfinance-v2-consent-api
         locator: page:12-13
       - source_id: bg-openfinance-v2-consent-api
-        locator: page:70
+        locator: page:71
       - source_id: bg-openfinance-v2-openapi-consent
         locator: op:GET /v2/consents/{consent-category}/{consentId}/status
     endpoints:
@@ -1025,7 +1025,7 @@ requirements:
         locator: section:9.4
         note: Start Authorisation Process
       - source_id: bg-openfinance-v2-protocol-functions
-        locator: page:108-117
+        locator: page:119-129
       - source_id: bg-openfinance-v2-openapi-pis
         locator: op:POST /v2/{resource-path}/{resourceId}/{authorisation-category}
       - source_id: bg-openfinance-v2-openapi-consent
@@ -1055,9 +1055,9 @@ requirements:
         locator: section:9.4.2
         note: Update PSU Data (Identification)
       - source_id: bg-openfinance-v2-protocol-functions
-        locator: page:109
+        locator: page:120
       - source_id: bg-openfinance-v2-protocol-functions
-        locator: page:123-125
+        locator: page:135-137
       - source_id: bg-openfinance-v2-openapi-pis
         locator: op:PUT /v2/{resource-path}/{resourceId}/{authorisation-category}/{authorisationId}
       - source_id: bg-openfinance-v2-openapi-consent
@@ -1081,9 +1081,9 @@ requirements:
         locator: section:9.6
         note: GET Authorisation Sub-Resources Request
       - source_id: bg-openfinance-v2-protocol-functions
-        locator: page:108
+        locator: page:119
       - source_id: bg-openfinance-v2-protocol-functions
-        locator: page:145-146
+        locator: page:155-202
       - source_id: bg-openfinance-v2-openapi-pis
         locator: op:GET /v2/{resource-path}/{resourceId}/{authorisation-category}
       - source_id: bg-openfinance-v2-openapi-consent
@@ -1105,9 +1105,9 @@ requirements:
         locator: section:9.7
         note: GET Authorisation Status Request
       - source_id: bg-openfinance-v2-protocol-functions
-        locator: page:109
+        locator: page:120
       - source_id: bg-openfinance-v2-protocol-functions
-        locator: page:147-149
+        locator: page:155-162
       - source_id: bg-openfinance-v2-openapi-pis
         locator: op:GET /v2/{resource-path}/{resourceId}/{authorisation-category}/{authorisationId}
       - source_id: bg-openfinance-v2-openapi-consent
@@ -1133,9 +1133,9 @@ requirements:
         locator: section:9.8
         note: Confirmation Request Procedure
       - source_id: bg-openfinance-v2-protocol-functions
-        locator: page:109
+        locator: page:120
       - source_id: bg-openfinance-v2-protocol-functions
-        locator: page:150-158
+        locator: page:164-172
       - source_id: bg-openfinance-v2-openapi-pis
         locator: op:PUT /v2/{resource-path}/{resourceId}/{authorisation-category}/{authorisationId}
       - source_id: bg-openfinance-v2-openapi-consent
@@ -1163,12 +1163,12 @@ requirements:
         locator: section:11.2
         note: Establish Signing Basket Request
       - source_id: bg-openfinance-v2-protocol-functions
-        locator: page:181-183
+        locator: page:197-199
       - source_id: bg-openfinance-v2-xs2a-operational-rules
         locator: section:4.12
         note: API Service Grouping requested services to signing baskets
       - source_id: bg-openfinance-v2-xs2a-operational-rules
-        locator: page:26
+        locator: page:27
       - source_id: bg-openfinance-v2-openapi-signing-basket
         locator: op:POST /v2/signing-baskets
     endpoints:
@@ -1190,7 +1190,7 @@ requirements:
         locator: section:11.3
         note: Get Signing Basket Request
       - source_id: bg-openfinance-v2-protocol-functions
-        locator: page:185-187
+        locator: page:201-203
       - source_id: bg-openfinance-v2-openapi-signing-basket
         locator: op:GET /v2/signing-baskets/{basketId}
     endpoints:
@@ -1209,7 +1209,7 @@ requirements:
         locator: section:11.4
         note: Get Signing Basket Status Request
       - source_id: bg-openfinance-v2-protocol-functions
-        locator: page:187-188
+        locator: page:203-204
       - source_id: bg-openfinance-v2-openapi-signing-basket
         locator: op:GET /v2/signing-baskets/{basketId}/status
     endpoints:
@@ -1230,9 +1230,9 @@ requirements:
         locator: section:11.5
         note: Cancellation of Signing Baskets
       - source_id: bg-openfinance-v2-protocol-functions
-        locator: page:181
+        locator: page:197
       - source_id: bg-openfinance-v2-protocol-functions
-        locator: page:189-190
+        locator: page:205-206
       - source_id: bg-openfinance-v2-openapi-signing-basket
         locator: op:DELETE /v2/signing-baskets/{basketId}
     endpoints:
@@ -1255,7 +1255,7 @@ requirements:
         locator: section:12
         note: Resource Status Notification
       - source_id: bg-openfinance-v2-protocol-functions
-        locator: page:191-196
+        locator: page:207-212
       - source_id: project-openfinance-v2-errata
         locator: section:E-08
       - source_id: bg-openfinance-v2-openapi-push
@@ -1278,10 +1278,10 @@ requirements:
     title: Request header parameter families
     sources:
       - source_id: bg-openfinance-v2-protocol-functions
-        locator: section:3.4
+        locator: section:3.5
         note: API Request Header Parameter
       - source_id: bg-openfinance-v2-protocol-functions
-        locator: page:25-26
+        locator: page:30-31
     acceptance_criteria:
       - "Transaction Initiation Requests carry PSU context data (8.2), PSU identification data (8.3) and SCA approach preferences (8.4)."
       - "Service Resource Creation Requests carry the Client Brand Logging Information header and API Client notification data."
@@ -1294,10 +1294,10 @@ requirements:
     title: X-Request-ID and idempotent handling of repeated requests
     sources:
       - source_id: bg-openfinance-v2-protocol-functions
-        locator: section:3.5
+        locator: section:3.6
         note: Header Parameters for Idempotency
       - source_id: bg-openfinance-v2-protocol-functions
-        locator: page:27
+        locator: page:32
     acceptance_criteria:
       - "Every request and response carries a UUID X-Request-ID; the response value equals the request value."
       - "A repeated request with the same X-Request-ID and the same business content within an acceptable time should get the same response."
@@ -1309,13 +1309,13 @@ requirements:
     title: Steering the API flow with hyperlinks
     sources:
       - source_id: bg-openfinance-v2-protocol-functions
-        locator: section:3.6
+        locator: section:3.7
         note: API Steering Process by Hyperlinks (HATEOAS)
       - source_id: bg-openfinance-v2-protocol-functions
-        locator: section:3.7
+        locator: section:3.8
         note: Links in dedicated Responses
       - source_id: bg-openfinance-v2-protocol-functions
-        locator: page:28-30
+        locator: page:33-36
     acceptance_criteria:
       - "Some steering hyperlinks require additional data in the same response body, as listed in the steering hyperlink table."
       - "Transaction Initiation Responses may contain hyperlinks for the next authorisation steps, defined generically in section 3.7.1."
@@ -1326,10 +1326,10 @@ requirements:
     title: Supported HTTP response codes
     sources:
       - source_id: bg-openfinance-v2-protocol-functions
-        locator: section:3.8
+        locator: section:3.9
         note: HTTP Response Codes
       - source_id: bg-openfinance-v2-protocol-functions
-        locator: page:33-34
+        locator: page:38-40
     acceptance_criteria:
       - "4XX codes are only returned if the request cannot be fulfilled; a status request returns 200 even if the transaction failed."
       - "A POST funds confirmation returns 200 because it creates no resource."
@@ -1350,7 +1350,7 @@ requirements:
         locator: section:4.2
         note: Additional Error Information
       - source_id: bg-openfinance-v2-protocol-functions
-        locator: page:37-38
+        locator: page:50-51
     acceptance_criteria:
       - "Mandated (and applicable conditional) headers are also included in negative responses once functional processing has taken place."
       - "Body attributes of positive responses are also provided in error responses where possible and applicable."
@@ -1368,12 +1368,12 @@ requirements:
         locator: section:5.3
         note: Certificate Requirements on Redirect URIs
       - source_id: bg-openfinance-v2-protocol-functions
-        locator: page:42-43
+        locator: page:55-56
       - source_id: bg-openfinance-v2-xs2a-operational-rules
         locator: section:6.1
         note: Identification of the TPP and correct role
       - source_id: bg-openfinance-v2-xs2a-operational-rules
-        locator: page:31
+        locator: page:32
     acceptance_criteria:
       - "Communication is always TLS-secured with mutual authentication, using TLS 1.2 or higher."
       - "On the XS2A API the API Client authenticates with a QWAC issued by a qualified trust service provider under eIDAS."
@@ -1392,7 +1392,7 @@ requirements:
         locator: section:6.2
         note: Signing HTTP messages based on RFC7515
       - source_id: bg-openfinance-v2-protocol-functions
-        locator: page:45
+        locator: page:58
     acceptance_criteria:
       - "Support of message signing is optional for the ASPSP and mandatory for the API Client; if the ASPSP requests it, the API Client signs the request."
       - "The API Client signs with a qualified certificate for electronic seals (QSealC)."
@@ -1407,10 +1407,10 @@ requirements:
       GET /v2/{resource-path}/{resourceId}?toBeSigned=true.
     sources:
       - source_id: bg-openfinance-v2-protocol-functions
-        locator: section:7.1.3.2
+        locator: section:7.1.3.1
         note: Requesting the data to be signed
       - source_id: bg-openfinance-v2-protocol-functions
-        locator: page:67-68
+        locator: page:75-77
       - source_id: bg-openfinance-v2-openapi-consent
         locator: op:GET /v2/consents/account-access/{consentId}
       - source_id: bg-openfinance-v2-openapi-consent
@@ -1446,7 +1446,7 @@ requirements:
         locator: section:8.8
         note: OAuth SCA Approach
       - source_id: bg-openfinance-v2-protocol-functions
-        locator: page:96-101
+        locator: page:107-112
     acceptance_criteria:
       - "The optional OAuth2 protocol follows RFC6749; response type code and grant types authorization_code and refresh_token are recommended."
       - "The authorization response is an HTTP 302 with the mandatory code and the unchanged state."
@@ -1465,7 +1465,7 @@ requirements:
         locator: section:8.3
         note: Header Parameters for PSU Identification Data
       - source_id: bg-openfinance-v2-protocol-functions
-        locator: page:90-93
+        locator: page:101-104
     acceptance_criteria:
       - "PSU-IP-Address is conditional (conditions set per service); PSU-IP-Port and the PSU-Accept headers are optional."
       - "API Clients are highly recommended to send all PSU context information; missing information may raise the risk of rejection."
@@ -1485,7 +1485,7 @@ requirements:
         locator: section:8.4.1
         note: Request Header Parameters Steering SCA Approaches
       - source_id: bg-openfinance-v2-protocol-functions
-        locator: page:93-94
+        locator: page:104-105
       - source_id: project-openfinance-v2-errata
         locator: section:E-10
     acceptance_criteria:
@@ -1506,11 +1506,11 @@ requirements:
         locator: section:3.39
         note: SCA Approach Type
       - source_id: bg-openfinance-v2-data-dictionary
-        locator: page:213
+        locator: page:235
       - source_id: project-openfinance-v2-errata
         locator: section:E-02
       - source_id: bg-openfinance-v2-protocol-functions
-        locator: page:95
+        locator: page:106
         note: ASPSP-SCA-Approach header values (section 8.4.2)
     acceptance_criteria:
       - "The SCA Approach Type codes are Decoupled, Embedded, OAauth2 (as published), Redirect and Online-Channel."
@@ -1522,10 +1522,10 @@ requirements:
     title: TPP-prefixed header names replaced by Client-prefixed names
     sources:
       - source_id: bg-openfinance-v2-protocol-functions
-        locator: page:204-205
+        locator: page:221-222
         note: Change log 13.3.1
       - source_id: bg-openfinance-v2-protocol-functions
-        locator: page:94
+        locator: page:105
       - source_id: project-openfinance-v2-errata
         locator: section:E-08
       - source_id: project-openfinance-v2-errata
@@ -1535,7 +1535,7 @@ requirements:
       - "The v2 redirect headers are Client-Redirect-URI and Client-Nok-Redirect-URI."
     tags: [headers, naming, errata]
 
-  # ======================================================== openFinance v2 - Operational rules, administrative services and data dictionary
+  # ======================================================== openFinance v2 - Operational rules and data dictionary
   - id: OFV2-ERR-CODES-001
     version: openfinance-v2
     title: Message codes and their HTTP response codes
@@ -1544,7 +1544,7 @@ requirements:
         locator: section:3.25
         note: Message Code
       - source_id: bg-openfinance-v2-data-dictionary
-        locator: page:198-204
+        locator: page:220-227
     acceptance_criteria:
       - "Only the listed message error codes with their HTTP response codes are permitted; new services may add codes."
       - "CERTIFICATE_INVALID is returned with HTTP 401."
@@ -1554,55 +1554,6 @@ requirements:
       - "CANCELLATION_INVALID is returned with HTTP 405; AIS ACCESS_EXCEEDED with 429."
     tags: [errors, data-dictionary]
 
-  - id: OFV2-ADMIN-ONBOARDING-001
-    version: openfinance-v2
-    title: Technical onboarding of an API Client (administrative services)
-    description: >-
-      Before accessing extended services, an API Client onboards with POST v2/onboardings and then uses
-      the returned apiContractId. The endpoints are not part of the corpus OpenAPI files.
-    sources:
-      - source_id: bg-openfinance-v2-administrative-services
-        locator: section:1.2
-        note: Administrative Services
-      - source_id: bg-openfinance-v2-administrative-services
-        locator: section:2.4
-        note: Endpoints and API Access Methods
-      - source_id: bg-openfinance-v2-administrative-services
-        locator: section:3.1
-        note: Initiation of the onboarding process
-      - source_id: bg-openfinance-v2-administrative-services
-        locator: page:5-16
-    acceptance_criteria:
-      - "After onboarding the ASPSP assigns a unique apiContractId that the API Client uses for all further accesses to extended services."
-      - "The one step process is used when all access conditions are fixed by contract; the two step process asks for explicit confirmation of special conditions."
-      - "POST onboardings and GET onboardings/{onboardingId} are mandatory; the certificates endpoint and DELETE are optional."
-      - "schemeId (BILATERAL if no scheme) and serviceIds are mandatory in the onboarding request."
-      - "A successful onboarding request has HTTP 201; apiContractId and validTo are only provided when the status is valid."
-      - "An onboarding is valid from the day its status is set to valid; a future-dated onboarding is not possible."
-    tags: [administrative-services, onboarding]
-
-  - id: OFV2-ADMIN-SIGNING-001
-    version: openfinance-v2
-    title: Signed requests and certificate change for administrative services
-    sources:
-      - source_id: bg-openfinance-v2-administrative-services
-        locator: section:2.1
-        note: Signing Messages at Application Layer
-      - source_id: bg-openfinance-v2-administrative-services
-        locator: section:3.7
-        note: Information about a new QSealC of the API Client
-      - source_id: bg-openfinance-v2-administrative-services
-        locator: page:8
-      - source_id: bg-openfinance-v2-administrative-services
-        locator: page:26-27
-    acceptance_criteria:
-      - "The POST requests of sections 3.1, 3.3 and 3.7 are signed HTTP messages."
-      - "The QSealC is included in the JWS Protected Header (x5c) unless it was exchanged before."
-      - "A new certificate is announced with POST .../onboardings/{onboardingId}/certificates, signed with the new certificate."
-      - "A signature failure is answered with HTTP 401 SIGNATURE_INVALID; the old certificate stays valid."
-      - "A successful certificate notification has HTTP 200."
-    tags: [administrative-services, signing, certificates]
-
   - id: OFV2-OPS-BASIC-CODING-001
     version: openfinance-v2
     title: Coding of payment and account data
@@ -1611,7 +1562,7 @@ requirements:
         locator: section:5.1
         note: Coding of business data
       - source_id: bg-openfinance-v2-basic-operational-rules
-        locator: page:35
+        locator: page:46
     acceptance_criteria:
       - "If XML is supported for payments, payment data is a pain.001 message and the status response a pain.002 message."
       - "Account data is delivered as camt.05x, JSON and/or MT94x; MT94x will be deprecated."
@@ -1629,7 +1580,7 @@ requirements:
         locator: section:5.4
         note: Signing message bodies
       - source_id: bg-openfinance-v2-basic-operational-rules
-        locator: page:35-36
+        locator: page:46-47
     acceptance_criteria:
       - "Message signing is optional for the ASPSP and mandatory for the API Client when requested."
       - "HTTP responses are not signed by the ASPSP unless stated otherwise in its documentation."
@@ -1651,7 +1602,7 @@ requirements:
         locator: section:5.7
         note: Decision about Strong Customer Authentication
       - source_id: bg-openfinance-v2-basic-operational-rules
-        locator: page:36-37
+        locator: page:47-48
     acceptance_criteria:
       - "An API Client may execute a service only with the PSU's consent, authorised by SCA."
       - "The ASPSP may reject a Transaction Initiation Request if the PSU consent cannot be proven."
@@ -1667,12 +1618,12 @@ requirements:
         locator: section:5.8
         note: Revocation/cancellation of payment initiations
       - source_id: bg-openfinance-v2-basic-operational-rules
-        locator: page:37
+        locator: page:48
       - source_id: bg-openfinance-v2-xs2a-operational-rules
         locator: section:6.4
         note: Revocation/cancellation of payment initiations
       - source_id: bg-openfinance-v2-xs2a-operational-rules
-        locator: page:31-32
+        locator: page:32-33
     acceptance_criteria:
       - "The PSU can revoke all future dated payments directly with the ASPSP."
       - "The PSU can change or terminate a recurring payment directly at the ASPSP."
@@ -1693,11 +1644,11 @@ requirements:
         locator: section:6.5
         note: Separation and combination of services
       - source_id: bg-openfinance-v2-xs2a-operational-rules
-        locator: page:15-16
+        locator: page:16-17
       - source_id: bg-openfinance-v2-xs2a-operational-rules
-        locator: page:31-32
+        locator: page:32-33
       - source_id: bg-openfinance-v2-xs2a-operational-rules
-        locator: page:27
+        locator: page:28
     acceptance_criteria:
       - "A TPP may only execute an API service if it holds the role indicated for that service."
       - "Single payment initiation is mandatory."
@@ -1717,7 +1668,7 @@ requirements:
         locator: section:6.7
         note: Withdrawal of authorisation
       - source_id: bg-openfinance-v2-xs2a-operational-rules
-        locator: page:32
+        locator: page:33
     acceptance_criteria:
       - "A resource created in the first interaction has a default validity of 30 minutes, which the ASPSP may change."
       - "The TPP stops using its qualified certificate once its PISP/AISP/PIISP authorisation is withdrawn."
@@ -1730,21 +1681,114 @@ requirements:
       The PDFs and OpenAPI files of the corpus carry different version numbers (errata E-04).
     sources:
       - source_id: bg-openfinance-v2-xs2a-implementation-guidelines
-        locator: section:7.3
-        note: Changes from Version 2.3 to Version 2.4
+        locator: section:7.5
+        note: Changes from Version 2.4.1 to Version 2.4.2
       - source_id: bg-openfinance-v2-xs2a-implementation-guidelines
-        locator: page:127
+        locator: page:129
       - source_id: bg-openfinance-v2-consent-api
-        locator: section:5.2
-        note: Changes from Version 2.1 to Version 2.2
+        locator: section:5.3
+        note: Changes from Version 2.2 to Version 2.2.1
       - source_id: bg-openfinance-v2-consent-api
         locator: page:76
       - source_id: project-openfinance-v2-errata
         locator: section:E-04
     acceptance_criteria:
-      - "The XS2A Implementation Guidelines contain changes up to version 2.4."
-      - "The Consent API contains changes from version 2.1 to 2.2."
+      - "The XS2A Implementation Guidelines contain changes up to version 2.4.2, while the AIS, PIS and PIIS OpenAPI files declare 2.4.1."
+      - "The Consent API PDF contains changes up to version 2.2.1, while the Consent OpenAPI declares 2.1."
     tags: [versioning, errata]
+
+  # ======================================================== openFinance v2 - Extended services: Verification of Party (VOP)
+  - id: OFV2-VOP-SINGLE-001
+    version: openfinance-v2
+    title: Verification of party request (dedicated VOP API)
+    sources:
+      - source_id: bg-openfinance-v2-vop
+        locator: section:3.3
+        note: API Access Methods
+      - source_id: bg-openfinance-v2-vop
+        locator: section:3.4.1
+        note: Verification of Party Request
+      - source_id: bg-openfinance-v2-vop
+        locator: page:20-25
+      - source_id: bg-openfinance-v2-openapi-vop
+        locator: op:POST /v2/{party-verification-endpoint}
+    endpoints:
+      - POST /v2/{party-verification-endpoint}
+    acceptance_criteria:
+      - "POST {party-verification-endpoint} is mandatory for the ASPSP; supported endpoint values are payee-verifications, payer-verifications and party-verifications."
+      - "Supporting payee-verifications is sufficient to fulfil the instant payment regulation."
+      - "X-Request-ID is mandatory; API-Contract-ID is conditional on an onboarding contract; Accept-language is optional and may be ignored."
+      - "partyAccount and party (party name and/or party identification) are mandatory in the request body; partyAgent and unstructuredRemittanceInformation are optional; requestingAgent is not applicable."
+      - "A successful response has HTTP 200; partyNameMatch is provided only if a party name was provided, and partyIdMatch only if a party identification was provided."
+      - "matchedName may be provided in case of a near match; additionalInformation is optional human-readable text."
+    tags: [vop, extended-services]
+
+  - id: OFV2-VOP-BULK-001
+    version: openfinance-v2
+    title: Bulk verification of party request, retrieval and status
+    sources:
+      - source_id: bg-openfinance-v2-vop
+        locator: section:3.3
+        note: API Access Methods
+      - source_id: bg-openfinance-v2-vop
+        locator: section:3.4.2
+        note: Bulk Verification of Party Request
+      - source_id: bg-openfinance-v2-vop
+        locator: section:3.4.3
+        note: Retrieve Bulk Verification of Party Request
+      - source_id: bg-openfinance-v2-vop
+        locator: section:3.4.4
+        note: Get Status of Bulk Verification of Party Request
+      - source_id: bg-openfinance-v2-vop
+        locator: page:20
+      - source_id: bg-openfinance-v2-vop
+        locator: page:26-34
+      - source_id: bg-openfinance-v2-openapi-vop
+        locator: op:POST /v2/{bulk-party-verification-endpoint}
+      - source_id: bg-openfinance-v2-openapi-vop
+        locator: op:GET /v2/{bulk-party-verification-endpoint}/{vopBulkId}
+      - source_id: bg-openfinance-v2-openapi-vop
+        locator: op:GET /v2/{bulk-party-verification-endpoint}/{vopBulkId}/status
+    endpoints:
+      - POST /v2/{bulk-party-verification-endpoint}
+      - GET /v2/{bulk-party-verification-endpoint}/{vopBulkId}
+      - GET /v2/{bulk-party-verification-endpoint}/{vopBulkId}/status
+    acceptance_criteria:
+      - "POST {bulk-party-verification-endpoint} is optional for the ASPSP; GET of the vop bulk resource and of its status are conditional on a vopBulkId resource having been created."
+      - "Supported endpoint values are bulk-payee-verifications, bulk-payer-verifications and bulk-party-verifications."
+      - "partyVerificationRequests is a mandatory non-empty array in the bulk request; Client-Asynchronous-Process-Preferred is optional and may be ignored by the ASPSP."
+      - "The bulk request is answered with HTTP 200 when all results are available and HTTP 202 when processing is not completed."
+      - "vopBulkStatus is mandatory; vopBulkId and a _links element with at least a status link are provided only with HTTP 202; partyVerificationResponses is provided if (even partial) results are available."
+      - "GET of the vop bulk resource returns HTTP 200 with mandatory vopBulkId, vopBulkStatus and partyVerificationRequestsAndResults."
+      - "GET of the vop bulk status returns HTTP 200 with mandatory vopBulkId and vopBulkStatus, and optionally either reasonCode or reasonProprietary."
+    tags: [vop, extended-services, bulk]
+
+  - id: OFV2-VOP-CREDITOR-CONFIRMATION-001
+    version: openfinance-v2
+    title: Confirmation of creditor name and payment after a VOP mismatch
+    sources:
+      - source_id: bg-openfinance-v2-vop
+        locator: section:4.1
+        note: New codes for transaction status
+      - source_id: bg-openfinance-v2-vop
+        locator: section:4.5
+        note: New Method for Confirmation of Creditor Name and Payment
+      - source_id: bg-openfinance-v2-vop
+        locator: page:35
+      - source_id: bg-openfinance-v2-vop
+        locator: page:40-42
+      - source_id: bg-openfinance-v2-openapi-vop
+        locator: op:PUT /v2/{payment-service}/{payment-product}/{paymentId}/creditor-confirmation
+    endpoints:
+      - PUT /v2/{payment-service}/{payment-product}/{paymentId}/creditor-confirmation
+    acceptance_criteria:
+      - "VOP integration into payment APIs is an extended service, offered only if provided by the ASPSP or agreed in an API Access Scheme."
+      - "Transaction status RVCM means the VOP result requires an explicit confirmation by the payer; RVNC means VOP is not yet completed; RCVC means VOP is completed and no further confirmation is required."
+      - "A payment or bulk payment with status RVCM is not processed; for a bulk only the full bulk can be confirmed."
+      - "In case of no match, near match or no match applied, the payment is only initiated after the PSU's explicit confirmation via PUT .../creditor-confirmation."
+      - "The creditor confirmation request has a mandatory X-Request-ID header and no body."
+      - "A successful creditor confirmation has HTTP 200 with mandatory transactionStatus and _links; challengeData and scaMethods are conditional."
+    tags: [vop, extended-services, pis]
 
   # ======================================================== NextGenPSD2 v1.3 baseline
   - id: NGPSD2-AIS-TRANSACTIONS-001

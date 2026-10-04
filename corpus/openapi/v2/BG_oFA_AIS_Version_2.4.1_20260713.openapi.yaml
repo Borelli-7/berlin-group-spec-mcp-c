@@ -25,15 +25,15 @@ info:
     name: Creative Commons Attribution 4.0 International Public License
     url: https://creativecommons.org/licenses/by/4.0/
   title: openFinance API Framework XS2A API as PSD2 Interface Implementation Guidelines - Account Information Service
-  version: "2.3"
+  version: "2.4.1"
   x-references:
     documents:
       - document:
         title: openFinance API Framework Data Dictionary
-        version: "2.3.1"
+        version: "2.4"
       - document:
         title: openFinance API Framework XS2A API as PSD2 Interface Implementation Guidelines
-        version: "2.3"
+        version: "2.4.1"
 
 externalDocs:
   description: |
@@ -844,7 +844,7 @@ components:
           description: |
             An alias to access a payment account via a registered mobile phone number.
           allOf:
-            - $ref: '#/components/schemas/Max35Text'
+            - $ref: '#/components/schemas/MSISDN'
         other:
           description: |
             An alias with a proprietary coding
@@ -1347,7 +1347,7 @@ components:
             Name of the party.
           allOf:
             - $ref: '#/components/schemas/Max140Text'
-        postaladdress:
+        postalAddress:
           description: |
             Postal Address of the party.
           allOf:
@@ -1587,106 +1587,6 @@ components:
         - MIST
         - MIKS
       example: 'MADM'
-    standingOrderDetails:
-      description: |
-        See document \"openFinance API Framework Data Dictionary\", section \"Standing Order Details\" for more details.
-      type: object
-      required:
-        - paymentProduct
-        - paymentId
-        - frequency
-      properties:
-        paymentProduct:
-          description: |
-            Only included for AIS. This yields the payment product of the standing order resource.
-          type: string  
-        paymentId:
-          description: |
-            Only included for AIS. Resource Identifier of the standing order resource.
-          allOf:
-            - $ref: '#/components/schemas/UUID'
-        startDate:
-          description: |
-            The first applicable day of execution starting from this date the first payment was/will be executed.
-          allOf:
-            - $ref: '#/components/schemas/ISODate'
-        startDateTime:
-          description: |
-            The first applicable day and time of execution starting from this timestamp. This attribute is only applicable to instant payments. Seconds and milli seconds might be ignored by the ASPSP.
-            The ASPSP might restrict the implementation to startDate. This restriction will be part of the ASPSP documentation.
-          allOf:
-            - $ref: '#/components/schemas/ISODateTime'
-        endDate:
-          description: |
-            The last applicable day of execution
-            If not given, it is an infinite standing order.
-          allOf:
-            - $ref: '#/components/schemas/ISODate'
-        endDateTime:
-          description: |
-            The last applicable day and time of requested execution. This attribute is only applicable to instant payments.
-            If none of the attributes is given, it is an infinite standing order.
-            The ASPSP might restrict the implementation to endDate. This restriction will be part of the ASPSP documentation.
-          allOf:
-            - $ref: '#/components/schemas/ISODateTime'
-        displayName:
-          description: |
-            Name of the standing order defined by the PSU and displayed within the online channels.
-          allOf:
-            - $ref: '#/components/schemas/Max70Text'
-        executionRule:
-          description: |
-            \"following\" or \"preceding\" supported as values.
-            This data attribute defines the behavior when a transaction date resulting from a standing order falls on a weekend or bank holiday.
-            The payment is then executed either the \"preceding\" or \"following\" working day.
-          allOf:
-            - $ref: '#/components/schemas/ExecutionRuleCode'
-        withinAMonthFlag:
-          description: |
-            This element is only used in case of frequency equals \"Monthly\".
-            If this element equals false it has no effect. If this element equals true,
-            then the execution rule is overruled if the day of execution would fall into a different month using the execution rule.
-            Example: executionRule equals \"preceding\", dayOfExecution equals \"02\" and the second of a month is a Sunday.
-            In this case, the transaction date would be on the last day of the month before.
-            This would be overruled if withinAMonthFlag equals true and the payment is processed on Monday the third of the Month.
-            Remark: This attribute is rarely supported in the market.
-          type: boolean
-        frequency:
-          description: |
-            The frequency of the recurring payment resulting from this standing order.
-          allOf:
-            - $ref: '#/components/schemas/EventFrequencyCode'
-        monthsOfExecution:
-          description: |
-            The format is following the regular expression \d{1,2}. The array is restricted to 11 entries.
-            The values contained In the array entries shall all be different and the maximum value of one entry is 12.
-            This attribute is contained if and only if the frequency equals \"MonthlyVariable\".
-            Example: An execution on January, April and October each year is addressed by [\"1\". \"4\", \"10\"].
-          type: array
-          items:
-            $ref: '#/components/schemas/Max2Text'
-        multiplicator:
-          description: |
-            This is multiplying the given frequency resulting the exact frequency, e.g.
-            Frequency=weekly and multiplicator=3 means every 3 weeks.
-            Remark: This attribute is rarely supported in the market.
-          type: number
-        dayOfExecution:
-          description: |
-            \"31\" is ultimo.
-            The format is following the regular expression \d{1,2}.
-            Example: The first day is addressed by \"1\".
-            The date is referring to the time zone of the ASPSP.
-          allOf:
-            - $ref: '#/components/schemas/Max2Text'
-        limitAmount:
-          description: |
-            limitAmount
-            Amount limit for fund skimming, e.g. skim all funds above this limit to savings account, i.e. typically a specific periodic
-            payments with fixed remaining amount rather than fixed transaction amount. Amount may be zero as well as below zero, i.e. negative.
-            Constraints: transactionAmount needs to be zero and bankTransactionCode needs to specify \"PMNT-MCOP-OTHR\" for fund skimming.
-          allOf:
-            - $ref: '#/components/schemas/amount'
     BICFI:
       description: |
         See document \"openFinance API Framework Data Dictionary\", section \"Other ISO-related basic Types\" for more details.
@@ -1898,6 +1798,7 @@ components:
       enum: 
         - CERTIFICATE_INVALID
         - CERTIFICATE_EXPIRED
+        - ROLE_INVALID
         - CERTIFICATE_BLOCKED
         - CERTIFICATE_REVOKED
         - CERTIFICATE_MISSING
@@ -1906,7 +1807,6 @@ components:
         - API_CONTRACT_ID_INVALID
         - SIGNATURE_INVALID
         - SIGNATURE_MISSING
-        - ROLE_INVALID
         - PSU_CREDENTIALS_INVALID
         - CORPORATE_ID_INVALID
         - CONSENT_INVALID
@@ -2067,6 +1967,7 @@ components:
       enum:
         - ACCC
         - ACCP
+        - ACFW
         - ACSC
         - ACSP
         - ACTC
@@ -2097,6 +1998,94 @@ components:
       type: string
       maxLength: 70
       example: 'Text, maximum of 70 characters.'
+    standingOrderDetailsSubmission:
+      description: |
+        See document \"openFinance API Framework Data Dictionary\", section \"Standing Order Details Submission\" for more details.
+      type: object
+      required:
+        - frequency
+      properties:
+        startDate:
+          description: |
+            The first applicable day of execution starting from this date the first payment was/will be executed.
+          allOf:
+            - $ref: '#/components/schemas/ISODate'
+        startDateTime:
+          description: |
+            The first applicable day and time of execution starting from this timestamp.
+            This attribute is only applicable to instant payments. Seconds and milli seconds might be ignored by the ASPSP.
+            The ASPSP might restrict the implementation to startDate. This restriction will be part of the ASPSP documentation.
+          allOf:
+            - $ref: '#/components/schemas/ISODateTime'
+        endDate:
+          description: |
+            The last applicable day of execution
+            If not given, it is an infinite standing order.
+          allOf:
+            - $ref: '#/components/schemas/ISODate'
+        endDateTime:
+          description: |
+            The last applicable day and time of requested execution. 
+            This attribute is only applicable to instant payments.
+            If none of the attributes is given, it is an infinite standing order.
+            The ASPSP might restrict the implementation to endDate. This restriction will be part of the ASPSP documentation.
+          allOf:
+            - $ref: '#/components/schemas/ISODateTime'
+        displayName:
+          description: |
+            Name of the standing order defined by the PSU and displayed within the online channels
+          allOf:
+            - $ref: '#/components/schemas/Max70Text'
+        executionRule:
+          description: |
+            \"following\" or \"preceding\" supported as values.
+            This data attribute defines the behavior when a transaction date resulting from a standing order falls on a weekend or bank holiday.
+            The payment is then executed either the \"preceding\" or \"following\" working day.
+          allOf:
+            - $ref: '#/components/schemas/ExecutionRuleCode'
+        withinAMonthFlag:
+          description: |
+            This element is only used in case of frequency equals \"Monthly\".
+            If this element equals false it has no effect. If this element equals true, then the execution rule is overruled if the day of execution would fall into a different month using the execution rule. 
+            Example: executionRule equals "preceding", dayOfExecution equals "02" and the second of a month is a Sunday. In this case, the transaction date would be on the last day of the month before. This would be overruled if withinAMonthFlag equals true and the payment is processed on Monday the third of the Month.
+            Remark: This attribute is rarely supported in the market.
+          type: boolean
+        frequency:
+          description: |
+            The frequency of the recurring payment resulting from this standing order.
+          allOf:
+            - $ref: '#/components/schemas/EventFrequencyCode'
+        monthsOfExecution:
+          description: |
+            The format is following the regular expression \d{1,2}. The array is restricted to 11 entries. 
+            The values contained In the array entries shall all be different and the maximum value of one entry is 12.
+            This attribute is contained if and only if the frequency equals "MonthlyVariable".
+            Example: An execution on January, April and October each year is addressed by ["1". "4", "10"]
+          type: array
+          items:
+            $ref: '#/components/schemas/Max2Text'
+        multiplicator:
+          description: |
+            This is multiplying the given frequency resulting the exact frequency, e.g.
+            Frequency=weekly and multiplicator=3 means every 3 weeks.
+            Remark: This attribute is rarely supported in the market. 
+          type: number
+        dayOfExecution:
+          description: |
+            \"31\" is ultimo.
+            The format is following the regular expression \d{1,2}.
+            Example: The first day is addressed by \"1\".
+            The date is referring to the time zone of the ASPSP.
+          allOf:
+            - $ref: '#/components/schemas/Max2Text'
+        limitAmount:
+          description: |
+            limitAmount
+            Amount limit for fund skimming, e.g. skim all funds above this limit to savings account, i.e. typically a specific periodic payments with fixed remaining amount rather than fixed transaction amount. 
+            Amount may be zero as well as below zero, i.e. negative.
+            Constraints: transactionAmount needs to be zero and bankTransactionCode needs to specify PMNT-MCOP-OTHR for fund skimming.g
+          allOf:
+            - $ref: '#/components/schemas/amount'
     BalanceType:
       description: |
         See document \"openFinance API Framework Data Dictionary\", section \"Balance Type\" for more details.
@@ -2227,6 +2216,11 @@ components:
         status:
           description: |
             A link to retrieve the status of the transaction resource.
+          allOf:
+            - $ref: '#/components/schemas/hrefType'
+        changedVersion?{inChange=true}:
+          description: |
+            A link to retrieve the changed version of a resource that was created due to a Change Transaction Resource Request. The link can be used to retrieve the related ETag of the changed version.
           allOf:
             - $ref: '#/components/schemas/hrefType'
         transactionfees:
@@ -2399,7 +2393,7 @@ components:
             Name of the party.
           allOf:
             - $ref: '#/components/schemas/Max140Text'
-        postaladdress:
+        postalAddress:
           description: |
             Postal Address of the party.
           allOf:
@@ -2950,6 +2944,11 @@ components:
             Originator payment service provider in case of indirect participation regarding a related API Access Scheme or bilateral contract
           allOf:
             - $ref: '#/components/schemas/financialInstitutionIdentification'
+    MSISDN:
+      type: string
+      pattern: \+[0-9]{1,3}-[0-9()+\-]{1,30}
+      description: See document "openFinance API Framework Data Dictionary", section
+        "Other ISO-related basic Types" for more details.
     AccountIdentificationCode:
       description: |
         See document \"openFinance API Framework Data Dictionary\", section \"Other ISO-related basic Types\" for more details.
@@ -3786,11 +3785,11 @@ components:
         See document \"openFinance API Framework Data Dictionary\", section \"Structured Additional Information\" for more details.
       type: object
       properties:
-        standingOrderDetails:
+        standingOrderDetailsSubmission:
           description: |
             Details of underlying standing orders.
           allOf:
-            - $ref: '#/components/schemas/standingOrderDetails'
+            - $ref: '#/components/schemas/standingOrderDetailsSubmission'
         rtpDetails:
           description: |
             Details of underlying incoming RTPs
@@ -3853,6 +3852,18 @@ components:
         earlyPaymentAllowed:
           description: |
             Indicates if the debtor is allowed to pay before the requested execution date.
+          type: boolean
+        latePaymentAllowed:
+          description: |
+            Indicates if the debtor is allowed to pay later than the requested execution date.
+          type: boolean
+        remittanceInformationModificationAllowed:
+          description: |
+            Indicates if the debtor is allowed to change the remittance information.
+          type: boolean
+        creditorAccountModificationAllowed:
+          description: |
+            Indicates if the debtor is allowed to modify the requested creditor account.
           type: boolean
     ExternalLocalInstrumentCode:
       description: |
@@ -4131,7 +4142,7 @@ components:
             An alias to access a payment account via a registered mobile phone number. This alias might be needed e.g. in the payment initiation services.
             The support of this alias must be explicitly documented by the ASPSP for the corresponding API Calls.
           allOf:
-            - $ref: '#/components/schemas/Max35Text'
+            - $ref: '#/components/schemas/MSISDN'
         other:
           description: |
             An alias with a proprietary coding
@@ -4403,7 +4414,9 @@ components:
     HEADER_xRequestId:
       name: X-Request-ID
       in: header
-      description: ID of the request, unique to the call, as determined by the initiating party.
+      description: |
+        ID of the request, unique to the call, as determined by the initiating party.
+        This is the unique ID of the API Client for the payment initiation regarding PSD2 article 47 and EBA RTS article 29.
       required: true
       schema:
         type: string

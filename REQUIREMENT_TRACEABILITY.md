@@ -106,10 +106,10 @@ The server **reports** conflicts with citations and provenance. Deciding which s
 
 ### Official corpus (`corpus/`)
 
-`corpus/requirements/requirements.yaml` maps 102 requirements (73 `OFV2-*`, 29 `NGPSD2-*` baseline) onto the
+`corpus/requirements/requirements.yaml` maps 103 requirements (74 `OFV2-*`, 29 `NGPSD2-*` baseline) onto the
 official Berlin Group files. Every openFinance v2 OpenAPI operation is linked to at least one requirement;
 NextGenPSD2 1.3 operations are covered where a v2 counterpart exists, and endpoint-less requirements cover
-protocol functions, operational rules, administrative services and the Data Dictionary message codes.
+protocol functions, operational rules and the Data Dictionary message codes.
 Discrepancies between those files are recorded as project errata in
 `corpus/text/v2/errata.md` (source `project-openfinance-v2-errata`, authority `project`, precedence 10).
 

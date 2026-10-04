@@ -61,8 +61,8 @@ sources:
     version: openfinance-v2
     authority: normative      # normative | technical | informative | project | test | unknown
     precedence: 100           # 0..=1000; higher wins when sources of one version overlap
-    path: pdf/v2/XS2A API as PSD2 Interface implementation guide line-2.4.pdf   # relative to the corpus root
-    title: openFinance XS2A API as PSD2 Interface - Implementation Guidelines 2.4 (2025-10-31)   # optional
+    path: pdf/v2/11b.-Berlin-Group-...-XS2A-API-Implementation-Guidelines-V2.4.2-20260731.pdf   # relative to the corpus root
+    title: openFinance XS2A API as PSD2 Interface - Implementation Guidelines 2.4.2 (2026-07-31)   # optional
     description: ...                                       # optional
     tags: [implementation-guidelines]                      # optional
     blank_pages: [2]                                       # optional, pdf/text only: intentionally blank pages
