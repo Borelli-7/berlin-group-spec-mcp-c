@@ -1,0 +1,3800 @@
+openapi: 3.0.1
+
+info:
+  title: openFinance API Framework Implementation Guidelines for Extended Services AIS for Securities Accounts
+  version: "1.0"
+  description: |
+    With the XS2A Specification [XS2A-IG], a standard for an XS2A Interface is defined for the core services defined by the PSD2.
+    With [oFA-IG-SecAIS] an extension of the NextGenPSD2 XS2A Specification [XS2A-IG]. It describes how the existing services for 
+    account information can be extended to provide account information on securities accounts. Therefore, new endpoints are 
+    defined in order to provide the information.This yaml file reflects the API definition given in [oFA-IG-SecAIS] and therefore 
+    provides the (essentially) same information regarding the data definition in a machine readable form.
+      **[XS2A-IG]** NextGenPSD2 XS2A Framework, Implementation Guidelines, The Berlin Group Joint Initiative on a PSD2 Compliant XS2A Interface, version 1.3.12, published 01 July 2022.
+      **[oFA-IG-SecAIS]** openFinance API Framework Implementation Guidelines for Extended Services AIS for Securities Accounts
+  license:
+    name: Creative Commons Attribution 4.0 International Public License
+    url: https://creativecommons.org/licenses/by/4.0/
+  contact:
+    name: The Berlin Group - A European Standards Initiative
+    url: https://www.berlin-group.org/
+    email: info@berlin-group.org
+
+paths:
+  /v1/securities-accounts:
+    get:
+      summary: Read Securities Account List
+      description: Returns a list of securities accounts as permitted by the presented consent
+      operationId: getSecuritiesAccountList
+      tags:
+        - Securities AIS
+      security:
+        - {}
+        - BearerAuthOAuth: []
+      parameters:
+        - $ref: '#/components/parameters/QUERY_evaluationCurrency'
+        - $ref: '#/components/parameters/HEADER_xRequestId'
+        - $ref: '#/components/parameters/HEADER_digest'
+        - $ref: '#/components/parameters/HEADER_signature'
+        - $ref: '#/components/parameters/HEADER_tppSignatureCertificate'
+        - $ref: '#/components/parameters/HEADER_psuIpAddress_conditionalForAis'
+        - $ref: '#/components/parameters/HEADER_consentId_mandatory'
+        - $ref: '#/components/parameters/HEADER_psuIpPort'
+        - $ref: '#/components/parameters/HEADER_psuAccept'
+        - $ref: '#/components/parameters/HEADER_psuAcceptCharset'
+        - $ref: '#/components/parameters/HEADER_psuAcceptEncoding'
+        - $ref: '#/components/parameters/HEADER_psuAcceptLanguage'
+        - $ref: '#/components/parameters/HEADER_psuUserAgent'
+        - $ref: '#/components/parameters/HEADER_psuHttpMethod'
+        - $ref: '#/components/parameters/HEADER_psuDeviceId'
+        - $ref: '#/components/parameters/HEADER_psuGeoLocation'
+      responses:
+        '200':
+          $ref: '#/components/responses/OK_200_SecuritiesAccountList'
+        '400':
+          $ref: '#/components/responses/decline_400_AIS'
+        '401':
+          $ref: '#/components/responses/decline_401_AIS'
+        '403':
+          $ref: '#/components/responses/decline_403_AIS'
+        '404':
+          $ref: '#/components/responses/decline_404_AIS_Securities'
+        '405':
+          $ref: '#/components/responses/decline_405_AIS'
+        '406':
+          $ref: '#/components/responses/decline_406_AIS'
+        '408':
+          $ref: '#/components/responses/decline_408_AIS'
+        '409':
+          $ref: '#/components/responses/decline_409_AIS'
+        '415':
+          $ref: '#/components/responses/decline_415_AIS'
+        '429':
+          $ref: '#/components/responses/decline_429_AIS'
+        '500':
+          $ref: '#/components/responses/decline_500'
+        '503':
+          $ref: '#/components/responses/decline_503'
+  /v1/securities-accounts/{securities-account-id}:
+    get:
+      summary: Read Securities Account Details
+      description: Reads details about a securities account as permitted by the presented consent
+      operationId: getSecuritiesAccountDetails
+      tags:
+        - Securities AIS
+      security:
+        - {}
+        - BearerAuthOAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PATH_securitiesAccountId'
+        - $ref: '#/components/parameters/QUERY_evaluationCurrency'
+        - $ref: '#/components/parameters/HEADER_xRequestId'
+        - $ref: '#/components/parameters/HEADER_digest'
+        - $ref: '#/components/parameters/HEADER_signature'
+        - $ref: '#/components/parameters/HEADER_tppSignatureCertificate'
+        - $ref: '#/components/parameters/HEADER_psuIpAddress_conditionalForAis'
+        - $ref: '#/components/parameters/HEADER_consentId_mandatory'
+        - $ref: '#/components/parameters/HEADER_psuIpPort'
+        - $ref: '#/components/parameters/HEADER_psuAccept'
+        - $ref: '#/components/parameters/HEADER_psuAcceptCharset'
+        - $ref: '#/components/parameters/HEADER_psuAcceptEncoding'
+        - $ref: '#/components/parameters/HEADER_psuAcceptLanguage'
+        - $ref: '#/components/parameters/HEADER_psuUserAgent'
+        - $ref: '#/components/parameters/HEADER_psuHttpMethod'
+        - $ref: '#/components/parameters/HEADER_psuDeviceId'
+        - $ref: '#/components/parameters/HEADER_psuGeoLocation'
+      responses:
+        '200':
+          $ref: '#/components/responses/OK_200_SecuritiesAccountDetails'
+        '400':
+          $ref: '#/components/responses/decline_400_AIS'
+        '401':
+          $ref: '#/components/responses/decline_401_AIS'
+        '403':
+          $ref: '#/components/responses/decline_403_AIS'
+        '404':
+          $ref: '#/components/responses/decline_404_AIS_Securities'
+        '405':
+          $ref: '#/components/responses/decline_405_AIS'
+        '406':
+          $ref: '#/components/responses/decline_406_AIS'
+        '408':
+          $ref: '#/components/responses/decline_408_AIS'
+        '409':
+          $ref: '#/components/responses/decline_409_AIS'
+        '415':
+          $ref: '#/components/responses/decline_415_AIS'
+        '429':
+          $ref: '#/components/responses/decline_429_AIS'
+        '500':
+          $ref: '#/components/responses/decline_500'
+        '503':
+          $ref: '#/components/responses/decline_503'
+  /v1/securities-accounts/{securities-account-id}/positions:
+    get:
+      summary: Read Securities Account Positions
+      description: Reads the list of positions associated with a securities account as permitted by the presented consent
+      operationId: getSecuritiesAccountPositions
+      tags:
+        - Securities AIS
+      security:
+        - {}
+        - BearerAuthOAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PATH_securitiesAccountId'
+        - $ref: '#/components/parameters/HEADER_xRequestId'
+        - $ref: '#/components/parameters/HEADER_digest'
+        - $ref: '#/components/parameters/HEADER_signature'
+        - $ref: '#/components/parameters/HEADER_tppSignatureCertificate'
+        - $ref: '#/components/parameters/HEADER_psuIpAddress_conditionalForAis'
+        - $ref: '#/components/parameters/HEADER_consentId_mandatory'
+        - $ref: '#/components/parameters/HEADER_psuIpPort'
+        - $ref: '#/components/parameters/HEADER_psuAccept'
+        - $ref: '#/components/parameters/HEADER_psuAcceptCharset'
+        - $ref: '#/components/parameters/HEADER_psuAcceptEncoding'
+        - $ref: '#/components/parameters/HEADER_psuAcceptLanguage'
+        - $ref: '#/components/parameters/HEADER_psuUserAgent'
+        - $ref: '#/components/parameters/HEADER_psuHttpMethod'
+        - $ref: '#/components/parameters/HEADER_psuDeviceId'
+        - $ref: '#/components/parameters/HEADER_psuGeoLocation'
+      responses:
+        '200':
+          $ref: '#/components/responses/OK_200_SecuritiesAccountPositions'
+        '400':
+          $ref: '#/components/responses/decline_400_AIS'
+        '401':
+          $ref: '#/components/responses/decline_401_AIS'
+        '403':
+          $ref: '#/components/responses/decline_403_AIS'
+        '404':
+          $ref: '#/components/responses/decline_404_AIS_Securities'
+        '405':
+          $ref: '#/components/responses/decline_405_AIS'
+        '406':
+          $ref: '#/components/responses/decline_406_AIS'
+        '408':
+          $ref: '#/components/responses/decline_408_AIS'
+        '409':
+          $ref: '#/components/responses/decline_409_AIS'
+        '415':
+          $ref: '#/components/responses/decline_415_AIS'
+        '429':
+          $ref: '#/components/responses/decline_429_AIS'
+        '500':
+          $ref: '#/components/responses/decline_500'
+        '503':
+          $ref: '#/components/responses/decline_503'
+  /v1/securities-accounts/{securities-account-id}/transactions:
+    get:
+      summary: Read Securities Transaction List
+      description: Reads the list of transactions associated with a securities account as permitted by the presented consent
+      operationId: getSecuritiesTransactions
+      tags:
+        - Securities AIS
+      security:
+        - {}
+        - BearerAuthOAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PATH_securitiesAccountId'
+        - $ref: '#/components/parameters/QUERY_dateFrom'
+        - $ref: '#/components/parameters/QUERY_dateTo'
+        - $ref: '#/components/parameters/QUERY_entryReferenceFrom'
+        - $ref: '#/components/parameters/QUERY_deltaList'
+        - $ref: '#/components/parameters/HEADER_xRequestId'
+        - $ref: '#/components/parameters/HEADER_digest'
+        - $ref: '#/components/parameters/HEADER_signature'
+        - $ref: '#/components/parameters/HEADER_tppSignatureCertificate'
+        - $ref: '#/components/parameters/HEADER_psuIpAddress_conditionalForAis'
+        - $ref: '#/components/parameters/HEADER_consentId_mandatory'
+        - $ref: '#/components/parameters/HEADER_psuIpPort'
+        - $ref: '#/components/parameters/HEADER_psuAccept'
+        - $ref: '#/components/parameters/HEADER_psuAcceptCharset'
+        - $ref: '#/components/parameters/HEADER_psuAcceptEncoding'
+        - $ref: '#/components/parameters/HEADER_psuAcceptLanguage'
+        - $ref: '#/components/parameters/HEADER_psuUserAgent'
+        - $ref: '#/components/parameters/HEADER_psuHttpMethod'
+        - $ref: '#/components/parameters/HEADER_psuDeviceId'
+        - $ref: '#/components/parameters/HEADER_psuGeoLocation'
+      responses:
+        '200':
+          $ref: '#/components/responses/OK_200_SecuritiesTransactions'
+        '400':
+          $ref: '#/components/responses/decline_400_AIS'
+        '401':
+          $ref: '#/components/responses/decline_401_AIS'
+        '403':
+          $ref: '#/components/responses/decline_403_AIS'
+        '404':
+          $ref: '#/components/responses/decline_404_AIS_Securities'
+        '405':
+          $ref: '#/components/responses/decline_405_AIS'
+        '406':
+          $ref: '#/components/responses/decline_406_AIS'
+        '408':
+          $ref: '#/components/responses/decline_408_AIS'
+        '409':
+          $ref: '#/components/responses/decline_409_AIS'
+        '415':
+          $ref: '#/components/responses/decline_415_AIS'
+        '429':
+          $ref: '#/components/responses/decline_429_AIS'
+        '500':
+          $ref: '#/components/responses/decline_500'
+        '503':
+          $ref: '#/components/responses/decline_503'
+  /v1/securities-accounts/{securities-account-id}/transactions/{transactionId}:
+    get:
+      summary: Read Securities Transaction Details
+      description: Reads the details of a securities transaction as permitted by the presented consent
+      operationId: getSecuritiesTransactionDetails
+      tags:
+        - Securities AIS
+      security:
+        - {}
+        - BearerAuthOAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PATH_securitiesAccountId'
+        - $ref: '#/components/parameters/PATH_transactionId'
+        - $ref: '#/components/parameters/HEADER_xRequestId'
+        - $ref: '#/components/parameters/HEADER_digest'
+        - $ref: '#/components/parameters/HEADER_signature'
+        - $ref: '#/components/parameters/HEADER_tppSignatureCertificate'
+        - $ref: '#/components/parameters/HEADER_psuIpAddress_conditionalForAis'
+        - $ref: '#/components/parameters/HEADER_consentId_mandatory'
+        - $ref: '#/components/parameters/HEADER_psuIpPort'
+        - $ref: '#/components/parameters/HEADER_psuAccept'
+        - $ref: '#/components/parameters/HEADER_psuAcceptCharset'
+        - $ref: '#/components/parameters/HEADER_psuAcceptEncoding'
+        - $ref: '#/components/parameters/HEADER_psuAcceptLanguage'
+        - $ref: '#/components/parameters/HEADER_psuUserAgent'
+        - $ref: '#/components/parameters/HEADER_psuHttpMethod'
+        - $ref: '#/components/parameters/HEADER_psuDeviceId'
+        - $ref: '#/components/parameters/HEADER_psuGeoLocation'
+      responses:
+        '200':
+          $ref: '#/components/responses/OK_200_SecuritiesTransactionDetails'
+        '400':
+          $ref: '#/components/responses/decline_400_AIS'
+        '401':
+          $ref: '#/components/responses/decline_401_AIS'
+        '403':
+          $ref: '#/components/responses/decline_403_AIS'
+        '404':
+          $ref: '#/components/responses/decline_404_AIS_Securities'
+        '405':
+          $ref: '#/components/responses/decline_405_AIS'
+        '406':
+          $ref: '#/components/responses/decline_406_AIS'
+        '408':
+          $ref: '#/components/responses/decline_408_AIS'
+        '409':
+          $ref: '#/components/responses/decline_409_AIS'
+        '415':
+          $ref: '#/components/responses/decline_415_AIS'
+        '429':
+          $ref: '#/components/responses/decline_429_AIS'
+        '500':
+          $ref: '#/components/responses/decline_500'
+        '503':
+          $ref: '#/components/responses/decline_503'
+  /v1/securities-accounts/{securities-account-id}/orders:
+    get:
+      summary: Read Securities Order List
+      description: Reads the list of orders associated with a securities account as permitted by the presented consent
+      operationId: getSecuritiesOrders
+      tags:
+        - Securities AIS
+      security:
+        - {}
+        - BearerAuthOAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PATH_securitiesAccountId'
+        - $ref: '#/components/parameters/QUERY_dateFrom'
+        - $ref: '#/components/parameters/QUERY_dateTo'
+        - $ref: '#/components/parameters/QUERY_orderStatus'
+        - $ref: '#/components/parameters/HEADER_xRequestId'
+        - $ref: '#/components/parameters/HEADER_digest'
+        - $ref: '#/components/parameters/HEADER_signature'
+        - $ref: '#/components/parameters/HEADER_tppSignatureCertificate'
+        - $ref: '#/components/parameters/HEADER_psuIpAddress_conditionalForAis'
+        - $ref: '#/components/parameters/HEADER_consentId_mandatory'
+        - $ref: '#/components/parameters/HEADER_psuIpPort'
+        - $ref: '#/components/parameters/HEADER_psuAccept'
+        - $ref: '#/components/parameters/HEADER_psuAcceptCharset'
+        - $ref: '#/components/parameters/HEADER_psuAcceptEncoding'
+        - $ref: '#/components/parameters/HEADER_psuAcceptLanguage'
+        - $ref: '#/components/parameters/HEADER_psuUserAgent'
+        - $ref: '#/components/parameters/HEADER_psuHttpMethod'
+        - $ref: '#/components/parameters/HEADER_psuDeviceId'
+        - $ref: '#/components/parameters/HEADER_psuGeoLocation'
+      responses:
+        '200':
+          $ref: '#/components/responses/OK_200_SecuritiesOrders'
+        '400':
+          $ref: '#/components/responses/decline_400_AIS'
+        '401':
+          $ref: '#/components/responses/decline_401_AIS'
+        '403':
+          $ref: '#/components/responses/decline_403_AIS'
+        '404':
+          $ref: '#/components/responses/decline_404_AIS_Securities'
+        '405':
+          $ref: '#/components/responses/decline_405_AIS'
+        '406':
+          $ref: '#/components/responses/decline_406_AIS'
+        '408':
+          $ref: '#/components/responses/decline_408_AIS'
+        '409':
+          $ref: '#/components/responses/decline_409_AIS'
+        '415':
+          $ref: '#/components/responses/decline_415_AIS'
+        '429':
+          $ref: '#/components/responses/decline_429_AIS'
+        '500':
+          $ref: '#/components/responses/decline_500'
+        '503':
+          $ref: '#/components/responses/decline_503'
+  /v1/securities-accounts/{securities-account-id}/orders/{orderId}:
+    get:
+      summary: Read Securities Order Details
+      description: Reads the details of a securities order as permitted by the presented consent
+      operationId: getSecuritiesOrderDetails
+      tags:
+        - Securities AIS
+      security:
+        - {}
+        - BearerAuthOAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PATH_securitiesAccountId'
+        - $ref: '#/components/parameters/PATH_orderId'
+        - $ref: '#/components/parameters/HEADER_xRequestId'
+        - $ref: '#/components/parameters/HEADER_digest'
+        - $ref: '#/components/parameters/HEADER_signature'
+        - $ref: '#/components/parameters/HEADER_tppSignatureCertificate'
+        - $ref: '#/components/parameters/HEADER_psuIpAddress_conditionalForAis'
+        - $ref: '#/components/parameters/HEADER_consentId_mandatory'
+        - $ref: '#/components/parameters/HEADER_psuIpPort'
+        - $ref: '#/components/parameters/HEADER_psuAccept'
+        - $ref: '#/components/parameters/HEADER_psuAcceptCharset'
+        - $ref: '#/components/parameters/HEADER_psuAcceptEncoding'
+        - $ref: '#/components/parameters/HEADER_psuAcceptLanguage'
+        - $ref: '#/components/parameters/HEADER_psuUserAgent'
+        - $ref: '#/components/parameters/HEADER_psuHttpMethod'
+        - $ref: '#/components/parameters/HEADER_psuDeviceId'
+        - $ref: '#/components/parameters/HEADER_psuGeoLocation'
+      responses:
+        '200':
+          $ref: '#/components/responses/OK_200_SecuritiesOrderDetails'
+        '400':
+          $ref: '#/components/responses/decline_400_AIS'
+        '401':
+          $ref: '#/components/responses/decline_401_AIS'
+        '403':
+          $ref: '#/components/responses/decline_403_AIS'
+        '404':
+          $ref: '#/components/responses/decline_404_AIS_Securities'
+        '405':
+          $ref: '#/components/responses/decline_405_AIS'
+        '406':
+          $ref: '#/components/responses/decline_406_AIS'
+        '408':
+          $ref: '#/components/responses/decline_408_AIS'
+        '409':
+          $ref: '#/components/responses/decline_409_AIS'
+        '415':
+          $ref: '#/components/responses/decline_415_AIS'
+        '429':
+          $ref: '#/components/responses/decline_429_AIS'
+        '500':
+          $ref: '#/components/responses/decline_500'
+        '503':
+          $ref: '#/components/responses/decline_503'
+
+
+components:
+  securitySchemes:
+    BearerAuthOAuth:
+      description: |
+        Bearer Token. 
+        Is contained only, if an OAuth2 based authentication was performed in a pre-step or 
+        an OAuth2 based SCA was performed in a preceding AIS service in the same session.
+      type: http
+      scheme: bearer
+  schemas:
+    error_RFC7807_429_AIS: 
+      description: |
+        Standardised definition of reporting error information according to [RFC7807].
+      type: object
+      required:
+        - type
+        - code
+      properties:
+        type: 
+          description: |
+            A URI reference [RFC3986] that identifies the problem type. 
+            Remark For Future: These URI will be provided by NextGenPSD2 in future.
+          type: string
+          format: uri
+          maxLength: 70
+        title:
+          $ref: '#/components/schemas/Max70Text'
+        detail:
+          description: |
+                $ref: '#/components/schemas/Max500Text'
+        code:
+          $ref: '#/components/schemas/MessageCode_429_AIS'
+        additionalErrors:
+          description: |
+            Array of Error Information Blocks.
+            Might be used if more than one error is to be communicated
+          type: array
+          items: #ErrorInformation
+            description: This is a data element to support the declaration of additional errors in the context of [RFC7807]. 
+            type: object
+            required:
+              - code
+            properties:
+              title:
+                $ref: '#/components/schemas/Max70Text'
+              detail:
+                $ref: '#/components/schemas/Max500Text'
+              code:
+                $ref: '#/components/schemas/MessageCode_429_AIS'
+        _links:
+          $ref: '#/components/schemas/_linksAll'
+    TradingSessionTypeCode:
+      description: |
+        Code set to identify the type of a trading session, in which an order shall be executed. Possible values:
+        * **auctions**: Orders that are traded in regularly occurring auctions: orders are 
+          accumulated and executed on the basis of defined algorithms.
+        * **continuous**: Orders that are executed directly against each other as they hit the marketplace.
+      type: string
+      enum:
+       - auctions
+       - continuous
+    MessageCode_405_AIS: 
+      description: Message codes defined for AIS for HTTP Error code 405 (METHOD NOT ALLOWED).
+      type: string
+      enum: 
+        - "SERVICE_INVALID"           #gens
+    SecuritiesOrderSide: 
+      description: |
+        Code set to identify the \"side\" / intended action for the respective order. 
+      type: string
+      enum:
+        - buy
+        - sell
+        - subscription
+        - redemption
+    error_NG_400_AIS: 
+      type: object
+      properties:
+        tppMessages:
+          type: array
+          items:
+            $ref: '#/components/schemas/tppMessage_400_AIS'
+        _links:
+          $ref: '#/components/schemas/_linksAll'
+    tppMessage_403_AIS:
+      type: object
+      required:
+        - category
+        - code
+      properties:
+        category:
+           $ref: '#/components/schemas/TppMessageCategory'
+        code:
+          $ref: '#/components/schemas/MessageCode_403_AIS'
+        path:
+          type: string
+        text:
+          $ref: '#/components/schemas/Max500Text'
+    evaluatedAmount:
+      description: This data structure represents an evaluated amount (without indicating the method of evaluation) 
+        when an unambiguous balance cannot be provided, but an evaluation, e.g. the  value of a securities position.
+      type: object
+      required: 
+        - amount
+      properties:
+        amount:
+          allOf:
+            - description: Amount that is evaluated.
+            - $ref: '#/components/schemas/amount'
+        evaluationDateTime:
+          allOf:
+            - description: Date and time of the evaluation.
+            - $ref: '#/components/schemas/ISODateTime'
+        evaluationDate:
+          allOf:
+            - description: Date of the evaluation.
+            - $ref: '#/components/schemas/ISODate'
+    otherFinancialInstrumentIdentification:
+      description: |
+        This data element structure represents the identification of a financial instrument by means other than ISIN.
+      type: object
+      required: 
+        - identification
+      properties:
+        identification:
+          allOf:
+            - description: Identification of a security.
+            - $ref: '#/components/schemas/Max35Text'
+        suffix:
+          allOf:
+            - description: Identifies the suffix of the security identification.
+            - $ref: '#/components/schemas/Max16Text'
+        typeCode:
+          allOf:
+            - description: Unique and unambiguous identification source, as assigned via a pre-determined code list.
+            - $ref: '#/components/schemas/ExternalFinancialInstrumentIdentificationType1Code'
+        typeProprietary:
+          allOf:
+            - description: Unique and unambiguous identification source using a proprietary identification scheme.
+            - $ref: '#/components/schemas/Max35Text'
+    securitiesPosition:
+      description: |
+        This data element structure represents the identification of a financial instrument by means other than ISIN.
+      type: object
+      required:
+        - financialInstrument
+      properties: 
+        financialInstrument:
+          allOf:
+            - description: |
+                Financial Instrument that is contained in this position.
+            - $ref: '#/components/schemas/financialInstrument'
+        unitsNumber:
+          allOf:
+            - description: |
+                Numeric quantification of the financial instrument. Negative values for short positions.
+            - type: number
+        unitsNominal:
+          allOf:
+            - description: |
+                Nominal quantification of the financial instrument. Negative values for short positions.
+            - $ref: '#/components/schemas/amount'
+        externalIdentifier:
+          allOf:
+           - description: |
+                Name or identifier with an intrinsic meaning for the PSU to be displayed.
+           - $ref: '#/components/schemas/Max35Text'
+        safekeepingPlace:
+          allOf:
+            - description: |
+                BIC of the place where the securities are safe-kept, physically or notionally. 
+            - $ref: '#/components/schemas/BICFI'
+        safekeepingCountry:
+          allOf:
+            - description: |
+                Country where the securities are safe-kept.
+            - $ref: '#/components/schemas/CountryCode'
+        balanceType:
+          allOf:
+             - description: |
+                Specifies the nature of the securities or investment fund balance.
+                Type of balance in case of multiple positions for the same financial instrument for 
+                further distinction.
+                *Remark:* In consequence, several positions with the same financial instrument may occur in the same position list, 
+                having different values of \"balanceType\".
+             - $ref: '#/components/schemas/SecuritiesBalanceType_1_2_11_12_Code'
+        averageBuyingPrice:
+          allOf:
+            - description: |
+                Average buying price of the position excluding any fees or taxes.
+            - $ref: '#/components/schemas/amount'
+        averageSellingPrice:
+          allOf:
+            - description: |
+                Average selling price of the position, e.g. in case of a short position. Price excluding any fees or taxes.
+            - $ref: '#/components/schemas/amount'
+        totalBuyingPrice:
+          allOf:
+            - description: |
+                In case of bonds, an average buying price does not make sense. 
+                Therefore, the total buying price excluding any fees or taxes can be shown displayed instead.
+            - $ref: '#/components/schemas/amount'
+        estimatedCurrentValue:
+          allOf:
+            - description: |
+                Estimated value of the position and timestamp of the estimation.
+            - $ref: '#/components/schemas/evaluatedAmount'
+        accruedInterest:
+          allOf:
+            - description: |
+                Accrued interest by the position.
+            - $ref: '#/components/schemas/accruedInterest'
+        currencyExchange:
+          allOf:
+            - description: |
+                The ASPSP might include exchange rates e.g. if the security is denoted in another currency 
+                than the account itself.
+            - type: array
+              items:
+                $ref: '#/components/schemas/reportExchangeRate'
+        details:
+          allOf:
+            - description: |
+                Additional details to the position.
+            - $ref: '#/components/schemas/Max500Text'
+    TppMessageCategory:
+      description: Category of the TPP message category.
+      type: string
+      enum:
+        - "ERROR"
+        - "WARNING"
+    error_NG_409_AIS: 
+      type: object
+      properties:
+        tppMessages:
+          type: array
+          items:
+            $ref: '#/components/schemas/tppMessage_409_AIS'
+        _links:
+          $ref: '#/components/schemas/_linksAll'
+    error_RFC7807_403_AIS: 
+      description: |
+        Standardised definition of reporting error information according to [RFC7807].
+      type: object
+      required:
+        - type
+        - code
+      properties:
+        type: 
+          description: |
+            A URI reference [RFC3986] that identifies the problem type. 
+            Remark For Future: These URI will be provided by NextGenPSD2 in future.
+          type: string
+          format: uri
+          maxLength: 70
+        title:
+          $ref: '#/components/schemas/Max70Text'
+        detail:
+          description: |
+                $ref: '#/components/schemas/Max500Text'
+        code:
+          $ref: '#/components/schemas/MessageCode_403_AIS'
+        additionalErrors:
+          description: |
+            Array of Error Information Blocks.
+            Might be used if more than one error is to be communicated
+          type: array
+          items: #ErrorInformation
+            description: This is a data element to support the declaration of additional errors in the context of [RFC7807]. 
+            type: object
+            required:
+              - code
+            properties:
+              title:
+                $ref: '#/components/schemas/Max70Text'
+              detail:
+                $ref: '#/components/schemas/Max500Text'
+              code:
+                $ref: '#/components/schemas/MessageCode_403_AIS'
+        _links:
+          $ref: '#/components/schemas/_linksAll'
+    Max500Text:
+      type: string
+      maxLength: 500
+    CurrencyCode:
+      description: |
+        ISO 4217 Alpha 3 currency code.
+      type: string
+      pattern: '[A-Z]{3}'
+      example: "EUR"
+    Max70Text:
+      type: string
+      maxLength: 70
+    tppMessage_429_AIS:
+      type: object
+      required:
+        - category
+        - code
+      properties:
+        category:
+           $ref: '#/components/schemas/TppMessageCategory'
+        code:
+          $ref: '#/components/schemas/MessageCode_429_AIS'
+        path:
+          type: string
+        text:
+          $ref: '#/components/schemas/Max500Text'
+    BalanceType:
+      description: |
+        The following balance types are defined:
+          - \"closingBooked\": 
+            Balance of the account at the end of the pre-agreed account reporting period. 
+            It is the sum of the opening booked balance at the beginning of the period and all entries booked 
+            to the account during the pre-agreed account reporting period.
+            For card-accounts, this is composed of
+              - invoiced, but not yet paid entries
+          - \"expected\":
+            Balance composed of booked entries and pending items known at the time of calculation, 
+            which projects the end of day balance if everything is booked on the account and no other entry is posted.
+            For card accounts, this is composed of:
+              - invoiced, but not yet paid entries
+              - not yet invoiced but already booked entries and
+              - pending items (not yet booked)
+            For savings and loans:
+            estimated balance (e.g. including an upcoming interest payment) for the referenced date.
+          - \"openingBooked\":
+            Book balance of the account at the beginning of the account reporting period. 
+            It always equals the closing book balance from the previous report.
+          - \"interimAvailable\":
+            Available balance calculated in the course of the account ?servicer?s business day, 
+            at the time specified, and subject to further changes during the business day. 
+            The interim balance is calculated on the basis of booked credit and debit items during the calculation 
+            time/period specified.
+            For card-accounts, this is composed of:
+              - invoiced, but not yet paid entries
+              - not yet invoiced but already booked entries
+            NOT used for savings and loans.
+          - \"interimBooked\":
+            Balance calculated in the course of the account servicer's business day, at the time specified, 
+            and subject to further changes during the business day. 
+            The interim balance is calculated on the basis of booked credit and debit items during the calculation time/period 
+            specified.
+          - \"forwardAvailable\":
+            Forward available balance of money that is at the disposal of the account owner on the date specified.
+            NOT used for savings and loans.
+          - \"nonInvoiced\": 
+            Only for card accounts, to be defined yet.
+      type: string
+      enum:
+          - closingBooked
+          - expected
+          - openingBooked
+          - interimAvailable
+          - interimBooked
+          - forwardAvailable
+          - nonInvoiced
+    balanceSecurities:
+      description: |
+        In the context of securities, balances are used to represent an estimation of the securities account's 
+        total value. As the value of single financial instruments and therefore the sum of all such values is 
+        constantly changing, the estimation does particularly depend on the time of its creation. 
+        Therefore, it is strongly recommended (and in some instances mandated) 
+        to include the element referenceDateTime.
+      type: object
+      required:
+        - balanceAmount
+        - balanceType
+      properties:
+        balanceAmount:
+          allOf:
+            - description: |
+            - $ref: '#/components/schemas/amount'
+        balanceType:
+          allOf:
+            - description: |
+                The used balance types that apply to securities are restricted to the following values 
+                with ther specific interpretation for securities accounts:
+                * closingBooked: estimation based in the last fully finished trading date as interpreted 
+                by the ASPSP.
+                * interimAvailable: intermediate estimation of the amounts value. If a balance with type 
+                \"interimAvailable\" is used, it must indicate the date and time of the evaluation in 
+                field referenceDateTime.
+            - $ref: '#/components/schemas/BalanceType'
+        lastChangeDateTime:
+          allOf:
+          - description: |
+              This data element might be used to indicate e.g. with the expected or booked balance that no action is known 
+              on the account, which is not yet booked.
+          - $ref: '#/components/schemas/ISODateTime'
+        referenceDate:
+          allOf:
+          - description: Indicates the date of the balance.
+          - $ref: '#/components/schemas/ISODate'
+        referenceDateTime:
+          allOf:
+          - description: Indicates the date and time of the balance. Mandated, if balanceType = interimAvailable.
+          - $ref: '#/components/schemas/ISODateTime'
+        lastCommittedTransaction:
+          description: |
+            \"entryReference\" of the last commited transaction to support the TPP in identifying whether all 
+            PSU transactions are already known.
+          type: string
+          maxLength: 35
+    MessageCode_403_AIS: 
+      allOf:
+        - description: Message codes defined for AIS for HTTP Error code 403 (FORBIDDEN).
+        - oneOf:
+          - $ref: '#/components/schemas/MessageCode_403_Generic'
+    hrefType:
+      description: Link to a resource.
+      type: object
+      properties:
+        href:
+          description: Link to a resource.
+          type: string
+          example: "/v1/payments/sepa-credit-transfers/1234-wertiq-983"
+    MessageCode_400_Generic: 
+      description: Generic message codes defined for  HTTP Error code 400 (BAD_REQUEST).
+      type: string
+      enum: 
+        - "FORMAT_ERROR"              #gen
+        - "PARAMETER_NOT_CONSISTENT"  #gen
+        - "PARAMETER_NOT_SUPPORTED"   #gen
+        - "SERVICE_INVALID"           #gen
+        - "RESOURCE_UNKNOWN"          #gen
+        - "RESOURCE_EXPIRED"          #gen
+        - "RESOURCE_BLOCKED"          #gen
+        - "TIMESTAMP_INVALID"         #gen
+        - "PERIOD_INVALID"            #gen
+        - "SCA_METHOD_UNKNOWN"        #gen
+        - "SCA_INVALID"               #gen
+        - "CONSENT_UNKNOWN"           #gen
+    MessageCode_429_AIS: 
+      description: Message codes for HTTP Error code 429 (TOO MANY REQUESTS).
+      type: string
+      enum: 
+        - "ACCESS_EXCEEDED"           #AIS
+    error_RFC7807_404_AIS_Securities: 
+      description: |
+        Standardised definition of reporting error information according to [RFC7807].
+      type: object
+      required:
+        - type
+        - code
+      properties:
+        type: 
+          description: |
+            A URI reference [RFC3986] that identifies the problem type. 
+            Remark For Future: These URI will be provided by NextGenPSD2 in future.
+          type: string
+          format: uri
+          maxLength: 70
+        title:
+          $ref: '#/components/schemas/Max70Text'
+        detail:
+          description: |
+                $ref: '#/components/schemas/Max500Text'
+        code:
+          $ref: '#/components/schemas/MessageCode_404_AIS_Securities'
+        additionalErrors:
+          description: |
+            Array of Error Information Blocks.
+            Might be used if more than one error is to be communicated
+          type: array
+          items: #ErrorInformation
+            description: This is a data element to support the declaration of additional errors in the context of [RFC7807]. 
+            type: object
+            required:
+              - code
+            properties:
+              title:
+                $ref: '#/components/schemas/Max70Text'
+              detail:
+                $ref: '#/components/schemas/Max500Text'
+              code:
+                $ref: '#/components/schemas/MessageCode_404_AIS_Securities'
+        _links:
+          $ref: '#/components/schemas/_linksAll'
+    Max35Text:
+      type: string
+      maxLength: 35
+    tppMessage_406_AIS:
+      type: object
+      required:
+        - category
+        - code
+      properties:
+        category:
+           $ref: '#/components/schemas/TppMessageCategory'
+        code:
+          $ref: '#/components/schemas/MessageCode_406_AIS'
+        path:
+          type: string
+        text:
+          $ref: '#/components/schemas/Max500Text'
+    error_RFC7807_400_AIS: 
+      description: |
+        Standardised definition of reporting error information according to [RFC7807].
+      type: object
+      required:
+        - type
+        - code
+      properties:
+        type: 
+          description: |
+            A URI reference [RFC3986] that identifies the problem type. 
+            Remark For Future: These URI will be provided by NextGenPSD2 in future.
+          type: string
+          format: uri
+          maxLength: 70
+        title:
+          $ref: '#/components/schemas/Max70Text'
+        detail:
+          description: |
+                $ref: '#/components/schemas/Max500Text'
+        code:
+          $ref: '#/components/schemas/MessageCode_400_AIS'
+        additionalErrors:
+          description: |
+            Array of Error Information Blocks.
+            Might be used if more than one error is to be communicated
+          type: array
+          items: #ErrorInformation
+            description: This is a data element to support the declaration of additional errors in the context of [RFC7807]. 
+            type: object
+            required:
+              - code
+            properties:
+              title:
+                $ref: '#/components/schemas/Max70Text'
+              detail:
+                $ref: '#/components/schemas/Max500Text'
+              code:
+                $ref: '#/components/schemas/MessageCode_400_AIS'
+        _links:
+          $ref: '#/components/schemas/_linksAll'
+    MessageCode_401_Generic: 
+      description: Generic message codes defined for HTTP Error code 401 (UNAUTHORIZED).
+      type: string
+      enum: 
+        - "CERTIFICATE_INVALID"       #gen
+        - "ROLE_INVALID"              #gen
+        - "CERTIFICATE_EXPIRED"       #gen
+        - "CERTIFICATE_BLOCKED"       #gen
+        - "CERTIFICATE_REVOKE"        #gen
+        - "CERTIFICATE_MISSING"       #gen
+        - "SIGNATURE_INVALID"         #gen
+        - "SIGNATURE_MISSING"         #gen
+        - "CORPORATE_ID_INVALID"      #gen
+        - "PSU_CREDENTIALS_INVALID"   #gen
+        - "CONSENT_INVALID"           #gen, AIS
+        - "CONSENT_EXPIRED"           #gen
+        - "TOKEN_UNKNOWN"             #gen
+        - "TOKEN_INVALID"             #gen
+        - "TOKEN_EXPIRED"             #gen
+    accountReference:
+      description: | 
+        This type is containing any account identification which can be used on payload-level to address specific 
+        accounts. The ASPSP will document which account reference type it will support.
+      type: object
+      properties: 
+        iban: 
+          allOf:
+            - description: |
+            - $ref: '#/components/schemas/IBAN'
+        bban:  
+          allOf:
+            - description: |
+                This data element can be used for accounts when no IBAN is provided.
+            - $ref: '#/components/schemas/BBAN'
+        pan:  
+          allOf:
+            - description: |
+                Primary Account Number (PAN) of a card, can be tokenised by the ASPSP due to PCI DSS requirements. 
+            - $ref: '#/components/schemas/Max35Text'
+        maskedPan:  
+          allOf:
+            - description: |
+                Primary Account Number (PAN) of a card in a masked form.
+            - $ref: '#/components/schemas/Max35Text'
+        msisdn:  
+          allOf:
+            - description: |
+                An alias to access a payment account via a registered mobile phone number. 
+            - $ref: '#/components/schemas/Max35Text'
+        other: 
+          allOf:
+            - description: |
+                In cases where the criteria listed above (IBAN, BBAN,MSISDN) are not provided to 
+                identify the account (e.g. a securities account), the ASPSP shall support delivery 
+                of a proprietary ID of the respective account that uniquely identifies the account 
+                for this ASPSP. This ID will be delivered within the \"other\" structure.
+                In this case, the ASPSP specifically shall support consent establishment for an account 
+                identified by its proprietary ID.
+                **Remark:** An ASPSP does not have to support the \"other\" element for (regular payment) 
+                accounts.
+            - $ref: '#/components/schemas/otherType'
+        currency:
+          allOf:
+            - description: |
+                ISO 4217 Alpha 3 currency code
+            - $ref: '#/components/schemas/CurrencyCode'
+        cashAccountType:
+          allOf:
+            - description: |
+                ExternalCashAccountType1Code from ISO 20022. Might be extended by an additional code to indicate securities accounts. 
+                A global definition of a code for securities accounts is intentionally not provided by this document.
+                The API provider may restrict the accepted values further (e.g. only \"SVGS\" and \"CACC\" may be supported). 
+                The TPP includes this element, if the account reference may identify several accounts of different types, 
+                but the TPP only requests access to a specific type (e.g. card accounts).
+                If the cashAccountType is not present, it indicates the cashAccountType
+                * \"Card Account\" in case of the account identification being provided as a maskedPan or a pan and 
+                * \"Current Account\" (CACC) otherwise.                    
+            - $ref: '#/components/schemas/ExternalCashAccountType'
+    IBAN:
+      type: string
+      description: IBAN of an account.
+      pattern: "[A-Z]{2,2}[0-9]{2,2}[a-zA-Z0-9]{1,30}"
+      example: "FR7612345987650123456789014"
+    securitiesTransaction:
+      description: Represents a securities transaction.
+      type: object
+      required: 
+        - relevantDates
+        - financialInstrument
+      properties:
+        transactionId:
+          allOf:
+            - description: |
+                Can be used as access-ID in the API, where more details on a transaction is offered. 
+                If this data attribute is provided, this shows that the AIS can get access on more details 
+                about this transaction using the Read Securities Transaction Details Request.
+            - type: string
+        entryReference:
+          allOf:
+            - description: |
+                Identification of the transaction as used e.g. for reference for deltafunction on application level. 
+            - $ref: '#/components/schemas/Max35Text'
+        relevantDates:
+          allOf:
+            - description: |
+            - type: array
+              items:
+                $ref: '#/components/schemas/securitiesRelatedDateOrTime'
+        financialInstrument:
+          allOf:
+            - description: |
+                Financial instrument that was transferred within the transaction.
+            - $ref: '#/components/schemas/financialInstrument'
+        orderId:
+          allOf:
+            - description: |
+                Resource Id of the order resource that triggered this transaction, if applicable.
+            - type: string
+        unitsNumber:
+          allOf:
+            - description: |
+                Numeric quantification of the financial instrument. Negative values indicate that 
+                the respective quantity of the financial instrument has been taken from the securities
+                account, positive values indicate that the quantity hasbeen added.
+            - type: number
+        unitsNominal:
+          allOf:
+            - description: |
+                Nominal quantification of the financial instrument. Negative values indicate that 
+                the respective quantity of the financial instrument has been taken from the securities
+                account, positive values indicate that the quantity hasbeen added.
+            - $ref: '#/components/schemas/amount'
+        transactionTypeCode:
+          allOf:
+            - description: |
+                Type of the transaction as code.
+            - $ref: '#/components/schemas/TransactionActivityType1Code'
+        transactionTypeProprietary:
+          allOf:
+            - description: |
+                Type of the transaction as a proprietary string.
+            - $ref: '#/components/schemas/Max35Text'
+        placeOfTrade:
+          allOf:
+            - description: |
+            - $ref: '#/components/schemas/marketIdentification'
+        amountIncludesFees:
+          allOf:
+            - description: |
+                Indicates whether the transactionAmount (see below) is including fees. Default: false
+            - type: boolean
+        amountIncludesTaxes:
+          allOf:
+            - description: |
+                Indicates whether the transactionAmount (see below) is including taxes. Default: false
+            - type: boolean
+        transactionAmount:
+          allOf:
+            - description: |
+                Transaction amount for the transferred security for the PSU. Potential fees or taxes are reflected as indicated 
+                by elements \"amountIncludesFees\" and \"amountIncludesTaxes\".
+                Remark: The price denoted here is the price for the whole lot of securities within this transaction, 
+                not for a single item.
+            - $ref: '#/components/schemas/amount'
+        relatedFees:
+          allOf:
+            - description: |
+                Only allowed if amountIncludesFees = true.  In that case Details of the fees that have been applied to
+                this transaction (and therefore represent additional costs of the transaction beyond the 
+                transactionAmount).
+                Fees with positive amount are debited by the PSU, only in the rare case of a fee credited to the PSU 
+                (e.g. in case of a reversal) negative amounts are used.
+            - type: array
+              items:
+                $ref: '#/components/schemas/securitiesRelatedFee'
+        currencyExchange:
+          allOf:
+            - description: |
+                The ASPSP might include exchange rates e.g. if the transaction has been settled 
+                in another currency than the PSU's currency.
+            - type: array
+              items:
+                $ref: '#/components/schemas/reportExchangeRate'
+        reversalIndicator:
+          allOf:
+            - description: |
+                 Indicates whether it is the reversal of a previously reported movement. Default: false
+            - type: boolean
+        reversedTransactionId:
+          allOf:
+            - description: |
+                 \"transactionId\" of the reversed transaction, if applicable and supported by the ASPSP.
+            - type: boolean
+        unitsNumberBeforeTx:
+          allOf:
+            - description: |
+                Numeric quantification of the financial instrument within the primary position before the
+                transaction, negative values for short positions.
+            - type: number
+        unitsNominalBeforeTx:
+          allOf:
+            - description: |
+                Nominal quantification of the financial instrument within the primary position before the
+                transaction, negative values for short positions.
+            - $ref: '#/components/schemas/amount'
+        unitsNumberAfterTx:
+          allOf:
+            - description: |
+                Numeric quantification of the financial instrument within the primary position after the
+                transaction, negative values for short positions.
+            - type: number
+        unitsNominalAfterAfterTx:
+          allOf:
+            - description: |
+                Nominal quantification of the financial instrument within the primary position after the
+                transaction, negative values for short positions.
+            - $ref: '#/components/schemas/amount'
+        accruedInterest:
+          allOf:
+            - description: |
+                Accrued interest by the position to make transparent what the PSU really lost within this transaction
+            - $ref: '#/components/schemas/accruedInterest'
+        details:
+          allOf:
+            - description: |
+                Additional details to the transaction. 
+            - $ref: '#/components/schemas/Max500Text'
+        _links:
+          description: |
+            The following types of links are supported:
+             * \"transactionDetails\": Single link for retrieving details on this specific transaction. Only
+               applicable, if the ASPSP supports the Read Securities Transaction Details endpoint. 
+          type: object
+          additionalProperties: 
+            $ref: '#/components/schemas/hrefType'
+          properties:
+            transactionDetails:
+              $ref: '#/components/schemas/hrefType'
+    _linksAll:
+      description: |
+        A _link object with all available link types.
+      type: object
+      additionalProperties: 
+        $ref: '#/components/schemas/hrefType'
+      properties:
+        scaRedirect:
+          $ref: '#/components/schemas/hrefType'
+        scaOAuth:
+          $ref: '#/components/schemas/hrefType'
+        confirmation:
+          $ref: '#/components/schemas/hrefType'
+        startAuthorisation:
+          $ref: '#/components/schemas/hrefType'
+        startAuthorisationWithPsuIdentification:
+          $ref: '#/components/schemas/hrefType'
+        updatePsuIdentification:
+          $ref: '#/components/schemas/hrefType'
+        startAuthorisationWithProprietaryData:
+          $ref: '#/components/schemas/hrefType'
+        updateProprietaryData:
+          $ref: '#/components/schemas/hrefType'
+        startAuthorisationWithPsuAuthentication:
+          $ref: '#/components/schemas/hrefType'
+        updatePsuAuthentication:
+          $ref: '#/components/schemas/hrefType'
+        startAuthorisationWithEncryptedPsuAuthentication:
+          $ref: '#/components/schemas/hrefType'
+        updateEncryptedPsuAuthentication:
+          $ref: '#/components/schemas/hrefType'
+        updateAdditionalPsuAuthentication:
+          $ref: '#/components/schemas/hrefType'
+        updateAdditionalEncryptedPsuAuthentication:
+          $ref: '#/components/schemas/hrefType'
+        startAuthorisationWithAuthenticationMethodSelection:
+          $ref: '#/components/schemas/hrefType'
+        selectAuthenticationMethod:
+          $ref: '#/components/schemas/hrefType'
+        startAuthorisationWithTransactionAuthorisation:
+          $ref: '#/components/schemas/hrefType'
+        authoriseTransaction:
+          $ref: '#/components/schemas/hrefType'
+        self:
+          $ref: '#/components/schemas/hrefType'
+        status:
+          $ref: '#/components/schemas/hrefType'
+        scaStatus:
+          $ref: '#/components/schemas/hrefType'
+        account:
+          $ref: '#/components/schemas/hrefType'
+        balances:
+          $ref: '#/components/schemas/hrefType'
+        positions:
+          $ref: '#/components/schemas/hrefType'
+        orders:
+          $ref: '#/components/schemas/hrefType'
+        transactions:
+          $ref: '#/components/schemas/hrefType'
+        transactionDetails:
+          $ref: '#/components/schemas/hrefType'
+        cardAccount:
+          $ref: '#/components/schemas/hrefType'
+        cardTransactions:
+          $ref: '#/components/schemas/hrefType'
+        relatedOrders:
+          allOf:
+            - description: |
+                An array of links to request order details of related orders (e.g. other
+                orders that originated from the same order split as this order).
+                Only applicable, if the ASPSP supports the Read Securities Order Details endpoint.
+            - type: array
+              items:
+                $ref: '#/components/schemas/hrefType'
+        relatedTransactions:
+          allOf:
+            - description: |
+                An array of links to request securities transaction details of transactions that resulted
+                from this order. 
+                Only applicable, if the ASPSP supports the Read Securities Transaction Details endpoint.
+            - type: array
+              items:
+                $ref: '#/components/schemas/hrefType'
+        orderDetails:
+          allOf:
+            - description: |
+                Single link for retrieving details on this specific order. 
+                Only applicable, if the ASPSP supports the Read Securities Order Details endpoint.
+            - $ref: '#/components/schemas/hrefType'
+        first:
+          $ref: '#/components/schemas/hrefType'
+        next:
+          $ref: '#/components/schemas/hrefType'
+        previous:
+          $ref: '#/components/schemas/hrefType'
+        last:
+          $ref: '#/components/schemas/hrefType'
+        download:
+          $ref: '#/components/schemas/hrefType'
+    Max16Text:
+      type: string
+      maxLength: 16
+    accruedInterest:
+      type: object
+      properties:
+        daysAccrued:
+          allOf:
+            - description: Specifies the number of days used for calculating the accrued interest amount.
+            - type: number
+        amounts:
+          allOf:
+            - description: Amount of the accrued interest. Each item represents the same monetary value in 
+                different currencies, e.g. account currency, currency of the security's denomination.
+            - type: array
+              items:
+                $ref: '#/components/schemas/amount'
+    securitiesAccountFeeRule:
+      description: |
+        Represents parameters of a given type of fee (represented by the overlying Securities Fee Rule) as they apply 
+        if the volume of certain (not explicitly mentioned) statistics of the account / PSU lies in the intervall from
+        a certain \"fromBaseAmount\" to a certain \"toBaseAmount\".
+      type: object
+      properties:
+        amount:
+          allOf:
+            - description: |
+                Amount of the fee.
+            - $ref: '#/components/schemas/amount'
+        percentage:
+          description: Percentage of the fee. Up to 20 significant figures. Negative amounts are signed by minus.
+            The decimal separator is a dot. Trailing zeroes must be truncated.
+          type: string
+          pattern: "-?[0-9]{1,20}(\\.[0-9]{0,19})?"
+        fromBaseAmount:
+          allOf:
+            - description: |
+                To be used for fees where a tiered percentage is used to calculate the fee relative to an implicitly defined 
+                base amount (such as a transaction's volume being the base amount for a courtage).
+                The range of one tier is defined as all applicable entities with base amounts X and 
+                fromBaseAmount \<\= X \<\= toBaseAmount
+                In any array of fee rules, only one of these entries may be missing the
+                \"fromBaseAmount\" element (indicating that the rule represented by this entry is
+                used without a lower bound to the base amount) and only one entry may be missing the
+                \"toBaseAmount\" element (indicating that the rule represented by this entry is applied 
+                without an upper limit to the base amount).
+                In cases, where the fee is not calculated as a tiered percentage, only one entry in array \"feeRules\" is included.
+                This entry must be missing the subelements \"fromBaseAmount\" and \"toBaseAmount\".
+            - $ref: '#/components/schemas/amount'
+        toBaseAmount:
+          allOf:
+            - description: |
+                To be used for fees where a tiered percentage is used to calculate the fee relative to an implicitly defined 
+                base amount (such as a transaction's volume being the base amount for a courtage).
+                The range of one tier is defined as all applicable entities with base amounts X and 
+                fromBaseAmount \<\= X \<\= toBaseAmount
+                In any array of fee rules, only one of these entries may be missing the
+                \"fromBaseAmount\" element (indicating that the rule represented by this entry is
+                used without a lower bound to the base amount) and only one entry may be missing the
+                \"toBaseAmount\" element (indicating that the rule represented by this entry is applied 
+                without an upper limit to the base amount).
+                In cases, where the fee is not calculated as a tiered percentage, only one entry in array \"feeRules\" is included.
+                This entry must be missing the subelements "fromBaseAmount" and "toBaseAmount".
+            - $ref: '#/components/schemas/amount'
+        minimumAmount:
+          allOf:
+            - description: |
+                Minimum amount of the fee in each billing period / for each billed event, if applicable.
+            - $ref: '#/components/schemas/amount'
+        maximumAmount:
+          allOf:
+            - description: |
+                Maximum amount of the fee in each billing period / for each billed event, if applicable.
+            - $ref: '#/components/schemas/amount'
+    error_RFC7807_401_AIS: 
+      description: |
+        Standardised definition of reporting error information according to [RFC7807].
+      type: object
+      required:
+        - type
+        - code
+      properties:
+        type: 
+          description: |
+            A URI reference [RFC3986] that identifies the problem type. 
+            Remark For Future: These URI will be provided by NextGenPSD2 in future.
+          type: string
+          format: uri
+          maxLength: 70
+        title:
+          $ref: '#/components/schemas/Max70Text'
+        detail:
+          description: |
+                $ref: '#/components/schemas/Max500Text'
+        code:
+          $ref: '#/components/schemas/MessageCode_401_AIS'
+        additionalErrors:
+          description: |
+            Array of Error Information Blocks.
+            Might be used if more than one error is to be communicated
+          type: array
+          items: #ErrorInformation
+            description: This is a data element to support the declaration of additional errors in the context of [RFC7807]. 
+            type: object
+            required:
+              - code
+            properties:
+              title:
+                $ref: '#/components/schemas/Max70Text'
+              detail:
+                $ref: '#/components/schemas/Max500Text'
+              code:
+                $ref: '#/components/schemas/MessageCode_401_AIS'
+        _links:
+          $ref: '#/components/schemas/_linksAll'
+    MessageCode_403_Generic: 
+      description: Generic message codes defined defined for HTTP Error code 403 (FORBIDDEN).
+      type: string
+      enum: 
+        - "CONSENT_UNKNOWN"           #gen
+        - "SERVICE_BLOCKED"           #gen
+        - "RESOURCE_UNKNOWN"          #gen
+        - "RESOURCE_EXPIRED"          #gen
+    TypeOfOrderCode: 
+      description: |
+        Code set to indicate characteristics of an order.
+        <table border="1">
+          <tr>
+            <th>CodeName</th>
+            <th>Definition</th>
+          </tr>
+          <tr>
+            <td>allOrNone</td>
+            <td>A round-lot market or limit-price order which must be executed in its entirety or not at all; unlike 'fill or kill', these orders are not cancelled if not executed as soon as received.</td>
+          </tr>
+          <tr>
+            <td>buyContraShortExempt</td>
+            <td>Order to buy contra short exempt.</td>
+          </tr>
+          <tr>
+            <td>buyContraShort</td>
+            <td>Order to buy contra short.</td>
+          </tr>
+          <tr>
+            <td>buyMinus</td>
+            <td>Order to buy at a price lower than the current market price. This is an order to buy a stated amount of a financial instrument provided that its price is not higher than the last sale if the last sale was a minus or zero minus tick, not higher than the last sale minus the minimum fractional change in the stock if the last sale was a plus or zero plus tick. The price limit indicates the highest price at which the order can be executed.</td>
+          </tr>
+          <tr>
+            <td>carefully</td>
+            <td>Order that is not to be executed as a whole because it may disturb the price.</td>
+          </tr>
+          <tr>
+            <td>combinationOrder</td>
+            <td>Order that is linked to another order to buy or sell and must be executed as a unit, both or none, or cancelled as a unit.</td>
+          </tr>
+          <tr>
+            <td>discretionary</td>
+            <td>Order where the executing broker or investment manager decides on the quantity or price.</td>
+          </tr>
+          <tr>
+            <td>doNotIncrease</td>
+            <td>Limit order to buy or stop order to sell or stop limit order that is not to be increased in shares on the ex-dividend date as a result of a stock dividend or distribution.</td>
+          </tr>
+          <tr>
+            <td>doNotReduce</td>
+            <td>Limit order to buy or stop order to sell, or stop-limit order to sell that is not to be reduced in price by the amount of an ordinary cash dividend. Applies only to ordinary stock dividends; should be reduced for other distributions.</td>
+          </tr>
+          <tr>
+            <td>icebergOrder</td>
+            <td>Type of limit order whose overall quantity is not transparent to the market. Rather, only a client-defined part of the order is shown to the market (the 'tip of the iceberg'). Upon execution of the first 'tip' (that is partial execution to the client while for the market it does not appear to be a 'partial') the system releases the next 'tip' of the same size to the market until the 'iceberg' has been melted down successfully. Different from a usual care order.</td>
+          </tr>
+          <tr>
+            <td>limitWith</td>
+            <td>Order to be executed at a limit price, with a round-lot (or board-lot) sales; valid only for odd lot orders.</td>
+          </tr>
+          <tr>
+            <td>limitWithout</td>
+            <td>Order to be executed at a limit price, without a round-lot (or board-lot) sales; valid only for odd lot orders.</td>
+          </tr>
+          <tr>
+            <td>limitOrder</td>
+            <td>Order to buy at the indicated price limit or lower or an order to sell at the indicated limit price or higher.</td>
+          </tr>
+          <tr>
+            <td>atMarket</td>
+            <td>Order to buy or sell a specified amount of a financial instrument at the quoted market price or better.</td>
+          </tr>
+          <tr>
+            <td>marketNotHeld</td>
+            <td>Order to buy or sell a specified amount of a financial instrument at the quoted market price or better with some discretion on the price limit.</td>
+          </tr>
+          <tr>
+            <td>marketToLimitOrder</td>
+            <td>Type of order that couples the high possibility of execution (Market Order) with a protection against unwanted price fluctuations (Limit Order).</td>
+          </tr>
+          <tr>
+            <td>marketUntilTouched</td>
+            <td>Order to buy or sell a specified amount of a financial instrument at the quoted market price or better with some discretion on the price limit.</td>
+          </tr>
+          <tr>
+            <td>notHeld</td>
+            <td>Order that may be executed in partials or outside the hours of the exchange or other exchange rules.</td>
+          </tr>
+          <tr>
+            <td>orderLie</td>
+            <td>Order that is related to another order where the second order may be cancelled without cancelling the first. Normally, the sell order must be executed before the buy order.</td>
+          </tr>
+          <tr>
+            <td>stopLimit</td>
+            <td>Stop order to buy (sell) that becomes a limit order at the limit price when the financial instrument trades at or above (below) the stop price after the order is submitted.</td>
+          </tr>
+          <tr>
+            <td>stopOrder</td>
+            <td>Order to buy that becomes a market order when the financial instrument trades at or above the stop price after the order is submitted or an order to sell which becomes a market order when the financial instrument trades at or below the stop price.</td>
+          </tr>
+          <tr>
+            <td>stopLoss</td>
+            <td>Order to sell that sets the sell price below the market price.</td>
+          </tr>
+          <tr>
+            <td>sellPlus</td>
+            <td>Order to sell a stated amount provided that the price is not lower than the last sale price if the last sale was a plus or zero plus tick and not lower than the last sale minus the minimum fractional change in the financial instrument if the last sale was a minus or zero minus tick.</td>
+          </tr>
+          <tr>
+            <td>sellShortExempt</td>
+            <td>Order to sell short which is exempt from short-sale rules.</td>
+          </tr>
+          <tr>
+            <td>sellShort</td>
+            <td>Order to sell a financial instrument that the seller does not own; a sale effected by delivering a financial instrument borrowed by or for the account of the seller.</td>
+          </tr>
+        </table>
+      type: string
+      enum:
+        - allOrNone
+        - buyContraShortExempt
+        - buyContraShort
+        - buyMinus
+        - carefully
+        - combinationOrder
+        - discretionary
+        - doNotIncrease
+        - doNotReduce
+        - icebergOrder
+        - limitWith
+        - limitWithout
+        - limitOrder
+        - atMarket
+        - marketNotHeld
+        - marketToLimitOrder
+        - marketUntilTouched
+        - notHeld
+        - orderLie
+        - stopLimit
+        - stopOrder
+        - stopLoss 
+        - sellPlus
+        - sellShortExempt
+        - sellShort
+    SecuritiesBalanceType_1_2_11_12_Code: 
+      description: |
+        SecuritiesBalanceTypeV2Code from ISO 20022.
+        <table border="1">
+          <tr>
+            <th>CodeName</th>
+            <th>Name</th>
+            <th>Definition</th>
+          </tr>
+          <tr>
+            <td>AVAI</td>
+            <td>Available</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>AWAS</td>
+            <td>AvailableWithNoAdditionalStatus</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>BTRA</td>
+            <td>BeingTransferred/td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>BLOK</td>
+            <td>Blocked</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>BLOV</td>
+            <td>BlockedAuthenticity</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>BLCA</td>
+            <td>BlockedCorporateAction</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>BLTA</td>
+            <td>BlockedTrading</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>BORR</td>
+            <td>Borrowed/td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>COLI</td>
+            <td>ColateralIn</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>COLO</td>
+            <td>ColateralOut</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>MARG</td>
+            <td>DerivativesMargin</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>DRAW</td>
+            <td>Drawn/td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>COLA</td>
+            <td>EligibleForCollateralPurposes</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>TRAN</td>
+            <td>InTransshipment</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>ISSU</td>
+            <td>Issued</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>DIRT</td>
+            <td>NonTaxExempt</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>LOAN</td>
+            <td>OnLoan/td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>REGO</td>
+            <td>OnRegistration</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>BODE</td>
+            <td>PendingBorrowedDelivery</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>BORE</td>
+            <td>PendingBorrowedReceipt</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>PEDA</td>
+            <td>PendingCorporateActionDelivera</td>
+            <td>OnRegistration</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>PECA</td>
+            <td>PendingCorporateActionReceipt</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>PEND</td>
+            <td>Pending</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>PDMT</td>
+            <td>PendingDeliveryMatchedBalance/td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>PDUM</td>
+            <td>PendingDeliveryUnmatchedBalance</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>LODE</td>
+            <td>PendingOnLoanDelivery</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>LORE</td>
+            <td>PendingOnLoanReceipt</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>PENR</td>
+            <td>PendingReceipt</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>PRMT</td>
+            <td>PendingReceiptMatchedBalance/td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>PRUM</td>
+            <td>PendingReceiptUnmatchedBalance</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>PLED</td>
+            <td>Pledged</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>BORE</td>
+            <td>PendingBorrowedReceipt</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>QUAS</td>
+            <td>QuasiIssued/td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>NOMI</td>
+            <td>Registered</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>RSTR</td>
+            <td>Restricted</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>SPOS</td>
+            <td>StreetPosition</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>CLEN</td>
+            <td>TaxExempt</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>OTHR</td>
+            <td>Unclassified/td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>UNRG</td>
+            <td>Unregistered</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>WDOC</td>
+            <td>WaitingDocumentation</td>
+            <td></td>
+          </tr>
+        </table>
+      type: string
+      enum:
+        - AVAI
+        - AWAS
+        - BTRA
+        - BLOK
+        - BLOV
+        - BLCA
+        - BLOT
+        - BORR
+        - COLI
+        - COLO
+        - MARG
+        - DRAW
+        - COLA
+        - TRAN
+        - ISSU
+        - DIRT
+        - LOAN
+        - REGO
+        - BODE
+        - BORE
+        - PEDA
+        - PECA
+        - PEND
+        - PDMT
+        - PDUM
+        - LODE
+        - LORE
+        - PENR
+        - PRMT
+        - PRUM
+        - PLED
+        - QUAS
+        - NOMI
+        - RSTR
+        - SPOS
+        - CLEN
+        - OTHR
+        - UNRG
+        - WDOC
+    securitiesRelatedFee:
+      description: |
+        Represents a specific fee amount related to a securities transaction.
+      type: object
+      required: 
+        - amount
+      properties:
+        typeCode:
+          allOf:
+            - description: |
+            - $ref: '#/components/schemas/SecuritiesFeeTypeCode'
+        typeProprietary:
+          allOf:
+            - description: |
+            - $ref: '#/components/schemas/Max35Text'
+        amount:
+          allOf:
+            - description: |
+            - $ref: '#/components/schemas/amount'
+        _links:
+          allOf:
+            - description: |
+                Links to resources, where the ASPSP can provide additional
+                information on the fee, e.g. an overview on the general fee
+                rules of the underlying securities account. Currently, no specific href
+                types are defined in this context.
+          type: object
+          additionalProperties: 
+            $ref: '#/components/schemas/hrefType'
+    tppMessage_405_AIS:
+      type: object
+      required:
+        - category
+        - code
+      properties:
+        category:
+           $ref: '#/components/schemas/TppMessageCategory'
+        code:
+          $ref: '#/components/schemas/MessageCode_405_AIS'
+        path:
+          type: string
+        text:
+          $ref: '#/components/schemas/Max500Text'
+    MessageCode_406_AIS: 
+      description: Message codes defined for AIS for HTTP Error code 406 (NOT ACCEPTABLE).
+      type: string
+      enum: 
+        - "REQUESTED_FORMATS_INVALID"  #AIS
+    sourceOfPrice:
+      description: Represents the source of a price for a financial instrument, such as a market.
+      type: object
+      required: 
+        - type
+      properties:
+        type:
+          allOf:
+            - $ref: '#/components/schemas/MarketType4Code'
+        mic:
+          allOf:
+            - description: Date and time of the evaluation.
+            - $ref: '#/components/schemas/Max4Text'
+        marketIdentifierProprietary:
+          allOf:
+            - description: Date and time of the evaluation.
+            - $ref: '#/components/schemas/Max35Text'
+    securitiesRelatedDateOrTime:
+      description: |
+        Represents the date / time of an event with specific meaning for securities.
+      type: object
+      required: 
+        - type
+      properties:
+        type:
+          allOf:
+            - description: |
+                Can be used as access-ID in the API, where more details on a transaction is offered. 
+                If this data attribute is provided, this shows that the AIS can get access on more details 
+                about this transaction using the Read Securities Transaction Details Request.
+            - type: string
+              enum:
+                - effectiveSettlementDate
+                - settlementDate
+                - valueDate
+                - performanceDate
+                - bookingDate
+                - transactionDate
+        date:
+          allOf:
+            - description: |
+            - $ref: '#/components/schemas/ISODate'
+        dateAndTime:
+          allOf:
+            - description: |
+            - $ref: '#/components/schemas/ISODateTime'
+    error_NG_406_AIS: 
+      type: object
+      properties:
+        tppMessages:
+          type: array
+          items:
+            $ref: '#/components/schemas/tppMessage_406_AIS'
+        _links:
+          $ref: '#/components/schemas/_linksAll'
+    error_NG_405_AIS: 
+      type: object
+      properties:
+        tppMessages:
+          type: array
+          items:
+            $ref: '#/components/schemas/tppMessage_405_AIS'
+        _links:
+          $ref: '#/components/schemas/_linksAll'
+    MessageCode_409_AIS: 
+      description: Message codes defined for AIS for HTTP Error code 409 (CONFLICT).
+      type: string
+      enum: 
+        - "STATUS_INVALID"            #gen
+    MessageCode_400_AIS: 
+      allOf:
+        - description: Message codes defined for AIS for HTTP Error code 400 (BAD_REQUEST).
+        - oneOf:
+            - $ref: '#/components/schemas/MessageCode_400_Generic'
+            - type: string
+              enum: 
+              - "SESSIONS_NOT_SUPPORTED"    #AIS
+    evaluatedPrice:
+      description: This data structure represents an evaluated price (e.g. of a security) when an unambiguous 
+        balance cannot be provided, but an evaluation, e.g. the total value of a securities deposit.
+      type: object
+      properties:
+        amount:
+              $ref: '#/components/schemas/amount'
+        percentage:
+          description: Up to 20 significant figures. Negative amounts are signed by minus.
+            The decimal separator is a dot. Trailing zeroes must be truncated.
+          type: string
+          pattern: "-?[0-9]{1,20}(\\.[0-9]{0,19})?"
+        priceDateTime:
+          allOf:
+            - description: Date and time of the evaluation of this price.
+            - $ref: '#/components/schemas/ISODateTime'
+        priceDate:
+          allOf:
+            - description: Date of the evaluation of this price.
+            - $ref: '#/components/schemas/ISODate'
+        priceType:
+          allOf:
+            - description: Type of the price.
+            - $ref: '#/components/schemas/TypeOfPrice17Code'
+        sourceOfPrice:
+          allOf:
+            - description: Indicates the source of the respective price.
+            - $ref: '#/components/schemas/sourceOfPrice'
+        description:
+          allOf:
+            - description: Additional description of the source of price. E.g., if the source of price indicates 
+                a local market, the ASPSP can include the local market's name in this field.
+            - $ref: '#/components/schemas/Max500Text'
+        exchangeRates:
+          allOf:
+            - description: Relevant exchange rates for the determined price.
+            - type: array
+              items: 
+                $ref: '#/components/schemas/reportExchangeRate'
+    ExternalFinancialInstrumentIdentificationType1Code:
+      description: |
+        ExternalFinancialInstrumentIdentificationType1Code from ISO 20022.
+        <table border="1">
+          <tr>
+            <th>CodeName</th>
+            <th>Name</th>
+            <th>Definition</th>
+          </tr>
+          <tr>
+            <td>BELC</td>
+            <td>CodeSRWSecretariaatVoorRoerendeWaardenOrSVMSecrÃ©tariatDesValeursMobiliÃšres</td>
+            <td>
+              National securities identification number for BE issued by the National Numbering 
+              Association SIX Telekurs Belgium.
+            </td>
+          </tr>
+          <tr>
+            <td>BLOM</td>
+            <td>Bloomberg</td>
+            <td>Ticker-like code assigned by Bloomberg to identify financial instruments.</td>
+          </tr>
+          <tr>
+            <td>CCCD</td>
+            <td>OtherNationalSecuritiesIdentificationNumber</td>
+            <td>
+              National Securities Identification Number issued by the National Numbering Association for 
+              a country for which no specific financial instrument identification type code already yet. 
+              The first two letters of the code represents the country code (for example, EGDC for Egyptian NSIN). 
+              To be used only until the code is added to the ISO ExternalFinancialInstrumentIdentificationType1Code 
+              list.
+            </td>
+          </tr>
+          <tr>
+            <td>CMED</td>
+            <td>ChicagoMercantileExchangeCME</td>
+            <td>
+              Ticker-like code assigned by the Chicago Mercantile Exchange to identify 
+              listed-derivatives instruments.
+            </td>
+          </tr>
+          <tr>
+            <td>COMM</td>
+            <td>CommonCode</td>
+            <td>
+              National securities identification number for ICSDs issued by the National Numbering Association 
+              Clearstream and Euroclear.
+            </td>
+          </tr>
+          <tr>
+            <td>CTAC</td>
+            <td>ConsolidatedTapeAssociationCTA</td>
+            <td>Ticker-like code assigned by the Consolidated Tape Association to identify financial instruments.</td>
+          </tr>
+          <tr>
+            <td>CUSP</td>
+            <td>CommitteeOnUniformSecurityIdentificationProceduresCUSI</td>
+            <td>
+              National securities identification number for US and CA issued by the National Numbering Association 
+              Standard & PoorÂŽs - CUSIP Global Services.
+            </td>
+          </tr>
+          <tr>
+            <td>FIGC</td>
+            <td>FinancialInstrumentGlobalIdentifierComposite</td>
+            <td>
+              A Financial Instrument Global Identifier Composite (FIGC) is a unique, 
+              persistent twelve character string that serves to identify financial instruments 
+              across asset classes at the composite level, is associated with one or more FIGI venue 
+              level ID's and a single Share Class level ID.
+            </td>
+          </tr>
+          <tr>
+            <td>FIGG</td>
+            <td>FinancialInstrumentGlobalIdentifierShareClass</td>
+            <td>
+              A Financial Instrument Global Identifier Share Class (FIGG) is a unique, 
+              persistent twelve character string that serves to identify financial instruments 
+              across asset classes at the global share class level, and is associated with one 
+              or more Composite level ID's.
+            </td>
+          </tr>
+          <tr>
+            <td>FIGI</td>
+            <td>FinancialInstrumentGlobalIdentifier</td>
+            <td>
+              A Financial Instrument Global Identifier (FIGI) is a unique, persistent twelve 
+              character string that serves to identify financial instruments across asset classes 
+              at the venue level. It is associated with one Composite ID.
+            </td>
+          </tr>
+          <tr>
+            <td>ISDU</td>
+            <td>ISDAAndFpMLProductURLInSecurityID</td>
+            <td>URL in Description to identify OTC derivatives instruments.</td>
+          </tr>
+          <tr>
+            <td>ISDX</td>
+            <td>ISDAAndFpMLProductSpecificationXMLInEncodedSecurityDesc</td>
+            <td>XML in Description to identify OTC derivatives instruments.</td>
+          </tr>
+          <tr>
+            <td>LCHD</td>
+            <td>LCHClearnet</td>
+            <td>Ticker-like code assigned by LCH to identify listed-derivatives instruments.</td>
+          </tr>
+          <tr>
+            <td>OCCS</td>
+            <td>OptionsClearingCorpOCC</td>
+            <td>Ticker-like code assigned by the Options Clearing Corporation to identify financial instruments.</td>
+          </tr>
+          <tr>
+            <td>OPRA</td>
+            <td>OptionsPriceReportingAuthorityOPRA</td>
+            <td>
+              Ticker-like code assigned by the Options Price Reporting Authority to 
+              identify financial instruments.
+            </td>
+          </tr>
+          <tr>
+            <td>RCMD</td>
+            <td>MarkitRedCode</td>
+            <td>Ticker-like code assigned by Markit to identify listed-derivatives instruments.</td>
+          </tr>
+          <tr>
+            <td>RICC</td>
+            <td>ReutersInstrumentCodeRIC</td>
+            <td>Ticker-like code assigned by Thomson Reuters to identify financial instruments.</td>
+          </tr>
+          <tr>
+            <td>SEDL</td>
+            <td>StockExchangeDailyOfficialListSEDOL</td>
+            <td>
+              National securities identification number for GB issued by the National Numbering Association 
+              London Stock Exchange.
+            </td>
+          </tr>
+          <tr>
+            <td>SICC</td>
+            <td>SecuritiesIdentificationCodeCommittee</td>
+            <td>
+              National securities identification number for JP issued by the National Numbering Association 
+              6 Stock Exchanges and JASDEC (Securities Identification Ticker-like code Committee)
+            </td>
+          </tr>
+          <tr>
+            <td>TIKR</td>
+            <td>TickerSymbolTS</td>
+            <td>Ticker Code assigned by an exchange to identify financial instruments.</td>
+          </tr>
+          <tr>
+            <td>VALO</td>
+            <td>VALOR</td>
+            <td>
+              National securities identification number for CH and LI issued by the National Numbering Association 
+              SIX Telekurs Ltd.
+            </td>
+          </tr>
+          <tr>
+            <td>WKNR</td>
+            <td>WertpapierkennummerWKN</td>
+            <td>
+              National securities identification number for DE issued by the National Numbering Association 
+              WM Datenservice.
+            </td>
+          </tr>
+          <tr>
+            <td>CCDC</td>
+            <td>BondIdentificationCodeListChina</td>
+            <td>
+              National Bond identification number for China issued by CHINA CENTRAL DEPOSITORY & CLEARING CO.
+              , Limited.
+            </td>
+          </tr>
+        </table>
+      type: string
+    accountDetailsSecurities:
+      description: |
+        Extended defintion of the \"Account Details\" Structure to represent Securities Accounts.
+      type: object
+      required:
+        - resourceId
+        - currency
+      properties:
+        resourceId:
+          description: |
+              This is the data element to be used in the path when retrieving data from a dedicated account.
+          type: string
+        iban:
+          allOf:
+            - description: |
+                This data element can be used in the body of the Consent Request Message for retrieving account 
+                access consent from this account.
+            - $ref: '#/components/schemas/IBAN'
+        bban:
+          allOf:
+            - description: |
+                This data element can be used in the body of the Consent Request Message for retrieving account 
+                access consent from this account. This data elements is used for payment accounts which have no IBAN.
+            - $ref: '#/components/schemas/BBAN'
+        msisdn:
+          allOf:
+            - description: |
+                An alias to access an account via a registered mobile phone number. 
+                This alias might be needed e.g. in the payment initiation service. 
+                The support of this alias must be explicitly documented by the ASPSP 
+                for the corresponding API Calls.
+            - $ref: '#/components/schemas/Max35Text'
+        other:
+          allOf:
+            - description: |
+                In cases where the criteria listed above (IBAN, BBAN, MSISDN) are not provided to identify an 
+                instance of the respective account type (e.g. a securities account), the ASPSP shall include a 
+                proprietary ID of the respective account that uniquely identifies the account for this ASPSP.
+            - $ref: '#/components/schemas/otherType'
+        currency:
+          allOf:
+            - description: |
+                Account currency. If the (e.g. securities) account does not have a dedicated account currency, 
+                code \"XXX\" is used.
+            - $ref: '#/components/schemas/CurrencyCode'
+        ownerName:
+          allOf:
+            - description: |
+                Name of the legal account owner. If there is more than one owner, then e.g. two names might be noted here.
+                For a corporate account, the corporate name is used for this attribute.
+                Even if supported by the ASPSP, the provision of this field might depend on the fact whether an explicit 
+                consent to this specific additional account information has been given by the PSU.
+            - $ref: '#/components/schemas/Max140Text'
+        name:
+          allOf:
+            - description: |
+                Name of the account, as assigned by the ASPSP, in agreement with the account owner in order to provide an additional 
+                means of identification of the account.
+            - $ref: '#/components/schemas/Max70Text'
+        displayName:
+          allOf:
+            - description: |
+                Name of the account as defined by the PSU within online channels.
+            - $ref: '#/components/schemas/Max70Text'
+        product:
+          allOf:
+            - description: |
+                Product Name of the ASPSP for this account, proprietary definition.
+            - $ref: '#/components/schemas/Max35Text'
+        cashAccountType:
+          allOf:
+            - description: |
+                ExternalCashAccountType1Code from ISO 20022. Might be extended by an additional code to indicate 
+                securities accounts. A global definition of a code for securities accounts is intentionally not 
+                provided by this document.
+            - $ref: '#/components/schemas/ExternalCashAccountType'
+        status:
+          description: |
+            Account status. The value is one of the following:
+              * \"enabled\": account is available
+              * \"deleted\": account is terminated
+              * \"blocked\": account is blocked e.g. for legal reasons
+            If this field is not used, than the account is available in the sense of this specification.
+          type: string
+          enum:
+            - "enabled"
+            - "deleted"
+            - "blocked"
+        bic:
+          allOf:
+            - description: |
+                The BIC associated with the account.
+            - $ref: '#/components/schemas/BICFI'
+        linkedAccounts:
+          allOf:
+            - description: |
+                This data attribute is a field, where an ASPSP can name a cash account associated with the 
+                (e.g. securities) account.
+            - $ref: '#/components/schemas/Max70Text'
+        usage:
+          description: |
+            Specifies the usage of the account:
+              * PRIV: private personal account
+              * ORGA: professional account
+          type: string
+          maxLength: 4
+          enum:
+            - "PRIV"
+            - "ORGA"
+        details:
+          allOf:
+            - description: |
+                Specifications that might be provided by the ASPSP:
+                  * characteristics of the account
+                  * characteristics of the relevant card
+                  * characteristics of the savings account, and the ASPSP will provide specification for each deposit
+                  * characteristics of the loan
+            - $ref: '#/components/schemas/Max500Text'
+        balances:
+          description: |
+            A list of balances regarding this account, e.g. the current balance, the last booked balance.
+            The list might be restricted to the current balance.
+          type: array
+          items:
+            $ref: '#/components/schemas/balanceSecurities'
+        tariffs:
+          allOf:
+            - description: |
+                Text information on tariffs related to this securities account.
+            - $ref: '#/components/schemas/Max1000Text'
+        applicableFees:
+          allOf:
+            - description: |
+                Array of elements, each representing one fee (rule) that is individually applicable for this 
+                Securities account. If, for example, an ASPSP applies a standard \"managementFee\" X, but the
+                consumer negotiated a discount D, an element should represent (X-D), but neither X nor D.
+          type: array
+          items:
+            $ref: '#/components/schemas/securitiesAccountFee'
+        _links:
+          description: |
+            Links to the account, which can be directly used for retrieving account
+            information from this dedicated account.
+            Links to \"positions\", \"orders\" or \"transactions\".
+            These links are only supported, when the corresponding consent has been already granted. 
+          type: object
+          additionalProperties: 
+            $ref: '#/components/schemas/hrefType'
+          properties:
+            positions:
+              $ref: '#/components/schemas/hrefType'
+            orders:
+              $ref: '#/components/schemas/hrefType'
+            transactions:
+              $ref: '#/components/schemas/hrefType'
+    error_NG_403_AIS: 
+      type: object
+      properties:
+        tppMessages:
+          type: array
+          items:
+            $ref: '#/components/schemas/tppMessage_403_AIS'
+        _links:
+          $ref: '#/components/schemas/_linksAll'
+    error_RFC7807_409_AIS: 
+      description: |
+        Standardised definition of reporting error information according to [RFC7807].
+      type: object
+      required:
+        - type
+        - code
+      properties:
+        type: 
+          description: |
+            A URI reference [RFC3986] that identifies the problem type. 
+            Remark For Future: These URI will be provided by NextGenPSD2 in future.
+          type: string
+          format: uri
+          maxLength: 70
+        title:
+          $ref: '#/components/schemas/Max70Text'
+        detail:
+          description: |
+                $ref: '#/components/schemas/Max500Text'
+        code:
+          $ref: '#/components/schemas/MessageCode_409_AIS'
+        additionalErrors:
+          description: |
+            Array of Error Information Blocks.
+            Might be used if more than one error is to be communicated
+          type: array
+          items: #ErrorInformation
+            description: This is a data element to support the declaration of additional errors in the context of [RFC7807]. 
+            type: object
+            required:
+              - code
+            properties:
+              title:
+                $ref: '#/components/schemas/Max70Text'
+              detail:
+                $ref: '#/components/schemas/Max500Text'
+              code:
+                $ref: '#/components/schemas/MessageCode_409_AIS'
+        _links:
+          $ref: '#/components/schemas/_linksAll'
+    error_NG_429_AIS: 
+      type: object
+      properties:
+        tppMessages:
+          type: array
+          items:
+            $ref: '#/components/schemas/tppMessage_429_AIS'
+        _links:
+          $ref: '#/components/schemas/_linksAll'
+    TransactionActivityType1Code:
+      description: |
+        TransactionActivityType1Code from ISO 20022.
+        Compare 
+        ISO 20022
+        Settlement And Reconciliation - ISO - Maintenace 2019 - 2020
+        Message Definition Report - Part 2
+        Approved by the Securities SEG on the 27th of January 2020:
+        <table border="1">
+          <tr>
+            <th>CodeName</th>
+            <th>Name</th>
+            <th>Definition</th>
+          </tr>
+          <tr>
+            <td>BOLE</td>
+            <td>BorrowingLendingActivity</td>
+            <td>Transaction relates to lending/borrowing.</td>
+          </tr>
+          <tr>
+            <td>CLAI</td>
+            <td>MarketClaim</td>
+            <td>Transaction relates to a market claim following a corporate action.</td>
+          </tr>
+          <tr>
+            <td>COLL</td>
+            <td>CollateralActivity/td>
+            <td>Transaction relates to collateral.</td>
+          </tr>
+          <tr>
+            <td>CORP</td>
+            <td>CorporateActionActivity</td>
+            <td>Transaction relates to corporate action.</td>
+          </tr>
+          <tr>
+            <td>SETT</td>
+            <td>SettlementandClearingActivity</td>
+            <td>Transaction relates to settlement and clearing.</td>
+          </tr>
+        </table>
+      type: string
+      enum:
+        - BOLE
+        - CLAI
+        - COLL
+        - CORP
+        - SETT
+    ExternalCashAccountType:
+      description: |
+        ExternalCashAccountType1Code from ISO 20022.
+      type: string
+    BICFI: 
+      description: |
+        BICFI
+      type: string
+      pattern: '[A-Z]{6,6}[A-Z2-9][A-NP-Z0-9]([A-Z0-9]{3,3}){0,1}'
+      example: "AAAADEBBXXX"
+    Max1000Text:
+      type: string
+      maxLength: 1000
+    _links_200_SecuritiesOrders: 
+      type: object
+      additionalProperties: 
+        $ref: '#/components/schemas/hrefType'
+      properties:
+        first:
+          $ref: '#/components/schemas/hrefType'
+        next:
+          $ref: '#/components/schemas/hrefType'
+        previous:
+          $ref: '#/components/schemas/hrefType'
+        last:
+          $ref: '#/components/schemas/hrefType'
+    CountryCode:
+      description: ISO 3166 ALPHA2 country code.
+      type: string
+      pattern: "[A-Z]{2}"
+      example: "SE"
+    Max140Text:
+      type: string
+      maxLength: 140
+    MarketType4Code:
+      description: |
+        MarketType4Code from ISO 20022.
+        Compare 
+        ISO 20022
+        Settlement And Reconciliation - ISO - Maintenace 2019 - 2020
+        Message Definition Report - Part 2
+        Approved by the Securities SEG on the 27th of January 2020:
+        <table border="1">
+          <tr>
+            <th>CodeName</th>
+            <th>Name</th>
+            <th>Definition</th>
+          </tr>
+          <tr>
+            <td>FUND</td>
+            <td>Fund</td>
+            <td>The place is a fund (transfer agent, fund itself, etc.).</td>
+          </tr>
+          <tr>
+            <td>LMAR</td>
+            <td>LocalMarket</td>
+            <td>The place is a local market.</td>
+          </tr>
+          <tr>
+            <td>THEO</td>
+            <td>Theoretical/td>
+            <td>The place is theoretical.</td>
+          </tr>
+          <tr>
+            <td>VEND</td>
+            <td>Vendor</td>
+            <td>The place is a vendor.</td>
+          </tr>
+        </table>
+      type: string
+      enum:
+        - FUND
+        - LMAR
+        - THEO
+        - VEND
+    financialInstrument:
+      description: This data structure represents financial instrument.
+      type: object
+      properties:
+        isin:
+          allOf:
+            - description: |
+                ISIN of the financial Instrument.
+            - $ref: '#/components/schemas/ISIN'
+        other:
+          allOf:
+            - description: |
+                If an ISIN is not available, the ASPSP may instead include an identification by other means.
+            - $ref: '#/components/schemas/otherFinancialInstrumentIdentification'
+        name:
+          allOf:
+            - description: |
+                Name of the financial instrument.
+            - $ref: '#/components/schemas/Max70Text'
+        normalisedPrice:
+          allOf:
+            - description: |
+                Price per unit of the financial instrument in case of a price amount. Percentage price otherwise.
+                If used in the context of a transaction, the price here shall indicate the applied price 
+                (without fees) for the trade.
+            - $ref: '#/components/schemas/evaluatedPrice'
+    error_RFC7807_405_AIS: 
+      description: |
+        Standardised definition of reporting error information according to [RFC7807].
+      type: object
+      required:
+        - type
+        - code
+      properties:
+        type: 
+          description: |
+            A URI reference [RFC3986] that identifies the problem type. 
+            Remark For Future: These URI will be provided by NextGenPSD2 in future.
+          type: string
+          format: uri
+          maxLength: 70
+        title:
+          $ref: '#/components/schemas/Max70Text'
+        detail:
+          description: |
+                $ref: '#/components/schemas/Max500Text'
+        code:
+          $ref: '#/components/schemas/MessageCode_405_AIS'
+        additionalErrors:
+          description: |
+            Array of Error Information Blocks.
+            Might be used if more than one error is to be communicated
+          type: array
+          items: #ErrorInformation
+            description: This is a data element to support the declaration of additional errors in the context of [RFC7807]. 
+            type: object
+            required:
+              - code
+            properties:
+              title:
+                $ref: '#/components/schemas/Max70Text'
+              detail:
+                $ref: '#/components/schemas/Max500Text'
+              code:
+                $ref: '#/components/schemas/MessageCode_405_AIS'
+        _links:
+          $ref: '#/components/schemas/_linksAll'
+    marketIdentification:
+      description: Identification of a market for financial instruments.
+      type: object
+      properties:
+        mic:
+          allOf:
+            - description: Date and time of the evaluation.
+            - $ref: '#/components/schemas/Max4Text'
+        marketIdentifierProprietary:
+          allOf:
+            - description: Date and time of the evaluation.
+            - $ref: '#/components/schemas/Max35Text'
+    MessageCode_404_AIS_Securities: 
+      allOf:
+        - description: Message codes defined for AIS for HTTP Error code 404 (NOT FOUND).
+        - oneOf:
+          - $ref: '#/components/schemas/MessageCode_404_Generic'
+          - type: string
+            enum: 
+            - "CONTENT_TEMPORARILY_NOT_AVAILABLE"          #Securities AIS specific error condition
+    tppMessage_401_AIS:
+      type: object
+      required:
+        - category
+        - code
+      properties:
+        category:
+           $ref: '#/components/schemas/TppMessageCategory'
+        code:
+          $ref: '#/components/schemas/MessageCode_401_AIS'
+        path:
+          type: string
+        text:
+          $ref: '#/components/schemas/Max500Text'
+    amount:
+      type: object
+      required:
+        - currency
+        - amount
+      properties:
+        currency:
+          $ref: '#/components/schemas/CurrencyCode'
+        amount:
+          description: |
+            The amount given with fractional digits, where fractions must be compliant to the currency definition.
+            Up to 14 significant figures. Negative amounts are signed by minus.
+            The decimal separator is a dot.
+            **Example:**
+            Valid representations for EUR with up to two decimals are:
+              * 1056
+              * 5768.2
+              * -1.50
+              * 5877.78
+          type: string
+          pattern: "-?[0-9]{1,14}(\\.[0-9]{1,3})?"
+          example: "5877.78"
+      example: 
+        {
+          "currency": "EUR", 
+          "amount": "123"
+        }
+    reportExchangeRate:
+      description: Exchange Rate.
+      type: object
+      required:
+        - sourceCurrency
+        - exchangeRate
+        - unitCurrency
+        - targetCurrency
+        - quotationDate
+      properties:
+        sourceCurrency:
+          allOf:
+            - description: |
+            - $ref: '#/components/schemas/CurrencyCode'
+        exchangeRate:
+          allOf:
+            - description: |
+            - type: string
+        unitCurrency:
+          allOf:
+            - description: |
+            - $ref: '#/components/schemas/CurrencyCode'
+        targetCurrency:
+          allOf:
+            - description: |
+            - $ref: '#/components/schemas/CurrencyCode'
+        quotationDate:
+          allOf:
+            - description: |
+            - $ref: '#/components/schemas/ISODate'
+        contractIdentification:
+          allOf:
+            - description: |
+            - $ref: '#/components/schemas/Max35Text'
+    tppMessage_404_AIS_Securities:
+      type: object
+      required:
+        - category
+        - code
+      properties:
+        category:
+           $ref: '#/components/schemas/TppMessageCategory'
+        code:
+          $ref: '#/components/schemas/MessageCode_404_AIS_Securities'
+        path:
+          type: string
+        text:
+          $ref: '#/components/schemas/Max500Text'
+    OrderStatusCode:
+      description: |
+        Code set to identify the status of an order. 
+        <table border="1">
+          <tr>
+            <th>CodeName</th>
+            <th>Definition</th>
+          </tr>
+          <tr>
+            <td>unknown</td>
+            <td>the status of this order can currently not be determined</td>
+          </tr>
+          <tr>
+            <td>new</td>
+            <td>Outstanding order with no executions</td>
+          </tr>
+          <tr>
+            <td>partiallyFilled</td>
+            <td>Outstanding order with executions and remaining quantity</td>
+          </tr>
+          <tr>
+            <td>filled</td>
+            <td>Order completely filled, no remaining quantity</td>
+          </tr>
+          <tr>
+            <td>doneForDay</td>
+            <td>Order not, or partially, filled; no further executions forthcoming for the trading day</td>
+          </tr>
+          <tr>
+            <td>canceled</td>
+            <td>Cancelled order with or without executions</td>
+          </tr>
+          <tr>
+            <td>replaced</td>
+            <td>Cancelled order due to a replacement with or without executions</td>
+          </tr>
+          <tr>
+            <td>pendingCancel</td>
+            <td>Order with a request for cancellation pending. Does not indicate that the order has been cancelled.</td>
+          </tr>
+          <tr>
+            <td>stopped</td>
+            <td>Order has been stopped at the exchange. Used when guaranteeing or protecting a price and quantity</td>
+          </tr>
+          <tr>
+            <td>rejected</td>
+            <td>Order has been rejected by sell-side (broker, exchange, ECN). NOTE: An order can be rejected subsequent to order acknowledgment, i.e. an order can pass from New to Rejected status.</td>
+          </tr>
+          <tr>
+            <td>suspended</td>
+            <td>Order has been placed in suspended state at the request of the client.</td>
+          </tr>
+          <tr>
+            <td>pendingNew</td>
+            <td>Order has been received by sell-side's (broker, exchange, ECN) system but not yet accepted for execution.</td>
+          </tr>
+          <tr>
+            <td>calculated</td>
+            <td>Order has been completed for the day (either filled or done for day). Commission or currency settlement details have been calculated</td>
+          </tr>
+          <tr>
+            <td>expired</td>
+            <td>Order has been cancelled in broker's system due to time in force instructions.</td>
+          </tr>
+          <tr>
+            <td>acceptedForBidding</td>
+            <td>Order has been received and is being evaluated for pricing.</td>
+          </tr>
+          <tr>
+            <td>pendingReplace</td>
+            <td>Order with an Order Cancel/Replace Request pending.</td>
+          </tr>
+        </table>
+      type: string
+      enum:
+        - unknown
+        - new
+        - partiallyFilled
+        - filled
+        - doneForDay
+        - canceled
+        - replaced
+        - pendingCancel
+        - stopped
+        - rejected
+        - suspended
+        - pendingNew
+        - calculated
+        - expired
+        - acceptedForBidding
+        - pendingReplace
+    _links_200_SecuritiesTransactions: 
+      type: object
+      additionalProperties: 
+        $ref: '#/components/schemas/hrefType'
+      properties:
+        first:
+          $ref: '#/components/schemas/hrefType'
+        next:
+          $ref: '#/components/schemas/hrefType'
+        previous:
+          $ref: '#/components/schemas/hrefType'
+        last:
+          $ref: '#/components/schemas/hrefType'
+    MessageCode_404_Generic: 
+      description: Generic message codes defined for HTTP Error code 404 (NOT FOUND).
+      type: string
+      enum: 
+        - "RESOURCE_UNKNOWN"          #gens
+    SecuritiesFeeTypeCode: 
+      description: |
+        List of supported Fee Type Codes in the context of securities. 
+        Might be changed based on market experience with the API.
+      type: string
+      enum:
+        - transactionFee
+        - brokerageFee
+        - managementFee
+        - courtage
+        - custodyFee
+        - exchangeRate
+        - thirdPartyFee
+        - otherFee
+    ISIN:
+      type: string
+      description: |
+        International Securities Identification Number (ISIN). A numbering system designed by the United Nation's 
+        International Organisation for Standardisation (ISO). The ISIN is composed of a 2-character prefix 
+        representing the country of issue, followed by the national security number (if one exists), and a 
+        check digit. Each country has a national numbering agency that assigns ISIN numbers for securities in 
+        that country.
+      pattern: '[A-Z0-9]{12,12}'
+    otherType:
+      description: In cases where the specifically defined criteria (IBAN, BBAN, MSISDN)
+        are not provided to identify an instance of the respective account type (e.g. a savings account), 
+        the ASPSP shall include a proprietary ID of the respective account that uniquely identifies the account for this ASPSP.
+      type: object
+      required: 
+        - identification
+      properties:
+        identification:
+          allOf:
+            - description: Proprietary identification of the account.
+            - $ref: '#/components/schemas/Max35Text'
+        issuer:
+          allOf:
+            - description: Issuer of the identification.
+            - $ref: '#/components/schemas/Max35Text'
+        schemeNameProprietary:
+          allOf:
+            - description: A scheme name defined in a proprietary way.
+            - $ref: '#/components/schemas/Max35Text'
+        schemeNameCode:
+          allOf:
+            - description: An entry provided by an external ISO code list.
+            - $ref: '#/components/schemas/Max35Text'
+    MessageCode_401_AIS: 
+      allOf:
+        - description: Message codes defined for AIS for HTTP Error code 401 (UNAUTHORIZED).
+        - oneOf:
+          - $ref: '#/components/schemas/MessageCode_401_Generic'
+    ISODate:
+      type: string
+      format: date
+    BBAN:
+      description: |
+        Basic Bank Account Number (BBAN) Identifier.
+        This data element can be used in the body of the consent request.
+          Message for retrieving account access consent from this account. This
+          data elements is used for payment accounts which have no IBAN.
+          ISO20022: Basic Bank Account Number (BBAN). 
+          Identifier used nationally by financial institutions, i.e., in individual countries, 
+          generally as part of a National Account Numbering Scheme(s), 
+          which uniquely identifies the account of a customer.
+      type: string
+      pattern: "[a-zA-Z0-9]{1,30}" 
+      example: "BARC12345612345678"
+    error_RFC7807_406_AIS: 
+      description: |
+        Standardised definition of reporting error information according to [RFC7807].
+      type: object
+      required:
+        - type
+        - code
+      properties:
+        type: 
+          description: |
+            A URI reference [RFC3986] that identifies the problem type. 
+            Remark For Future: These URI will be provided by NextGenPSD2 in future.
+          type: string
+          format: uri
+          maxLength: 70
+        title:
+          $ref: '#/components/schemas/Max70Text'
+        detail:
+          description: |
+                $ref: '#/components/schemas/Max500Text'
+        code:
+          $ref: '#/components/schemas/MessageCode_406_AIS'
+        additionalErrors:
+          description: |
+            Array of Error Information Blocks.
+            Might be used if more than one error is to be communicated
+          type: array
+          items: #ErrorInformation
+            description: This is a data element to support the declaration of additional errors in the context of [RFC7807]. 
+            type: object
+            required:
+              - code
+            properties:
+              title:
+                $ref: '#/components/schemas/Max70Text'
+              detail:
+                $ref: '#/components/schemas/Max500Text'
+              code:
+                $ref: '#/components/schemas/MessageCode_406_AIS'
+        _links:
+          $ref: '#/components/schemas/_linksAll'
+    tppMessage_400_AIS:
+      type: object
+      required:
+        - category
+        - code
+      properties:
+        category:
+           $ref: '#/components/schemas/TppMessageCategory'
+        code:
+          $ref: '#/components/schemas/MessageCode_400_AIS'
+        path:
+          type: string
+        text:
+          $ref: '#/components/schemas/Max500Text'
+    securitiesOrder:
+      description: |
+        Represents a securities order.
+      type: object
+      required: 
+        - side
+        - financialInstrument
+        - orderStatus
+      properties:
+        orderId:
+          allOf:
+            - description: |
+                Can be used as access-ID in the API, where more details on an order is offered. 
+                If this data attribute is provided, this shows that the AIS can get access on more 
+                details about this transaction using the Read Securities Transaction Details Request.
+                *Remark:* In anticipation of future services where orders might be placed or revoked via the 
+                openFinance API, the orderId should be defined in a way that it will also identify an order in 
+                the case of a placement / cancellation, if the ASPSP intends to support those use cases, as well.
+            - type: string
+        side:
+          allOf:
+            - description: |
+                Type of transaction that is associated with this order.
+            - $ref: '#/components/schemas/SecuritiesOrderSide'
+        financialInstrument:
+          allOf:
+            - description: |
+                Financial instrument the order refers to.
+            - $ref: '#/components/schemas/financialInstrument'
+        unitsNumberOrder:
+          allOf:
+            - description: |
+                Numeric quantification of the financial instrument that is ordered.
+            - type: number
+        unitsNominalOrder:
+          allOf:
+            - description: |
+                Nominal quantification of the financial instrument that is ordered.
+            - $ref: '#/components/schemas/amount'
+        unitsNumberDisplay:
+          allOf:
+            - description: |
+                Numeric quantification of the order that shall be displayed.
+            - type: number
+        unitsNominalDisplay:
+          allOf:
+            - description: |
+                Nominal quantification of the order that shall be displayed.
+            - $ref: '#/components/schemas/amount'
+        placeOfTrade:
+          allOf:
+            - description: |
+            - $ref: '#/components/schemas/marketIdentification'
+        limitPriceAmount:
+              $ref: '#/components/schemas/amount'
+        limitPricePercent:
+          description: Up to 20 significant figures. Negative amounts are signed by minus.
+            The decimal separator is a dot. Trailing zeroes must be truncated.
+          type: string
+          pattern: "-?[0-9]{1,20}(\\.[0-9]{0,19})?"
+        stopPriceAmount:
+              $ref: '#/components/schemas/amount'
+        stopPricePercent:
+          description: Up to 20 significant figures. Negative amounts are signed by minus.
+            The decimal separator is a dot. Trailing zeroes must be truncated.
+          type: string
+          pattern: "-?[0-9]{1,20}(\\.[0-9]{0,19})?"
+        tradingSessionIndicator:
+          allOf:
+            - description: |
+                Type of transaction that is associated with this order.
+            - $ref: '#/components/schemas/TradingSessionTypeCode'
+        typesOfOrder:
+          allOf:
+            - description: |
+                One or more Codes to indicate characteristics of the order.
+            - type: array
+              items:
+                $ref: '#/components/schemas/TypeOfOrderCode'
+        timeInForce:
+          allOf:
+            - description: |
+                If the order is restricted by a time limit, the type time limit is indicated by a value of 
+                the corresponding code set.
+            - $ref: '#/components/schemas/OrderTimeLimitCode'
+        expiryDate:
+          allOf:
+            - description: |
+                Date, when the order expires, if applicable.
+            - $ref: '#/components/schemas/ISODate'
+        expiryDateTime:
+          allOf:
+            - description: |
+                Date and time, when the order expires, if applicable.
+            - $ref: '#/components/schemas/ISODateTime'
+        relatedCashAccount:
+          allOf:
+            - description: |
+                If the execution of this order implies the transfer of money, cash account to be affected by this 
+                transfer from the PSU's side.
+            - $ref: '#/components/schemas/accountReference'
+        orderSplit:
+          allOf:
+            - description: |
+                Value true indicates that this order is the result of an order split. Missing values indicate \"false\".
+            - type: boolean
+        orderModifyable:
+          allOf:
+            - description: |
+                Value true indicates that this order can (still) be modified. Missing values indicate \"false\".
+            - type: boolean
+        orderStatus:
+          allOf:
+            - description: |
+                Status of the order.
+            - $ref: '#/components/schemas/OrderStatusCode'
+        details:
+          allOf:
+            - description: |
+                Additional details to the order.
+            - $ref: '#/components/schemas/Max500Text'
+        _links:
+          allOf:
+            - description: |
+            - type: object
+              additionalProperties: 
+                oneOf:
+                  - $ref: '#/components/schemas/hrefType'
+                  - type: array
+                    items:
+                      $ref: '#/components/schemas/hrefType'
+              properties:
+                relatedOrders:
+                  allOf:
+                    - description: |
+                        An array of links to request order details of related orders (e.g. other
+                        orders that originated from the same order split as this order).
+                        Only applicable, if the ASPSP supports the Read Securities Order Details endpoint.
+                    - type: array
+                      items:
+                        $ref: '#/components/schemas/hrefType'
+                relatedTransactions:
+                  allOf:
+                    - description: |
+                        An array of links to request securities transaction details of transactions that resulted
+                        from this order. 
+                        Only applicable, if the ASPSP supports the Read Securities Transaction Details endpoint.
+                    - type: array
+                      items:
+                        $ref: '#/components/schemas/hrefType'
+                orderDetails:
+                  allOf:
+                    - description: |
+                        Single link for retrieving details on this specific order. 
+                        Only applicable, if the ASPSP supports the Read Securities Order Details endpoint.
+                    - $ref: '#/components/schemas/hrefType'
+    error_NG_401_AIS: 
+      type: object
+      properties:
+        tppMessages:
+          type: array
+          items:
+            $ref: '#/components/schemas/tppMessage_401_AIS'
+        _links:
+          $ref: '#/components/schemas/_linksAll'
+    error_NG_404_AIS_Securities: 
+      type: object
+      properties:
+        tppMessages:
+          type: array
+          items:
+            $ref: '#/components/schemas/tppMessage_404_AIS_Securities'
+        _links:
+          $ref: '#/components/schemas/_linksAll'
+    tppMessage_409_AIS:
+      type: object
+      required:
+        - category
+        - code
+      properties:
+        category:
+           $ref: '#/components/schemas/TppMessageCategory'
+        code:
+          $ref: '#/components/schemas/MessageCode_409_AIS'
+        path:
+          type: string
+        text:
+          $ref: '#/components/schemas/Max500Text'
+    ISODateTime:
+      type: string
+      format: date-time
+    TypeOfPrice17Code:
+      description: |
+        TypeOfPrice17Code from ISO 20022.
+        Compare 
+        ISO 20022
+        Settlement And Reconciliation - ISO - Maintenace 2019 - 2020
+        Message Definition Report - Part 2
+        Approved by the Securities SEG on the 27th of January 2020:
+        <table border="1">
+          <tr>
+            <th>CodeName</th>
+            <th>Name</th>
+            <th>Definition</th>
+          </tr>
+          <tr>
+            <td>BIDE</td>
+            <td>Bid</td>
+            <td>
+              Price is the calculated bid price of a dual-priced fund (offer-bid prices), that is, 
+              the selling price of the units for the investor.
+            </td>
+          </tr>
+          <tr>
+            <td>OFFR</td>
+            <td>Offer</td>
+            <td>
+              Price is the calculated offer price of a dual-priced investment fund (offer-bid prices), 
+              that is, the buying price of the units for an investor.
+            </td>
+          </tr>
+          <tr>
+            <td>NAVL</td>
+            <td>NetAssetValue</td>
+            <td>
+              Price is the net asset value per unit that is used either as a transacting price for a single-priced 
+              investment fund class, or as a notional price for the calculation of other prices.
+            </td>
+          </tr>
+          <tr>
+            <td>CREA</td>
+            <td>Creation</td>
+            <td>
+              Price is the calculated creation price of a dual-priced investment fund (creation-cancellation 
+              prices) and the highest possible buying price of the units before the initial charge. 
+              The actual buying or offer price, which includes charges, will be higher.
+            </td>
+          </tr>
+          <tr>
+            <td>CANC</td>
+            <td>Cancellation</td>
+            <td>
+              Price is the calculated cancellation price of a dual-priced investment fund (creation-cancellation 
+              price), and the lowest possible valuation of the units on any one-day. 
+              The actual selling or bid price is usually higher.
+            </td>
+          </tr>
+          <tr>
+            <td>INTE</td>
+            <td>Interim</td>
+            <td>Price is the non-official interim price given to an investor before the executed price.</td>
+           </tr>
+          <tr>
+            <td>SWNG</td>
+            <td>Swing</td>
+            <td>
+               Price is the calculated net asset value price of a single-priced investment fund.
+               The price is adjusted to take into accountthe dealing costs due to individual large
+               deals, or due to a significant imbalance in volumes of subscriptions vs redemptions, 
+               as an alternative to dilutionlevy.
+             </td>
+          </tr>
+          <tr>
+            <td>MIDD</td>
+            <td>Mid</td>
+            <td>Price is the average price between the bid and offer prices.</td>
+          </tr>
+          <tr>
+            <td>RINV</td>
+            <td>Reinvestment</td>
+            <td>Price is the price used when reinvesting units after distribution.</td>
+          </tr>
+          <tr>
+            <td>SWIC</td>
+            <td>Switch</td>
+            <td>Price is the price used when transferring units between products.</td>
+          </tr>
+          <tr>
+            <td>MRKT</td>
+            <td>Market</td>
+            <td>Price is the current market price.</td>
+          </tr>
+          <tr>
+            <td>INDC</td>
+            <td>Indicative</td>
+            <td>Price is the estimated indicative price.</td>
+          </tr>
+          <tr>
+            <td>DDVR</td>
+            <td>DailyDividendRate</td>
+            <td>
+              Price is the net income of a financial instrument, calculated on each dealing
+              day, and divided by all the units outstanding on that day.
+            </td>
+          </tr>
+          <tr>
+            <td>ACTU</td>
+            <td>Actual</td>
+            <td>True offer price.</td>
+          </tr>
+        </table>
+      type: string
+      enum:
+        - BIDE
+        - OFFR
+        - NAVL
+        - CREA
+        - CANC
+        - INTE
+        - SWNG
+        - MIDD
+        - RINV
+        - SWIC
+        - MRKT
+        - INDC
+        - DDVR
+        - ACTU
+    securitiesAccountFee:
+      description: |
+        Represents the parameters of a given type of fee as they apply to the securities account.
+      type: object
+      required: 
+        - feeRules
+      properties:
+        typeCode:
+          allOf:
+            - description: |
+                Type of the fee as a code.
+                Might be adjusted in the future based on market experience.
+            - $ref: '#/components/schemas/SecuritiesFeeTypeCode'
+        typeProprietary:
+          allOf:
+            - description: |
+                Type of the fee as a proprietary string.
+            - $ref: '#/components/schemas/Max35Text'
+        feeRules:
+          allOf:
+            - description: |
+            - type: array
+              items: 
+                $ref: '#/components/schemas/securitiesAccountFeeRule'
+        applicableFrom:
+          allOf:
+            - description: |
+                First date, when this fee is applicable.
+                If not present, the fee is applicable starting with the
+                creation of this account / the latest reporting date supported by the ASPSP.
+            - $ref: '#/components/schemas/ISODate'
+        applicableTo:
+          allOf:
+            - description: |
+                Last date, when this fee is applicable.
+                If not present, the fee is applicable indefinitely.
+            - $ref: '#/components/schemas/ISODate'
+        additionalInformation:
+          allOf:
+            - description: |
+            - $ref: '#/components/schemas/Max500Text'
+    Max4Text:
+      type: string
+      maxLength: 4
+    OrderTimeLimitCode:
+      description: |
+        Code set to identify the time an order shall be in force. 
+      type: string
+      enum:
+        - day
+        - goodTillCancel
+        - atTheOpening
+        - immediateOrCancel
+        - fillOrKill
+        - fillAndKill
+        - goodTillCrossing
+        - goodTillDate
+        - atTheClose
+        - goodThroughCrossing
+        - atCrossing
+        - goodForTime
+        - goodForAuction
+        - goodForMonth
+  parameters:
+    HEADER_psuAccept:
+      name: PSU-Accept
+      in: header
+      description: |
+        The forwarded IP Accept header fields consist of the corresponding HTTP request Accept header fields between PSU and TPP, if available.
+      schema:
+        type: string
+      required: false
+    HEADER_psuGeoLocation:
+      name: PSU-Geo-Location
+      in: header
+      description: |
+        The forwarded Geo Location of the corresponding http request between PSU and TPP if available.
+      schema:
+        type: string
+        pattern: 'GEO:-?[0-9]{1,2}\.[0-9]{6};-?[0-9]{1,3}\.[0-9]{6}'
+      required: false
+      example: GEO:52.506931;13.144558
+    HEADER_psuAcceptEncoding:
+      name: PSU-Accept-Encoding
+      in: header
+      description: |
+        The forwarded IP Accept header fields consist of the corresponding HTTP request Accept header fields between PSU and TPP, if available.
+      schema:
+        type: string
+      required: false
+    PATH_orderId:
+      name: orderId
+      in: path
+      description: |
+        This identification is given by the attribute orderId of the corresponding entry of an order list.
+      required: true
+      schema:
+        type: string
+        example: "3dc3d5b3-order-f5400a64e80f"
+    HEADER_psuAcceptCharset:
+      name: PSU-Accept-Charset
+      in: header
+      description: |
+        The forwarded IP Accept header fields consist of the corresponding HTTP request Accept header fields between PSU and TPP, if available.
+      schema:
+        type: string
+      required: false
+    HEADER_psuDeviceId:
+      name: PSU-Device-ID
+      in: header
+      description: |
+        UUID (Universally Unique Identifier) for a device, which is used by the PSU, if available.
+        UUID identifies either a device or a device dependant application installation.
+        In case of an installation identification this ID needs to be unaltered until removal from device.
+      schema:
+        type: string
+        format: uuid
+      required: false
+      example: "99435c7e-ad88-49ec-a2ad-99ddcb1f5555"
+    QUERY_dateTo:
+      name: dateTo
+      in: query
+      description: |
+        End date (inclusive the data dateTo) of the transaction list, default is \"now\" if not given. 
+        Might be ignored if a delta function is used.
+        For booked transactions, the relevant date is the booking date. 
+        For pending transactions, the relevant date is the entry date, which may not be transparent 
+        neither in this API nor other channels of the ASPSP.
+      required: false
+      schema:
+        type: string
+        format: date
+    QUERY_evaluationCurrency:
+      name: evaluationCurrency
+      in: query
+      description: |
+        ISO Alpha-3 currency code to request evaluation of the balances in a specific currency.
+        This query parameter might be ignored by the ASPSP, if evaluation is not supported for variable 
+        currencies or does not support evaluation in the requested currency. 
+      required: false
+      schema:
+        type: string
+    HEADER_psuUserAgent:
+      name: PSU-User-Agent
+      in: header
+      description: |
+        The forwarded Agent header field of the HTTP request between PSU and TPP, if available.
+      schema:
+        type: string
+      required: false
+    HEADER_psuIpAddress_conditionalForAis:
+      name: PSU-IP-Address
+      in: header
+      description: |
+        The forwarded IP Address header field consists of the corresponding HTTP request 
+        IP Address field between PSU and TPP. 
+        It shall be contained if and only if this request was actively initiated by the PSU.
+      schema:
+        type: string
+        format: ipv4
+      required: false
+      example: 192.168.8.78
+    HEADER_tppSignatureCertificate:
+      name: TPP-Signature-Certificate
+      in: header
+      description: |
+        The certificate used for signing the request, in base64 encoding. 
+        Must be contained if a signature is contained.
+      schema:
+        type: string
+        format: byte
+      required: false # conditional
+    QUERY_entryReferenceFrom:
+      name: entryReferenceFrom
+      in: query
+      description: |
+        This data attribute is indicating that the AISP is in favour to get all transactions after 
+        the transaction with identification entryReferenceFrom alternatively to the above defined period. 
+        This is a implementation of a delta access. 
+        If this data element is contained, the entries \"dateFrom\" and \"dateTo\" might be ignored by the ASPSP 
+        if a delta report is supported.
+        Optional if supported by API provider.
+      required: false
+      schema:
+        type: string
+    HEADER_xRequestId:
+      name: X-Request-ID
+      in: header
+      description: ID of the request, unique to the call, as determined by the initiating party.
+      required: true
+      example: "99391c7e-ad88-49ec-a2ad-99ddcb1f7721"
+      schema:
+        type: string
+        format: uuid
+    HEADER_signature:
+      name: Signature
+      in: header
+      description: |
+        A signature of the request by the TPP on application level. This might be mandated by ASPSP.
+      schema:
+        type: string
+      required: false # conditional
+      example: >
+        keyId="SN=9FA1,CA=CN=D-TRUST%20CA%202-1%202015,O=D-Trust%20GmbH,C=DE",algorithm="rsa-sha256",
+        headers="Digest X-Request-ID PSU-ID TPP-Redirect-URI Date",
+        signature="Base64(RSA-SHA256(signing string))"
+    PATH_transactionId:
+      name: transactionId
+      in: path
+      description: |
+        This identification is given by the attribute transactionId of the corresponding entry of a transaction list.
+      required: true
+      schema:
+        type: string
+        example: "3dc3d5b3-7023-4848-9853-f5400a64e80f"
+    HEADER_psuAcceptLanguage:
+      name: PSU-Accept-Language
+      in: header
+      description: |
+        The forwarded IP Accept header fields consist of the corresponding HTTP request Accept header fields between PSU and TPP, if available.
+      schema:
+        type: string
+      required: false
+    HEADER_psuHttpMethod:
+      name: PSU-Http-Method
+      in: header
+      description: |
+        HTTP method used at the PSU ? TPP interface, if available.
+        Valid values are:
+        * GET
+        * POST
+        * PUT
+        * PATCH
+        * DELETE
+      schema:
+        type: string
+        enum:
+          - GET
+          - POST
+          - PUT
+          - PATCH
+          - DELETE
+      required: false
+    QUERY_deltaList:
+      name: deltaList
+      in: query
+      description: 
+        This data attribute is indicating that the AISP is in favour to get all transactions after the last report access 
+        for this PSU on the addressed account. 
+        This is another implementation of a delta access-report.
+        This delta indicator might be rejected by the ASPSP if this function is not supported.
+        Optional if supported by API provider
+      schema:
+        type: boolean
+    HEADER_psuIpPort:
+      name: PSU-IP-Port
+      in: header
+      description: |
+        The forwarded IP Port header field consists of the corresponding HTTP request IP Port field between PSU and TPP, if available.
+      schema:
+        type: string
+      required: false
+      example: "1234"
+    QUERY_orderStatus:
+      name: orderStatus
+      in: query
+      description: |
+        Comma separated list of Order Status Code
+        Restricts the result to orders that are currently assigned to one of the status values provided in 
+        this query parameter.
+        If the parameter is not provided, orders are provided without restriction to their respective status.
+      required: false
+      schema:
+        type: string
+    PATH_securitiesAccountId:
+      name: securities-account-id
+      in: path
+      description: |
+        This identification is denoting the addressed securities account. 
+        The securities-account-id is retrieved by using a \"Read Securities Account List\". 
+        The securities-account-id is the \"resourceId\" attribute of the securities account structure. 
+        Its value is constant at least throughout the lifecycle of a given consent.
+      required: true
+      schema:
+        type: string
+        example: "1234-SecAct-983"
+    HEADER_consentId_mandatory:
+      name: Consent-ID
+      in: header
+      description: |
+        This then contains the consentId of the related AIS consent, which was performed prior to this payment initiation.
+      required: true
+      schema:
+        type: string
+        example: "123cons456"
+    HEADER_digest:
+      name: Digest
+      in: header
+      description: Is contained if and only if the \"Signature\" element is contained in the header of the request.
+      schema:
+        type: string
+      required: false # conditional
+      example: "SHA-256=hl1/Eps8BEQW58FJhDApwJXjGY4nr1ArGDHIT25vq6A="
+    QUERY_dateFrom:
+      name: dateFrom
+      in: query
+      description: |
+        Conditional: Starting date (inclusive the date dateFrom) of the transaction list, mandated if no delta access is required
+        and if bookingStatus does not equal \"information\".
+        For booked transactions, the relevant date is the booking date. 
+        For pending transactions, the relevant date is the entry date, which may not be transparent 
+        neither in this API nor other channels of the ASPSP.
+      required: false
+      schema:
+        type: string
+        format: date
+  requestBodies: {}
+  headers:
+    X-Request-ID:
+      description: ID of the request, unique to the call, as determined by the initiating party.
+      required: true
+      example: "99391c7e-ad88-49ec-a2ad-99ddcb1f7721"
+      schema:
+        type: string
+        format: uuid
+    Location:
+      description: |
+        Location of the created resource.
+      schema:
+        type: string
+        format: url
+      required: false
+  responses:
+    OK_200_SecuritiesAccountPositions:
+      headers:
+        X-Request-ID:
+          $ref: '#/components/headers/X-Request-ID'
+      description: Ok
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - reportDateTime
+              - positionList
+            properties:
+              securitiesAccount:
+                $ref: '#/components/schemas/accountReference'
+              reportDateTime:
+                $ref: '#/components/schemas/ISODateTime'
+              balances:
+                type: array
+                items:
+                  $ref: '#/components/schemas/balanceSecurities'
+              positionList:
+                type: array
+                items:
+                  $ref: '#/components/schemas/securitiesPosition'
+    OK_200_SecuritiesAccountList:
+      headers:
+        X-Request-ID:
+          $ref: '#/components/headers/X-Request-ID'
+      description: Ok
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - securitiesAccounts
+            properties:
+              securitiesAccounts:
+                type: array
+                items:
+                  $ref: '#/components/schemas/accountDetailsSecurities'
+    decline_400_AIS:
+      headers:
+        Location:
+          $ref: '#/components/headers/Location'
+        X-Request-ID:
+          $ref: '#/components/headers/X-Request-ID'
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error_NG_400_AIS'
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/error_RFC7807_400_AIS'
+    decline_415_AIS:
+      headers:
+        Location:
+          $ref: '#/components/headers/Location'
+        X-Request-ID:
+          $ref: '#/components/headers/X-Request-ID'
+      description: Unsupported Media Type
+    decline_503:
+      headers:
+        Location:
+          $ref: '#/components/headers/Location'
+        X-Request-ID:
+          $ref: '#/components/headers/X-Request-ID'
+      description: Service Unavailable
+    decline_406_AIS:
+      headers:
+        Location:
+          $ref: '#/components/headers/Location'
+        X-Request-ID:
+          $ref: '#/components/headers/X-Request-ID'
+      description: Not Acceptable
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error_NG_406_AIS'
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/error_RFC7807_406_AIS'
+    OK_200_SecuritiesOrders:
+      headers:
+        X-Request-ID:
+          $ref: '#/components/headers/X-Request-ID'
+      description: Ok
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              securitiesAccount:
+                $ref: '#/components/schemas/accountReference'
+              orders:
+                type: array
+                items:
+                  $ref: '#/components/schemas/securitiesOrder'
+              _links:
+                $ref: '#/components/schemas/_links_200_SecuritiesOrders'
+    decline_500:
+      headers:
+        Location:
+          $ref: '#/components/headers/Location'
+        X-Request-ID:
+          $ref: '#/components/headers/X-Request-ID'
+      description: Internal Server Error
+    OK_200_SecuritiesTransactionDetails:
+      headers:
+        X-Request-ID:
+          $ref: '#/components/headers/X-Request-ID'
+      description: Ok
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - transactionDetails
+            properties:
+              transactionDetails:
+                $ref: '#/components/schemas/securitiesTransaction'
+    decline_401_AIS:
+      headers:
+        Location:
+          $ref: '#/components/headers/Location'
+        X-Request-ID:
+          $ref: '#/components/headers/X-Request-ID'
+      description: Unauthorised
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error_NG_401_AIS'
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/error_RFC7807_401_AIS'
+    OK_200_SecuritiesTransactions:
+      headers:
+        X-Request-ID:
+          $ref: '#/components/headers/X-Request-ID'
+      description: Ok
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              securitiesAccount:
+                $ref: '#/components/schemas/accountReference'
+              transactions:
+                type: array
+                items:
+                  $ref: '#/components/schemas/securitiesTransaction'
+              _links:
+                $ref: '#/components/schemas/_links_200_SecuritiesTransactions'
+    decline_404_AIS_Securities:
+      headers:
+        Location:
+          $ref: '#/components/headers/Location'
+        X-Request-ID:
+          $ref: '#/components/headers/X-Request-ID'
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error_NG_404_AIS_Securities'
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/error_RFC7807_404_AIS_Securities'
+    decline_408_AIS:
+      headers:
+        Location:
+          $ref: '#/components/headers/Location'
+        X-Request-ID:
+          $ref: '#/components/headers/X-Request-ID'
+      description: Request Timeout
+    decline_409_AIS:
+      headers:
+        Location:
+          $ref: '#/components/headers/Location'
+        X-Request-ID:
+          $ref: '#/components/headers/X-Request-ID'
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error_NG_409_AIS'
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/error_RFC7807_409_AIS'
+    decline_429_AIS:
+      headers:
+        Location:
+          $ref: '#/components/headers/Location'
+        X-Request-ID:
+          $ref: '#/components/headers/X-Request-ID'
+      description: Too many Requests
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error_NG_429_AIS'
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/error_RFC7807_429_AIS'
+    OK_200_SecuritiesAccountDetails:
+      headers:
+        X-Request-ID:
+          $ref: '#/components/headers/X-Request-ID'
+      description: Ok
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - securitiesAccount
+            properties:
+              securitiesAccount:
+                $ref: '#/components/schemas/accountDetailsSecurities'
+    decline_403_AIS:
+      headers:
+        Location:
+          $ref: '#/components/headers/Location'
+        X-Request-ID:
+          $ref: '#/components/headers/X-Request-ID'
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error_NG_403_AIS'
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/error_RFC7807_403_AIS'
+    decline_405_AIS:
+      headers:
+        Location:
+          $ref: '#/components/headers/Location'
+        X-Request-ID:
+          $ref: '#/components/headers/X-Request-ID'
+      description: Method not allowed
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error_NG_405_AIS'
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/error_RFC7807_405_AIS'
+    OK_200_SecuritiesOrderDetails:
+      headers:
+        X-Request-ID:
+          $ref: '#/components/headers/X-Request-ID'
+      description: Ok
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - orderDetails
+            properties:
+              orderDetails:
+                $ref: '#/components/schemas/securitiesOrder'
+  examples: {}
+
+
+externalDocs:
+  description: 'openFinance API Framework Implementation Guidelines for Extended Services AIS for Securities Accounts, Version 1.0, 16 November 2022'
+  url: https://www.berlin-group.org/openfinance-downloads
+
+servers:
+
+- description: PSD2 server
+  url: https://api.testbank.com/psd2
