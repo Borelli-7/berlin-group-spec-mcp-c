@@ -118,3 +118,22 @@ Client-SCA-Approach-Preference and Client-Nok-Redirect-URI.
 
 Clarification: implement the header names of section 8.4.1 and the OpenAPI files
 (Client-SCA-Approach-Preference, Client-Nok-Redirect-URI). The change log names are not used.
+
+## E-11 API-Contract-Id is named apiContractId in the Admin OpenAPI
+
+Administrative Services Implementation Guidelines 1.2 renamed the onboarding result identifier
+from apiContractId to API-Contract-Id (change log, page 48) and uses API-Contract-Id in sections
+3.1 (pages 32-34) and 3.5 (page 42). The Admin OpenAPI 1.1 still names the response attribute
+apiContractId in the schemas of POST /v2/onboardings and GET /v2/onboardings/{onboardingId}.
+
+Clarification: the Implementation Guidelines prevail. Use API-Contract-Id; clients generated from
+the OpenAPI 1.1 should also accept apiContractId.
+
+## E-12 Request body of the certificates operation missing from the Admin OpenAPI
+
+Administrative Services Implementation Guidelines 1.2, section 3.7 (pages 44-45), defines the
+mandatory request body attribute newCertificate (the new QSealC, base64url encoded) for
+POST /v2/onboardings/{onboardingId}/certificates. The Admin OpenAPI 1.1 operation
+informAboutNewQSeal declares no requestBody.
+
+Clarification: send and accept newCertificate as described in the Implementation Guidelines.

@@ -5,8 +5,8 @@
 # Precedence ladder, kept distinct per authority so that no unintended precedence_tie arises:
 #   100 normative implementation guidelines      95 normative data dictionary
 #    90 technical OpenAPI contracts              85 normative domestic definitions
-#    80 normative operational rules              50 informative guides / bulletins
-#    10 project clarifications (text/v2/errata.md)
+#    80 normative operational rules              70 normative external standards (ETSI, IETF)
+#    50 informative guides / bulletins            10 project clarifications (text/v2/errata.md)
 schema_version: 1
 sources:
   # ---------------------------------------------------------------- NextGenPSD2 v1.3.x
@@ -56,6 +56,16 @@ sources:
     path: openapi/v1/psd2-api-trusted_beneficiaries_v1.x_recent.openapi.yaml
     title: NextGenPSD2 Extended Services - Trusted Beneficiaries OpenAPI 1.0.0 (2020-05-06)
     tags: [ais, trusted-beneficiaries, extended-service]
+
+  - id: bg-nextgenpsd2-v1.3-openapi-securities-ais
+    kind: openapi
+    version: nextgenpsd2-v1.3
+    authority: technical
+    precedence: 90
+    path: openapi/v1/psd2-api-securitiesAIS_v1.x_recent.openapi.yaml
+    title: NextGenPSD2 Extended Services - AIS for Securities Accounts OpenAPI 1.0
+    description: Securities accounts, positions, transactions and orders under /v1/securities-accounts.
+    tags: [ais, securities, extended-service]
 
   - id: bg-nextgenpsd2-v1.3-implementation-guidelines
     kind: pdf
@@ -267,6 +277,46 @@ sources:
     title: openFinance Extended Services - Verification of Party (VOP) Implementation Guidelines 1.1 (2025-06-03)
     tags: [implementation-guidelines, vop, extended-services]
     blank_pages: [2, 6]   # intentionally blank: no fonts, no images
+
+  - id: bg-openfinance-v2-openapi-administrative-services
+    kind: openapi
+    version: openfinance-v2
+    authority: technical
+    precedence: 90
+    path: openapi/v2/BG_oFA_Admin_Version_1.1_20260713.openapi.yaml
+    title: openFinance Administrative Services - Technical Onboarding OpenAPI 1.1 (2026-07-13)
+    description: API Client technical onboarding (apiContractId) and certificate registration under /v2/onboardings.
+    tags: [administrative-services, onboarding, extended-services]
+
+  - id: bg-openfinance-v2-administrative-services
+    kind: pdf
+    version: openfinance-v2
+    authority: normative
+    precedence: 100
+    path: pdf/v2/17b.-Berlin-Group-openFinance-API-Framework-Implementation-Guidelines-Administrative-Services-V2-Version-1.2-20260731.pdf
+    title: openFinance API Framework Implementation Guidelines - Administrative Services 1.2 (2026-07-31)
+    tags: [implementation-guidelines, administrative-services, onboarding]
+
+  # ---------------------------------------------------------------- External standards referenced by the framework
+  - id: etsi-ts-119-495
+    kind: pdf
+    version: openfinance-v2
+    authority: normative
+    precedence: 70
+    path: pdf/v2/etsi-ts-119-495-v1-5-1-2021-04-.pdf
+    title: ETSI TS 119 495 V1.5.1 - Certificate Profiles and TSP Policy Requirements for Open Banking (2021-04)
+    description: eIDAS QWAC/QSealC profiles carrying PSD2 roles and authorisation numbers. Not a Berlin Group publication.
+    tags: [external-standard, security, certificates, eidas, qwac, qseal]
+
+  - id: ietf-rfc-5280
+    kind: pdf
+    version: openfinance-v2
+    authority: normative
+    precedence: 70
+    path: pdf/v2/rfc-editor.org_rfc_rfc5280.txt.pdf
+    title: IETF RFC 5280 - Internet X.509 Public Key Infrastructure Certificate and CRL Profile (2008-05)
+    description: X.509 v3 certificate and CRL profile and path validation. Not a Berlin Group publication.
+    tags: [external-standard, security, certificates, x509]
 
   - id: project-openfinance-v2-errata
     kind: text

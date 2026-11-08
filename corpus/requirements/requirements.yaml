@@ -1535,7 +1535,7 @@ requirements:
       - "The v2 redirect headers are Client-Redirect-URI and Client-Nok-Redirect-URI."
     tags: [headers, naming, errata]
 
-  # ======================================================== openFinance v2 - Operational rules and data dictionary
+  # ======================================================== openFinance v2 - Operational rules, data dictionary and administrative services
   - id: OFV2-ERR-CODES-001
     version: openfinance-v2
     title: Message codes and their HTTP response codes
@@ -1553,6 +1553,84 @@ requirements:
       - "PIS: STATUS_INVALID is returned with HTTP 409 and PRODUCT_UNKNOWN with 404."
       - "CANCELLATION_INVALID is returned with HTTP 405; AIS ACCESS_EXCEEDED with 429."
     tags: [errors, data-dictionary]
+
+  - id: OFV2-ADMIN-ONBOARDING-001
+    version: openfinance-v2
+    title: Technical onboarding of an API Client (administrative services)
+    description: >-
+      Before accessing extended services, an API Client onboards with POST v2/onboardings and then uses
+      the returned API-Contract-Id. The onboarding resource can be read, its status polled and the
+      onboarding cancelled. The Admin OpenAPI 1.1 still names the identifier apiContractId (errata E-11).
+    sources:
+      - source_id: bg-openfinance-v2-administrative-services
+        locator: section:1.2
+        note: Administrative Services
+      - source_id: bg-openfinance-v2-administrative-services
+        locator: section:2.2
+        note: Overview, transaction flow for the onboarding process
+      - source_id: bg-openfinance-v2-administrative-services
+        locator: section:2.6
+        note: Endpoints and API Access Methods
+      - source_id: bg-openfinance-v2-administrative-services
+        locator: section:3.1
+        note: Initiation of the onboarding process
+      - source_id: bg-openfinance-v2-administrative-services
+        locator: section:3.6
+        note: Cancel the onboarding
+      - source_id: bg-openfinance-v2-administrative-services
+        locator: page:6-7
+      - source_id: bg-openfinance-v2-administrative-services
+        locator: page:9-13
+      - source_id: bg-openfinance-v2-administrative-services
+        locator: page:30-35
+      - source_id: bg-openfinance-v2-administrative-services
+        locator: page:40-43
+      - source_id: bg-openfinance-v2-openapi-administrative-services
+        locator: op:POST /v2/onboardings
+      - source_id: bg-openfinance-v2-openapi-administrative-services
+        locator: op:GET /v2/onboardings/{onboardingId}/status
+      - source_id: bg-openfinance-v2-openapi-administrative-services
+        locator: op:GET /v2/onboardings/{onboardingId}
+      - source_id: bg-openfinance-v2-openapi-administrative-services
+        locator: op:DELETE /v2/onboardings/{onboardingId}
+      - source_id: project-openfinance-v2-errata
+        locator: section:E-11
+    acceptance_criteria:
+      - "After a successful onboarding the ASPSP assigns a unique API-Contract-Id that the API Client uses for all further accesses to extended services."
+      - "The one step process has no confirmation of price conditions at the API; the two step process requires the API Client to read and confirm the price lists. The scheme decides which applies, or the ASPSP if no scheme is involved."
+      - "POST onboardings, GET onboardings/{onboardingId}/status and GET onboardings/{onboardingId} are mandatory; DELETE and the certificates endpoint are optional; the price list endpoints are required only for the two step process."
+      - "schemeId (BILATERAL if no scheme), serviceIds and serviceContractId are mandatory in the onboarding request."
+      - "A successful onboarding request has HTTP 201; API-Contract-Id and validTo are only provided when the status is valid; validTo 9999-12-31 means unlimited validity."
+      - "An onboarding is valid from the day its status is set to valid; a future-dated onboarding is not possible."
+      - "GET onboardings/{onboardingId} includes priceLists and nextInvoicingDate when a two step onboarding is required."
+      - "A successful cancellation with DELETE onboardings/{onboardingId} has HTTP 204 and no response body."
+    tags: [administrative-services, onboarding]
+
+  - id: OFV2-ADMIN-SIGNING-001
+    version: openfinance-v2
+    title: Signed requests and certificate change for administrative services
+    sources:
+      - source_id: bg-openfinance-v2-administrative-services
+        locator: section:2.1
+        note: Signing Messages at Application Layer
+      - source_id: bg-openfinance-v2-administrative-services
+        locator: section:3.7
+        note: Information about a new QSealC of the API Client
+      - source_id: bg-openfinance-v2-administrative-services
+        locator: page:9
+      - source_id: bg-openfinance-v2-administrative-services
+        locator: page:44-46
+      - source_id: bg-openfinance-v2-openapi-administrative-services
+        locator: op:POST /v2/onboardings/{onboardingId}/certificates
+      - source_id: project-openfinance-v2-errata
+        locator: section:E-12
+    acceptance_criteria:
+      - "The POST requests of sections 3.1, 3.3 and 3.7 are signed HTTP messages as defined in section 6 of oFA-PFSM."
+      - "The QSealC is included in the JWS Protected Header (x5c) unless it was exchanged before."
+      - "A new certificate is announced with POST .../onboardings/{onboardingId}/certificates, signed with the current QSealC known to the ASPSP and carrying the new QSealC base64url encoded in newCertificate."
+      - "A signature failure is answered with HTTP 401 SIGNATURE_INVALID; the validity of the old certificate is not affected."
+      - "A successful certificate notification has HTTP 200 and no response body."
+    tags: [administrative-services, signing, certificates]
 
   - id: OFV2-OPS-BASIC-CODING-001
     version: openfinance-v2

@@ -106,10 +106,10 @@ The server **reports** conflicts with citations and provenance. Deciding which s
 
 ### Official corpus (`corpus/`)
 
-`corpus/requirements/requirements.yaml` maps 103 requirements (74 `OFV2-*`, 29 `NGPSD2-*` baseline) onto the
+`corpus/requirements/requirements.yaml` maps 105 requirements (76 `OFV2-*`, 29 `NGPSD2-*` baseline) onto the
 official Berlin Group files. Every openFinance v2 OpenAPI operation is linked to at least one requirement;
 NextGenPSD2 1.3 operations are covered where a v2 counterpart exists, and endpoint-less requirements cover
-protocol functions, operational rules and the Data Dictionary message codes.
+protocol functions, operational rules, administrative services and the Data Dictionary message codes.
 Discrepancies between those files are recorded as project errata in
 `corpus/text/v2/errata.md` (source `project-openfinance-v2-errata`, authority `project`, precedence 10).
 
@@ -120,6 +120,7 @@ Discrepancies between those files are recorded as project errata in
 | `OFV2-AIS-TRANSACTIONS-002`, `OFV2-AIS-FREQUENCY-001` | Normative sources complemented by project errata (E-03 `pageSize`, E-07 access counting) |
 | `NGPSD2-AIS-TRANSACTIONS-001`, `NGPSD2-AIS-BALANCES-001` | v1.3 baseline reached from the v2 path through the `/v1` ↔ `/v2` canonical key |
 | `OFV2-PIS-STATUS-CODES-001`, `OFV2-SCA-REQUEST-HEADERS-001` | Normative sources complemented by project errata (E-09 `PACT`/`PATC`, E-10 header names in change logs) |
+| `OFV2-ADMIN-ONBOARDING-001`, `OFV2-ADMIN-SIGNING-001` | Administrative Services IG 1.2 prevails over the Admin OpenAPI 1.1 (errata E-11 `API-Contract-Id`, E-12 missing `newCertificate` body) |
 | `OFV2-PIS-GET-PAYMENT-001`, `OFV2-AUTH-SUBRESOURCES-001` | Linked through `op:` citations only, because `GET /v2/{payment-service}/{payment-product}/{paymentId}` and `GET /v2/{resource-path}/{resourceId}/{authorisation-category}` share one canonical key |
 
 The ignored smoke test `cargo test -p bg-spec-indexer --release --test real_corpus -- --ignored` indexes

@@ -1,0 +1,1955 @@
+openapi: 3.0.1
+
+info:
+  contact:
+    email: info@berlin-group.org
+    name: The Berlin Group - A European Standards Initiative
+    url: https://www.berlin-group.org/
+  description: |
+    After conclusion of necessary contracts an API Client has to execute a technical onboarding at the openFinance API of an ASPSP.
+    As part of the technical onboarding the ASPSP can check if all necessary contractual steps have been finished before.
+    If everything is ok the ASPSP will assign a unique apiContractId to the API Client and will return this to the API Client as response of the technical onboarding.
+    The API Client has to use this apiContractId for all further accesses to the extended services at the openFinance API of the ASPSP.
+  license:
+    name: Creative Commons Attribution 4.0 International Public License
+    url: https://creativecommons.org/licenses/by/4.0/
+  title: openFinance API Framework Implementation Guidelines Administrative Services
+  version: "1.1"
+  x-references:
+    documents:
+      - document:
+        title: openFinance API Framework Data Dictionary
+        version: "2.4"
+      - document:
+        title: openFinance API Framework Implementation Guidelines Administrative Services
+        version: "1.1"
+
+externalDocs:
+  description: |
+    openFinance API Framework
+    Implementation Guidelines for Extended Services
+  url: https://www.berlin-group.org/openfinance-downloads
+
+servers:
+  - url: https://api.testbank.com/psd2
+    description: PSD2 server
+  - url: https://test-api.testbank.com/psd2
+    description: Optional PSD2 test server
+
+tags:
+  - name: Administrative API
+    description: |
+      The implementation of such an API would of course require the related banks to clarify the compliance with the related direct debit scheme rules. The related direct debit scheme could e.g. 
+        * define requirements on the API clients who are permitted to consume the APIs,
+        * could mandate a digital signature of the authorisation proof by the debtor bank or
+        * could restrict the usage of such a service to specific mandate classes. 
+
+paths:
+  /v2/onboardings:
+    post:
+      summary: Initiation of the onboarding process
+      description: | 
+        Creates the onboarding resource at the ASPSP.
+      operationId: initiateOnboarding
+      tags:
+        - Administrative API
+      security:
+        - {}
+        - BearerAuthOAuth: []
+      parameters:
+        - $ref: '#/components/parameters/HEADER_digest'
+        - $ref: '#/components/parameters/HEADER_xJwsSignature'
+        - $ref: '#/components/parameters/HEADER_bodySigProfile'
+        - $ref: '#/components/parameters/HEADER_xRequestId'
+      requestBody:
+        required: true
+        content: 
+          application/json:
+            schema:
+              type: object
+              required:
+                - schemeId
+                - serviceIds
+                - serviceContractId
+              properties:
+                schemeId:
+                  description: |
+                    Identification of the corresponding scheme, in case of no scheme involved use constant BILATERAL
+                    Example: giroAPI-payment
+                    The schemeIds supported by the ASPSP should be provided in the Discovery API [oFA Discov].
+                  allOf:
+                    - $ref: '#/components/schemas/Max70Text'
+                serviceIds:
+                  description: |
+                    Identification of the extended services for which the onboarding will be done.
+                    Possible values to identify a service have to be defined by the service owner (scheme or ASPSP).
+                    The service types supported by the ASPSP should be provided in the Discovery API [oFA Discov].
+                  type: array
+                  items: 
+                    $ref: '#/components/schemas/ServiceType'
+                apiClientContacts:
+                  description: |
+                    Contacts (of different categories) of the API Client. Only to be given if not already available by e.g. a directory service.
+                  type: array
+                  items: 
+                    $ref: '#/components/schemas/contact'
+                serviceContractId:
+                  description: |
+                    Identification of the service contract concluded between the service owner (scheme or ASPSP) and the API Client to use these services.
+                  allOf:
+                    - $ref: '#/components/schemas/Max70Text'
+      responses:
+        '201':
+          $ref: '#/components/responses/created_201_Admin'
+        '400':
+          $ref: '#/components/responses/decline_400_Administrative'
+        '401':
+          $ref: '#/components/responses/decline_401_Administrative'
+        '403':
+          $ref: '#/components/responses/decline_403_Administrative'
+        '404':
+          $ref: '#/components/responses/decline_404_Administrative'
+        '405':
+          $ref: '#/components/responses/decline_405_Administrative'
+        '406':
+          $ref: '#/components/responses/decline_406_Administrative'
+        '408':
+          $ref: '#/components/responses/decline_408_Administrative'
+        '409':
+          $ref: '#/components/responses/decline_409_Administrative'
+        '415':
+          $ref: '#/components/responses/decline_415_Administrative'
+        '500':
+          $ref: '#/components/responses/decline_500'
+        '503':
+          $ref: '#/components/responses/decline_503'
+  /v2/onboardings/{onboardingId}/status:
+    get:
+      summary: Reading the status of the onboarding
+      description: | 
+        Reads the current Status of the onboarding process
+      operationId: readOnboardingStatus
+      tags:
+        - Administrative API
+      security:
+        - {}
+        - BearerAuthOAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PATH_onboardingId'
+        - $ref: '#/components/parameters/HEADER_xRequestId'
+      responses:
+        '200':
+          $ref: '#/components/responses/Ok_200_Administrative_readOnboardingStatus'
+        '400':
+          $ref: '#/components/responses/decline_400_Administrative'
+        '401':
+          $ref: '#/components/responses/decline_401_Administrative'
+        '403':
+          $ref: '#/components/responses/decline_403_Administrative'
+        '404':
+          $ref: '#/components/responses/decline_404_Administrative'
+        '405':
+          $ref: '#/components/responses/decline_405_Administrative'
+        '406':
+          $ref: '#/components/responses/decline_406'
+        '408':
+          $ref: '#/components/responses/decline_408'
+        '409':
+          $ref: '#/components/responses/decline_409_Administrative'
+        '415':
+          $ref: '#/components/responses/decline_415'
+        '500':
+          $ref: '#/components/responses/decline_500'
+        '503':
+          $ref: '#/components/responses/decline_503'
+  /v2/onboardings/{onboardingId}:
+    get:
+      summary: Reading the status of the onboarding
+      description: | 
+        Reads the current Status of the onboarding process
+      operationId: readOnboardingResource
+      tags:
+        - Administrative API
+      security:
+        - {}
+        - BearerAuthOAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PATH_onboardingId'
+        - $ref: '#/components/parameters/HEADER_xRequestId'
+      responses:
+        '200':
+          $ref: '#/components/responses/Ok_200_Administrative_readOnboardingResource'
+        '400':
+          $ref: '#/components/responses/decline_400_Administrative'
+        '401':
+          $ref: '#/components/responses/decline_401_Administrative'
+        '403':
+          $ref: '#/components/responses/decline_403_Administrative'
+        '404':
+          $ref: '#/components/responses/decline_404_Administrative'
+        '405':
+          $ref: '#/components/responses/decline_405_Administrative'
+        '406':
+          $ref: '#/components/responses/decline_406'
+        '408':
+          $ref: '#/components/responses/decline_408'
+        '409':
+          $ref: '#/components/responses/decline_409_Administrative'
+        '415':
+          $ref: '#/components/responses/decline_415'
+        '500':
+          $ref: '#/components/responses/decline_500'
+        '503':
+          $ref: '#/components/responses/decline_503'
+    delete:
+      summary: Cancel the onboarding
+      description: | 
+        Cancels the Onboarding
+      operationId: cancelOnboarding
+      tags:
+        - Administrative API
+      security:
+        - {}
+        - BearerAuthOAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PATH_onboardingId'
+        - $ref: '#/components/parameters/HEADER_xRequestId'
+      responses:
+        '204':
+          $ref: '#/components/responses/Ok_204_Administrative_cancelOnboarding'
+        '400':
+          $ref: '#/components/responses/decline_400_Administrative'
+        '401':
+          $ref: '#/components/responses/decline_401_Administrative'
+        '403':
+          $ref: '#/components/responses/decline_403_Administrative'
+        '404':
+          $ref: '#/components/responses/decline_404_Administrative'
+        '405':
+          $ref: '#/components/responses/decline_405_Administrative'
+        '406':
+          $ref: '#/components/responses/decline_406'
+        '408':
+          $ref: '#/components/responses/decline_408'
+        '409':
+          $ref: '#/components/responses/decline_409_Administrative'
+        '415':
+          $ref: '#/components/responses/decline_415'
+        '500':
+          $ref: '#/components/responses/decline_500'
+        '503':
+          $ref: '#/components/responses/decline_503'
+  /v2/onboardings/{onboardingId}/certificates:
+    post:
+      summary: Information about a new QSealC of the API Client
+      description: | 
+        With this POST command the API Client informs the ASPSP that he will use for future calls a new certificate (QSealC) for message signing.
+      operationId: informAboutNewQSeal
+      tags:
+        - Administrative API
+      security:
+        - {}
+        - BearerAuthOAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PATH_onboardingId'
+        - $ref: '#/components/parameters/HEADER_digest'
+        - $ref: '#/components/parameters/HEADER_xJwsSignature'
+        - $ref: '#/components/parameters/HEADER_xRequestId'
+      responses:
+        '200':
+          $ref: '#/components/responses/Ok_200_Administrative_informAboutNewQSeal'
+        '400':
+          $ref: '#/components/responses/decline_400_Administrative'
+        '401':
+          $ref: '#/components/responses/decline_401_Administrative'
+        '403':
+          $ref: '#/components/responses/decline_403_Administrative'
+        '404':
+          $ref: '#/components/responses/decline_404_Administrative'
+        '405':
+          $ref: '#/components/responses/decline_405_Administrative'
+        '406':
+          $ref: '#/components/responses/decline_406'
+        '408':
+          $ref: '#/components/responses/decline_408'
+        '409':
+          $ref: '#/components/responses/decline_409_Administrative'
+        '415':
+          $ref: '#/components/responses/decline_415'
+        '500':
+          $ref: '#/components/responses/decline_500'
+        '503':
+          $ref: '#/components/responses/decline_503'
+
+
+components:
+  securitySchemes:
+    BearerAuthOAuth:
+      description: |
+        Bearer Token. 
+        Is contained only, if an OAuth2 based authentication was performed in a pre-step or 
+        an OAuth2 based SCA was performed in a preceding AIS service in the same session.
+      type: http
+      scheme: bearer
+  schemas:
+    ContactType:
+      description: |
+        See document \"openFinance API Framework Data Dictionary\", section \"Contact Type\" for more details.
+      type: string
+      enum:
+        - technical
+        - operational
+        - business
+        - security
+      example: 'technical'
+    PreferredMethod:
+      description: |
+        See document \"openFinance API Framework Data Dictionary\", section \"Preferred Method\" for more details.
+      type: string
+      enum:
+        - LETT
+        - MAIL
+        - PHON
+        - FAXX
+        - CELL
+      example: 'MAIL'
+    Max256Text:
+      type: string
+      maxLength: 256
+      example: 'Text, maximum of 256 characters.'
+    error_NG_400_Administrative: 
+      type: object
+      properties:
+        apiClientMessages:
+          type: array
+          items:
+            $ref: '#/components/schemas/clientMessageInformation_400_Administrative'
+        _links:
+          $ref: '#/components/schemas/links'
+    error_RFC7807_404_Administrative: 
+      description: |
+        Standardised definition of reporting error information according to [RFC7807].
+      type: object
+      required:
+        - type
+        - code
+      properties:
+        type: 
+          description: |
+            A URI reference [RFC3986] that identifies the problem type. 
+            Remark For Future: These URI will be provided by openFinance API Framework in future.
+          type: string
+          format: uri
+          maxLength: 70
+        title:
+          description: |
+            Short human readable description of error type. Could be in local language. To be provided by ASPSPs.
+          allOf:
+            - $ref: '#/components/schemas/Max70Text'
+        status:
+          description: |
+            HTTP response code generated by the server.
+            If contained, this is more relevant as the actual http response code in the actual response, because it is introduced by the application server.            
+          type: integer
+        detail:
+          description: |
+            Detailed human readable text specific to this instance of the error. 
+          allOf:
+            - $ref: '#/components/schemas/Max500Text'
+        instance:
+          description: |
+            This attribute is containing a JSON pointer (as defined in [RFC6901]) or XPath expression to indicate the path to an issue generating the error in the related request.
+          allOf:
+            - $ref: '#/components/schemas/Max256Text'
+        code:
+          $ref: '#/components/schemas/MessageCode_ServiceUnspecific_404'
+        additionalErrors:
+          description: |
+            Array of Error Information Blocks.
+            Might be used if more than one error is to be communicated
+          type: array
+          items: #ErrorInformation
+            description: This is a data element to support the declaration of additional errors in the context of [RFC7807]. 
+            type: object
+            required:
+              - code
+            properties:
+              title:
+                $ref: '#/components/schemas/Max70Text'
+              detail:
+                $ref: '#/components/schemas/Max500Text'
+              code:
+                $ref: '#/components/schemas/MessageCode_ServiceUnspecific_404'
+        _links:
+          $ref: '#/components/schemas/links'
+    error_NG_404_Administrative: 
+      type: object
+      properties:
+        apiClientMessages:
+          type: array
+          items:
+            $ref: '#/components/schemas/clientMessageInformation_404_Administrative'
+        _links:
+          $ref: '#/components/schemas/links'
+    OnboardingStatus:
+      description: |
+        See document \"openFinance API Framework Data Dictionary\", section \"Onboarding Status\" for more details.
+      type: string
+      enum:
+        - received
+        - rejected
+        - expired
+        - terminatedByApiClient
+        - terminatedByAspsp
+        - valid
+        - validTimeRestricted
+      example: 'received'
+    error_RFC7807_400_Administrative: 
+      description: |
+        Standardised definition of reporting error information according to [RFC7807].
+      type: object
+      required:
+        - type
+        - code
+      properties:
+        type: 
+          description: |
+            A URI reference [RFC3986] that identifies the problem type. 
+            Remark For Future: These URI will be provided by openFinance API Framework in future.
+          type: string
+          format: uri
+          maxLength: 70
+        title:
+          description: |
+            Short human readable description of error type. Could be in local language. To be provided by ASPSPs.
+          allOf:
+            - $ref: '#/components/schemas/Max70Text'
+        status:
+          description: |
+            HTTP response code generated by the server.
+            If contained, this is more relevant as the actual http response code in the actual response, because it is introduced by the application server.            
+          type: integer
+        detail:
+          description: |
+            Detailed human readable text specific to this instance of the error. 
+          allOf:
+            - $ref: '#/components/schemas/Max500Text'
+        instance:
+          description: |
+            This attribute is containing a JSON pointer (as defined in [RFC6901]) or XPath expression to indicate the path to an issue generating the error in the related request.
+          allOf:
+            - $ref: '#/components/schemas/Max256Text'
+        code:
+          $ref: '#/components/schemas/MessageCode_ServiceUnspecific_400'
+        additionalErrors:
+          description: |
+            Array of Error Information Blocks.
+            Might be used if more than one error is to be communicated
+          type: array
+          items: #ErrorInformation
+            description: This is a data element to support the declaration of additional errors in the context of [RFC7807]. 
+            type: object
+            required:
+              - code
+            properties:
+              title:
+                $ref: '#/components/schemas/Max70Text'
+              detail:
+                $ref: '#/components/schemas/Max500Text'
+              code:
+                $ref: '#/components/schemas/MessageCode_ServiceUnspecific_400'
+        _links:
+          $ref: '#/components/schemas/links'
+    Max500Text:
+      type: string
+      maxLength: 500
+      example: 'Text, maximum of 500 characters.'
+    clientMessageInformation_401_Administrative:
+      type: object
+      required:
+        - category
+        - code
+      properties:
+        category:
+          description: |
+            Only \"ERROR\" or \"WARNING\" permitted
+          type: string
+        code:
+          $ref: '#/components/schemas/MessageCode_ServiceUnspecific_401'
+        path:
+          type: string
+        text:
+          $ref: '#/components/schemas/Max500Text'
+    Max70Text:
+      type: string
+      maxLength: 70
+      example: 'Text, maximum of 70 characters.'
+    error_NG_403_Administrative: 
+      type: object
+      properties:
+        apiClientMessages:
+          type: array
+          items:
+            $ref: '#/components/schemas/clientMessageInformation_403_Administrative'
+        _links:
+          $ref: '#/components/schemas/links'
+    ServiceType:
+      description: |
+        See document \"openFinance API Framework Data Dictionary\", section \"Service Type\" for more details.
+      type: string
+      enum:
+        - PIS
+        - RPIS
+        - BPIS
+        - XFPIS
+        - XDPIS
+        - XDFPIS
+        - XMDPIS
+        - XMDFPIS
+        - XRPIS
+        - XRFPIS
+        - XMRPIS
+        - FCS
+        - CONS-AIS
+        - CONS-XAIS
+        - CONS-DOC
+        - CONS-USP
+        - CONS-FCS
+        - CONS-RTP
+        - AIS
+        - XAIS-LOAN
+        - XAIS-SAV
+        - XAIS-CRD
+        - XAIS-SEC
+        - XAIS-MAN
+        - SGNB
+        - MAN
+        - MAN-CANC
+        - DOC
+        - PAIS-AE
+        - PAIS-BI
+        - PAIS-AS
+        - PAIS-RTP
+        - RTP
+        - VOP-SNG
+        - VOP-BLK
+        - XAS
+        - ASPSP-IS
+        - USP-IS
+        - USP-IBCK
+        - CORP-IS
+      example: 'PIS'
+    NamePrefixCode:
+      description: |
+        See document \"openFinance API Framework Data Dictionary\", section \"Name Prefix Code\" for more details.
+      type: string
+      enum:
+        - DOCT
+        - MADM
+        - MISS
+        - MIST
+        - MIKS
+      example: 'MADM'
+    contact:
+      description: |
+        See document \"openFinance API Framework Data Dictionary\", section \"Contact\" for more details.
+      type: object
+      required:
+        - contactType
+      properties:
+        contactType:
+          description: |
+          allOf:
+            - $ref: '#/components/schemas/ContactType'
+        name:
+          description: |
+          allOf:
+            - $ref: '#/components/schemas/Max70Text'
+        postalAddress:
+          description: |
+          allOf:
+            - $ref: '#/components/schemas/postalAddress'
+        contactDetails:
+          description: |
+          allOf:
+            - $ref: '#/components/schemas/contactDetails'
+    error_RFC7807_409_Administrative: 
+      description: |
+        Standardised definition of reporting error information according to [RFC7807].
+      type: object
+      required:
+        - type
+        - code
+      properties:
+        type: 
+          description: |
+            A URI reference [RFC3986] that identifies the problem type. 
+            Remark For Future: These URI will be provided by openFinance API Framework in future.
+          type: string
+          format: uri
+          maxLength: 70
+        title:
+          description: |
+            Short human readable description of error type. Could be in local language. To be provided by ASPSPs.
+          allOf:
+            - $ref: '#/components/schemas/Max70Text'
+        status:
+          description: |
+            HTTP response code generated by the server.
+            If contained, this is more relevant as the actual http response code in the actual response, because it is introduced by the application server.            
+          type: integer
+        detail:
+          description: |
+            Detailed human readable text specific to this instance of the error. 
+          allOf:
+            - $ref: '#/components/schemas/Max500Text'
+        instance:
+          description: |
+            This attribute is containing a JSON pointer (as defined in [RFC6901]) or XPath expression to indicate the path to an issue generating the error in the related request.
+          allOf:
+            - $ref: '#/components/schemas/Max256Text'
+        code:
+          $ref: '#/components/schemas/MessageCode_ServiceUnspecific_409'
+        additionalErrors:
+          description: |
+            Array of Error Information Blocks.
+            Might be used if more than one error is to be communicated
+          type: array
+          items: #ErrorInformation
+            description: This is a data element to support the declaration of additional errors in the context of [RFC7807]. 
+            type: object
+            required:
+              - code
+            properties:
+              title:
+                $ref: '#/components/schemas/Max70Text'
+              detail:
+                $ref: '#/components/schemas/Max500Text'
+              code:
+                $ref: '#/components/schemas/MessageCode_ServiceUnspecific_409'
+        _links:
+          $ref: '#/components/schemas/links'
+    hrefType:
+      description: |
+        See document \"openFinance API Framework Data Dictionary\", section \"href Type\" for more details.
+      type: object
+      required:
+        - href
+      properties:
+        href:
+          description: |
+          type: string
+    links:
+      description: |
+        See document \"openFinance API Framework Data Dictionary\", section \"Links\" for more details.
+      type: object
+      properties:
+        scaRedirect:
+          description: |
+            A link to an ASPSP site where SCA is performed within the Redirect SCA approach.
+          allOf:
+            - $ref: '#/components/schemas/hrefType'
+        scaOAuth:
+          description: |
+            The link refers to a JSON document specifying the OAuth details of the ASPSP's authorisation server. JSON document follows the definition given in [RFC 8414].
+          allOf:
+            - $ref: '#/components/schemas/hrefType'
+        confirmation:
+          description: |
+            \"confirmation\": Might be added by the ASPSP if either the \"scaRedirect\" or \"scaOAuth\" hyperlink is returned in the same response message. 
+            This hyperlink defines the URL to the resource which needs to be updated with 
+            * a confirmation code as retrieved after the plain redirect authentication process with the ASPSP authentication server or
+            * an access token as retrieved by submitting an authorization code after the integrated Oauth based authentication process with the ASPSP authentication server.
+          allOf:
+            - $ref: '#/components/schemas/hrefType'
+        creditorNameConfirmation:
+          description: |
+            A link to an endpoint, where the submitted payment needs to be confirmed explicitly for execution after a verification of payee process has detected a deviation in the creditor account/creditor name pair.
+            If this hyperlink is provided, the addressed payment will not be executed without a related confirmation.
+          allOf:
+            - $ref: '#/components/schemas/hrefType'
+        startAuthorisation:
+          description: |
+            A link to an endpoint, where the authorisation of a transaction or the authorisation of a transaction cancellation shall be started with a POST command. 
+            No specific data is needed for this process start.
+          allOf:
+            - $ref: '#/components/schemas/hrefType'
+        startAuthorisationWithPsuIdentification:
+          description: |
+            The link to an endpoint where the authorisation of a transaction or of a transaction cancellation shall be started, where PSU identification shall be uploaded 
+            with the corresponding call.
+          allOf:
+            - $ref: '#/components/schemas/hrefType'
+        updatePsuIdentification:
+          description: |
+            The link to the payment initiation or account information resource, which needs to be updated by the PSU identification if not delivered yet.
+          allOf:
+            - $ref: '#/components/schemas/hrefType'
+        startAuthorisationWithProprietaryData:
+          description: |
+            A link to the endpoint, where the authorisation of a transaction or of a transaction cancellation shall be started, and where proprietary data needs to be updated with this call. 
+            The TPP can find the scope of missing proprietary data in the ASPSP documentation.
+            The usage of this hyperlink is not further specified in the specification but is used analogously to e.g. the startAuthorisation withPsuIdentification hyperlink.
+          allOf:
+            - $ref: '#/components/schemas/hrefType'
+        updateProprietaryData:
+          description: |
+            The link to the payment initiation or account information resource, which needs to be updated by the proprietary data.
+          allOf:
+            - $ref: '#/components/schemas/hrefType'
+        startAuthorisationWithPsuAuthentication:
+          description: |
+            The link to an endpoint where the authorisation of a transaction or of a transaction cancellation shall be started, where PSU authentication data shall be uploaded 
+            with the corresponding call.
+          allOf:
+            - $ref: '#/components/schemas/hrefType'
+        updatePsuAuthentication:
+          description: |
+            The link to the payment initiation or account information resource, which needs to be updated by a PSU password and eventually the PSU identification if not delivered yet. 
+          allOf:
+            - $ref: '#/components/schemas/hrefType'
+        startAuthorisationWithEncryptedPsuAuthentication:
+          description: |
+            The link to an endpoint where the authorisation of a transaction or of a transaction cancellation shall be started, where encrypted PSU authentication data shall be uploaded 
+            with the corresponding call.
+          allOf:
+            - $ref: '#/components/schemas/hrefType'
+        updateEncryptedPsuAuthentication:
+          description: |
+            The link to the payment initiation or account information resource, which needs to be updated by an encrypted PSU password and eventually the PSU identification if not delivered yet. 
+          allOf:
+            - $ref: '#/components/schemas/hrefType'
+        startAuthorisationWithAuthenticationMethodSelection:
+          description: |
+            This is a link to and endpoint where the authorisation of a transaction or of a transaction cancellation shall be started, 
+            where the selected SCA method shall be uploaded  with the corresponding call.
+          allOf:
+            - $ref: '#/components/schemas/hrefType'
+        selectAuthenticationMethod:
+          description: |
+            This is a link to a resource, where the TPP can select the applicable second factor authentication methods for the PSU, if there were several available authentication methods. 
+          allOf:
+            - $ref: '#/components/schemas/hrefType'
+        startAuthorisationWithTransactionAuthorisation:
+          description: |
+            A link to an endpoint, where an authorisation of a transaction or a cancellation can be started, and where the response data for the challenge is uploaded in the same call for the 
+            transaction authorisation or transaction cancellation at the same time in the Embedded SCA Approach.
+          allOf:
+            - $ref: '#/components/schemas/hrefType'
+        authoriseTransaction:
+          description: |
+            The link to the payment initiation or consent resource, where the \"Transaction Authorisation\"Request\" is sent to. This is the link to the resource which will authorise the payment or the consent by 
+            checking the SCA authentication data within the Embedded SCA approach.
+          allOf:
+            - $ref: '#/components/schemas/hrefType'
+        updateResourceByDebtorAccountResource:
+          description: |
+            A link to a payment related resource which needs to be updated by an account, referenced by a resource identification.
+          allOf:
+            - $ref: '#/components/schemas/hrefType'
+        self:
+          description: |
+            The link to the payment initiation resource created by the request itself. 
+            This link can be used later to retrieve the transaction status of the payment initiation.
+          allOf:
+            - $ref: '#/components/schemas/hrefType'
+        status:
+          description: |
+            A link to retrieve the status of the transaction resource.
+          allOf:
+            - $ref: '#/components/schemas/hrefType'
+        changedVersion?{inChange=true}:
+          description: |
+            A link to retrieve the changed version of a resource that was created due to a Change Transaction Resource Request. The link can be used to retrieve the related ETag of the changed version.
+          allOf:
+            - $ref: '#/components/schemas/hrefType'
+        transactionfees:
+          description: |
+            The link is to the status resource.  
+            This link is only added within the authorisation process in case fee information is available via the status resource.
+          allOf:
+            - $ref: '#/components/schemas/hrefType'
+        scaStatus:
+          description: |
+            A link to retrieve the status of the authorisation or cancellation-authorisation sub-resource.
+          allOf:
+            - $ref: '#/components/schemas/hrefType'
+        account:
+          description: |
+            A link to the resource providing the details of one account
+          allOf:
+            - $ref: '#/components/schemas/hrefType'
+        savingsAccount:
+          description: |
+            A link to the resource providing the details of a savings account.
+          allOf:
+            - $ref: '#/components/schemas/hrefType'
+        loanAccount:
+          description: |
+            A link to the resource providing the details of a loan account.
+          allOf:
+            - $ref: '#/components/schemas/hrefType'
+        balances:
+          description: |
+            A link to the resource providing the balance of a dedicated account.
+          allOf:
+            - $ref: '#/components/schemas/hrefType'
+        transactions:
+          description: |
+            A link to the resource providing the transaction history of a dedicated account.
+          allOf:
+            - $ref: '#/components/schemas/hrefType'
+        cardAccount:
+          description: |
+            A link to the resource providing the details of one card account.
+          allOf:
+            - $ref: '#/components/schemas/hrefType'
+        cardTransactions:
+          description: |
+            A link to the resource providing the transaction history of a dedicated card account.
+          allOf:
+            - $ref: '#/components/schemas/hrefType'
+        transactionDetails:
+          description: |
+            A link to the resource providing details of a dedicated transaction.
+          allOf:
+            - $ref: '#/components/schemas/hrefType'
+        ibanCheck:
+          description: |
+            A link to the endpoint offering the addressed iban check result.
+          allOf:
+            - $ref: '#/components/schemas/hrefType'
+        paymentInitiation:
+          description: |
+            A link to an initiation related to a payment resource.
+          allOf:
+            - $ref: '#/components/schemas/hrefType'
+        securitiesAccount:
+          description: |
+            A link to the resource providing the details of one securitiesAccount.
+          allOf:
+            - $ref: '#/components/schemas/hrefType'
+        positions:
+          description: |
+            A link to the resource providing the list of positions of one securitiesAccount.
+          allOf:
+            - $ref: '#/components/schemas/hrefType'
+        orders:
+          description: |
+            A link to the resource providing the list of orders of one securitiesAccount.
+          allOf:
+            - $ref: '#/components/schemas/hrefType'
+        orderDetails:
+          description: |
+            A link to the resource providing details of one specific order.
+          allOf:
+            - $ref: '#/components/schemas/hrefType'
+        relatedOrders:
+          description: |
+            An array of links to request order details of related orders related to the order that is represented by the data structure containing this element 
+            (e.g. other orders that originated from the same order split as this order). 
+          type: array
+          items:
+            $ref: '#/components/schemas/hrefType'
+        relatedTransactions:
+          description: |
+            An array of links to request securities transaction details of transactions that resulted from this order.
+          type: array
+          items:
+            $ref: '#/components/schemas/hrefType'
+        subscription:
+          description: |
+            A link to the resource providing the details of a subscription for Push AIS Services.
+          allOf:
+            - $ref: '#/components/schemas/hrefType'
+        entryStatusRevoked:
+          description: |
+            Links to entry endpoints where the entry status is revoked.
+          type: array
+          items:
+            $ref: '#/components/schemas/hrefType'
+        first:
+          description: |
+            Navigation link for paginated account reports.
+          allOf:
+            - $ref: '#/components/schemas/hrefType'
+        next:
+          description: |
+            Navigation link for paginated account reports.
+          allOf:
+            - $ref: '#/components/schemas/hrefType'
+        previous:
+          description: |
+            Navigation link for paginated account reports.
+          allOf:
+            - $ref: '#/components/schemas/hrefType'
+        last:
+          description: |
+            Navigation link for paginated account reports.
+          allOf:
+            - $ref: '#/components/schemas/hrefType'
+        download:
+          description: |
+            Download link for huge AIS data packages.
+          allOf:
+            - $ref: '#/components/schemas/hrefType'
+        confirmInitiation:
+          description: |
+            link to a confirmation endpoint, where a payment initiation needs to be confirmed explicitly by the API Client for execution.
+          allOf:
+            - $ref: '#/components/schemas/hrefType'
+        aspspParameters:
+          description: |
+          allOf:
+            - $ref: '#/components/schemas/hrefType'
+        aspspContacts:
+          description: |
+          allOf:
+            - $ref: '#/components/schemas/hrefType'
+        aspspDowntimes:
+          description: |
+          allOf:
+            - $ref: '#/components/schemas/hrefType'
+        onboardings:
+          description: |
+            A link to commercially onboard to the related API, see openFinance, Admin Services for more details.
+          allOf:
+            - $ref: '#/components/schemas/hrefType'
+        readConditions:
+          description: |
+          allOf:
+            - $ref: '#/components/schemas/hrefType'
+        confirmConditions:
+          description: |
+          allOf:
+            - $ref: '#/components/schemas/hrefType'
+    CountryCode:
+      description: |
+        See document \"openFinance API Framework Data Dictionary\", section \"Other ISO-related basic Types\" for more details.
+      type: string
+      pattern: '[A-Z]{2}'
+      example: 'SE'
+    UUID:
+      description: |
+        See document \"openFinance API Framework Data Dictionary\", section \"Other ISO-related basic Types\" for more details.
+      type: string
+      format: uuid
+      example: '99435c7e-ad88-49ec-a2ad-99ddcb1f5555'
+    clientMessageInformation_409_Administrative:
+      type: object
+      required:
+        - category
+        - code
+      properties:
+        category:
+          description: |
+            Only \"ERROR\" or \"WARNING\" permitted
+          type: string
+        code:
+          $ref: '#/components/schemas/MessageCode_ServiceUnspecific_409'
+        path:
+          type: string
+        text:
+          $ref: '#/components/schemas/Max500Text'
+    error_RFC7807_405_Administrative: 
+      description: |
+        Standardised definition of reporting error information according to [RFC7807].
+      type: object
+      required:
+        - type
+        - code
+      properties:
+        type: 
+          description: |
+            A URI reference [RFC3986] that identifies the problem type. 
+            Remark For Future: These URI will be provided by openFinance API Framework in future.
+          type: string
+          format: uri
+          maxLength: 70
+        title:
+          description: |
+            Short human readable description of error type. Could be in local language. To be provided by ASPSPs.
+          allOf:
+            - $ref: '#/components/schemas/Max70Text'
+        status:
+          description: |
+            HTTP response code generated by the server.
+            If contained, this is more relevant as the actual http response code in the actual response, because it is introduced by the application server.            
+          type: integer
+        detail:
+          description: |
+            Detailed human readable text specific to this instance of the error. 
+          allOf:
+            - $ref: '#/components/schemas/Max500Text'
+        instance:
+          description: |
+            This attribute is containing a JSON pointer (as defined in [RFC6901]) or XPath expression to indicate the path to an issue generating the error in the related request.
+          allOf:
+            - $ref: '#/components/schemas/Max256Text'
+        code:
+          $ref: '#/components/schemas/MessageCode_ServiceUnspecific_405'
+        additionalErrors:
+          description: |
+            Array of Error Information Blocks.
+            Might be used if more than one error is to be communicated
+          type: array
+          items: #ErrorInformation
+            description: This is a data element to support the declaration of additional errors in the context of [RFC7807]. 
+            type: object
+            required:
+              - code
+            properties:
+              title:
+                $ref: '#/components/schemas/Max70Text'
+              detail:
+                $ref: '#/components/schemas/Max500Text'
+              code:
+                $ref: '#/components/schemas/MessageCode_ServiceUnspecific_405'
+        _links:
+          $ref: '#/components/schemas/links'
+    Max140Text:
+      type: string
+      maxLength: 140
+      example: 'Text, maximum of 140 characters.'
+    Max35Text:
+      type: string
+      maxLength: 35
+      example: 'Text, maximum of 35 characters.'
+    clientMessageInformation_405_Administrative:
+      type: object
+      required:
+        - category
+        - code
+      properties:
+        category:
+          description: |
+            Only \"ERROR\" or \"WARNING\" permitted
+          type: string
+        code:
+          $ref: '#/components/schemas/MessageCode_ServiceUnspecific_405'
+        path:
+          type: string
+        text:
+          $ref: '#/components/schemas/Max500Text'
+    error_RFC7807_401_Administrative: 
+      description: |
+        Standardised definition of reporting error information according to [RFC7807].
+      type: object
+      required:
+        - type
+        - code
+      properties:
+        type: 
+          description: |
+            A URI reference [RFC3986] that identifies the problem type. 
+            Remark For Future: These URI will be provided by openFinance API Framework in future.
+          type: string
+          format: uri
+          maxLength: 70
+        title:
+          description: |
+            Short human readable description of error type. Could be in local language. To be provided by ASPSPs.
+          allOf:
+            - $ref: '#/components/schemas/Max70Text'
+        status:
+          description: |
+            HTTP response code generated by the server.
+            If contained, this is more relevant as the actual http response code in the actual response, because it is introduced by the application server.            
+          type: integer
+        detail:
+          description: |
+            Detailed human readable text specific to this instance of the error. 
+          allOf:
+            - $ref: '#/components/schemas/Max500Text'
+        instance:
+          description: |
+            This attribute is containing a JSON pointer (as defined in [RFC6901]) or XPath expression to indicate the path to an issue generating the error in the related request.
+          allOf:
+            - $ref: '#/components/schemas/Max256Text'
+        code:
+          $ref: '#/components/schemas/MessageCode_ServiceUnspecific_401'
+        additionalErrors:
+          description: |
+            Array of Error Information Blocks.
+            Might be used if more than one error is to be communicated
+          type: array
+          items: #ErrorInformation
+            description: This is a data element to support the declaration of additional errors in the context of [RFC7807]. 
+            type: object
+            required:
+              - code
+            properties:
+              title:
+                $ref: '#/components/schemas/Max70Text'
+              detail:
+                $ref: '#/components/schemas/Max500Text'
+              code:
+                $ref: '#/components/schemas/MessageCode_ServiceUnspecific_401'
+        _links:
+          $ref: '#/components/schemas/links'
+    _links_201_Admin: 
+      type: object
+      additionalProperties: 
+        $ref: '#/components/schemas/hrefType'
+      properties:
+        readConditions:
+          $ref: '#/components/schemas/hrefType'
+        confirmConditions:
+          $ref: '#/components/schemas/hrefType'
+    Max16Text:
+      type: string
+      maxLength: 16
+      example: '16 Chars at most'
+    clientMessageInformation_400_Administrative:
+      type: object
+      required:
+        - category
+        - code
+      properties:
+        category:
+          description: |
+            Only \"ERROR\" or \"WARNING\" permitted
+          type: string
+        code:
+          $ref: '#/components/schemas/MessageCode_ServiceUnspecific_400'
+        path:
+          type: string
+        text:
+          $ref: '#/components/schemas/Max500Text'
+    MessageCode_ServiceUnspecific_409:
+      description: |
+        See document \"openFinance API Framework Data Dictionary\", section \"Service Unspecific HTTP Error Codes\" for more details.
+      enum: 
+          - STATUS_INVALID
+          - CHANGE_INVALID
+      example: 'STATUS_INVALID'
+    contactDetails:
+      description: |
+        See document \"openFinance API Framework Data Dictionary\", section \"Contact Details\" for more details.
+      type: object
+      properties:
+        namePrefix:
+          description: |
+            Specifies the terms used to formally address a person.
+          allOf:
+            - $ref: '#/components/schemas/NamePrefixCode'
+        name:
+          description: |
+          allOf:
+            - $ref: '#/components/schemas/Max70Text'
+        phoneNumber:
+          description: |
+            pattern \+[0-9]{1,3}-[0-9()+\-]{1,30}
+          allOf:
+            - $ref: '#/components/schemas/Max35Text'
+        mobileNumber:
+          description: |
+            pattern \+[0-9]{1,3}-[0-9()+\-]{1,30}
+          allOf:
+            - $ref: '#/components/schemas/Max35Text'
+        faxNumber:
+          description: |
+            pattern \+[0-9]{1,3}-[0-9()+\-]{1,30}
+          allOf:
+            - $ref: '#/components/schemas/Max35Text'
+        emailAddress:
+          description: |
+            Address for electronic mail (e-mail).
+          allOf:
+            - $ref: '#/components/schemas/Max70Text'
+        emailPurpose:
+          description: |
+            Purpose for which an email address may be used.
+          allOf:
+            - $ref: '#/components/schemas/Max35Text'
+        jobTitle:
+          description: |
+            Title of the function.
+          allOf:
+            - $ref: '#/components/schemas/Max35Text'
+        responsibility:
+          description: |
+            Role of a person in an organisation.
+          allOf:
+            - $ref: '#/components/schemas/Max35Text'
+        department:
+          description: |
+            Identification of a division of a large organisation or building.
+          allOf:
+            - $ref: '#/components/schemas/Max35Text'
+        preferredMethod:
+          description: |
+            Preferred method used to reach the contact.
+          allOf:
+            - $ref: '#/components/schemas/PreferredMethod'
+    clientMessageInformation_404_Administrative:
+      type: object
+      required:
+        - category
+        - code
+      properties:
+        category:
+          description: |
+            Only \"ERROR\" or \"WARNING\" permitted
+          type: string
+        code:
+          $ref: '#/components/schemas/MessageCode_ServiceUnspecific_404'
+        path:
+          type: string
+        text:
+          $ref: '#/components/schemas/Max500Text'
+    MessageCode_ServiceUnspecific_405:
+      description: |
+        See document \"openFinance API Framework Data Dictionary\", section \"Service Unspecific HTTP Error Codes\" for more details.
+      type: string
+      enum: 
+        - SERVICE_INVALID
+      example: 'SERVICE_INVALID'
+    ISODate:
+      description: |
+        See document \"openFinance API Framework Data Dictionary\", section \"Other ISO-related basic Types\" for more details.
+      type: string
+      format: date
+      example: '2020-01-01'
+    MessageCode_ServiceUnspecific_404:
+      description: |
+        See document \"openFinance API Framework Data Dictionary\", section \"Service Unspecific HTTP Error Codes\" for more details.
+      type: string
+      enum: 
+        - RESOURCE_UNKNOWN
+      example: 'RESOURCE_UNKNOWN'
+    MessageCode_ServiceUnspecific_403:
+      description: |
+        See document \"openFinance API Framework Data Dictionary\", section \"Service Unspecific HTTP Error Codes\" for more details.
+      type: string
+      enum: 
+        - SERVICE_BLOCKED
+        - CONSENT_UNKNOWN
+        - RESOURCE_UNKNOWN
+        - RESOURCE_EXPIRED
+      example: 'SERVICE_BLOCKED'
+    postalAddress:
+      description: |
+        See document \"openFinance API Framework Data Dictionary\", section \"Postal Address (Either Structured or Unstructured Address)\" for more details.
+      type: object
+      properties:
+        addressLines:
+          description: |
+            At most seven entries are permitted. May only be used, if none of the structured address elements \"streetName\", \"buildingNumber\", \"postcode\" or \"townName\" is used.
+            *Remark:* For SEPA transactions this is further restricted to a maximum of 1 entry.
+          type: array
+          maxItems: 7
+          items:
+            $ref: '#/components/schemas/Max140Text'
+        department:
+          description: |
+            Identification of a division of a large organisation or building.
+          allOf:
+            - $ref: '#/components/schemas/Max70Text'
+        subDepartment:
+          description: |
+            Identification of a sub-division of a large organisation or building.
+          allOf:
+            - $ref: '#/components/schemas/Max70Text'
+        streetName:
+          description: |
+            Name of a street or thoroughfare.
+          allOf:
+            - $ref: '#/components/schemas/Max70Text'
+        buildingNumber:
+          description: |
+            Number that identifies the position of a building on a street.
+          allOf:
+            - $ref: '#/components/schemas/Max16Text'
+        buildingName:
+          description: |
+            Name of the building or house.
+          allOf:
+            - $ref: '#/components/schemas/Max35Text'
+        floor:
+          description: |
+            Floor or storey within a building.
+          allOf:
+            - $ref: '#/components/schemas/Max70Text'
+        postBox:
+          description: |
+            Numbered box in a post office, assigned to a person or organisation, where letters are kept until called for.
+          allOf:
+            - $ref: '#/components/schemas/Max16Text'
+        room:
+          description: |
+            Building room number.
+          allOf:
+            - $ref: '#/components/schemas/Max70Text'
+        postCode:
+          description: |
+            Identifier consisting of a group of letters and/or numbers that is added to a postal address to assist the sorting of mail.
+          allOf:
+            - $ref: '#/components/schemas/Max16Text'
+        townName:
+          description: |
+            Name of a built-up area, with defined boundaries, and a local government. 
+            *Usage Rule:* If address lines are not used, this attribute is mandatrory.
+          allOf:
+            - $ref: '#/components/schemas/Max35Text'
+        townLocationName:
+          description: |
+            Specific location name within the town.
+          allOf:
+            - $ref: '#/components/schemas/Max35Text'
+        districtName:
+          description: |
+            Identifies a subdivision within a country sub-division.
+          allOf:
+            - $ref: '#/components/schemas/Max35Text'
+        countrySubDivision:
+          description: |
+            Identifies a subdivision of a country such as state, region, county.
+          allOf:
+            - $ref: '#/components/schemas/Max35Text'
+        country:
+          description: |
+            Nation with its own government.
+            *Usage Rule:* If address lines are not used, this attribute is mandatrory.
+          allOf:
+            - $ref: '#/components/schemas/CountryCode'
+    MessageCode_ServiceUnspecific_401:
+      description: |
+        See document \"openFinance API Framework Data Dictionary\", section \"Service Unspecific HTTP Error Codes\" for more details.
+      type: string
+      enum: 
+        - CERTIFICATE_INVALID
+        - CERTIFICATE_EXPIRED
+        - ROLE_INVALID
+        - CERTIFICATE_BLOCKED
+        - CERTIFICATE_REVOKED
+        - CERTIFICATE_MISSING
+        - CLIENT_INVALID
+        - CLIENT_INCONSISTENT
+        - API_CONTRACT_ID_INVALID
+        - SIGNATURE_INVALID
+        - SIGNATURE_MISSING
+        - PSU_CREDENTIALS_INVALID
+        - CORPORATE_ID_INVALID
+        - CONSENT_INVALID
+        - CONSENT_EXPIRED
+        - TOKEN_UNKNOWN
+        - TOKEN_INVALID
+        - TOKEN_EXPIRED
+      example: 'CERTIFICATE_INVALID'
+    MessageCode_ServiceUnspecific_400:
+      description: |
+        See document \"openFinance API Framework Data Dictionary\", section \"Service Unspecific HTTP Error Codes\" for more details.
+      type: string
+      enum: 
+        - FORMAT_ERROR
+        - PARAMETER_NOT_CONSISTENT
+        - PARAMETER_NOT_SUPPORTED
+        - SERVICE_INVALID
+        - CONSENT_UNKNOWN
+        - RESOURCE_UNKNOWN
+        - RESOURCE_EXPIRED
+        - RESOURCE_BLOCKED
+        - TIMESTAMP_INVALID
+        - PERIOD_INVALID
+        - SCA_METHOD_UNKNOWN
+        - SCA_INVALID
+      example: 'FORMAT_ERROR'
+    error_NG_401_Administrative: 
+      type: object
+      properties:
+        apiClientMessages:
+          type: array
+          items:
+            $ref: '#/components/schemas/clientMessageInformation_401_Administrative'
+        _links:
+          $ref: '#/components/schemas/links'
+    error_NG_405_Administrative: 
+      type: object
+      properties:
+        apiClientMessages:
+          type: array
+          items:
+            $ref: '#/components/schemas/clientMessageInformation_405_Administrative'
+        _links:
+          $ref: '#/components/schemas/links'
+    error_RFC7807_403_Administrative: 
+      description: |
+        Standardised definition of reporting error information according to [RFC7807].
+      type: object
+      required:
+        - type
+        - code
+      properties:
+        type: 
+          description: |
+            A URI reference [RFC3986] that identifies the problem type. 
+            Remark For Future: These URI will be provided by openFinance API Framework in future.
+          type: string
+          format: uri
+          maxLength: 70
+        title:
+          description: |
+            Short human readable description of error type. Could be in local language. To be provided by ASPSPs.
+          allOf:
+            - $ref: '#/components/schemas/Max70Text'
+        status:
+          description: |
+            HTTP response code generated by the server.
+            If contained, this is more relevant as the actual http response code in the actual response, because it is introduced by the application server.            
+          type: integer
+        detail:
+          description: |
+            Detailed human readable text specific to this instance of the error. 
+          allOf:
+            - $ref: '#/components/schemas/Max500Text'
+        instance:
+          description: |
+            This attribute is containing a JSON pointer (as defined in [RFC6901]) or XPath expression to indicate the path to an issue generating the error in the related request.
+          allOf:
+            - $ref: '#/components/schemas/Max256Text'
+        code:
+          $ref: '#/components/schemas/MessageCode_ServiceUnspecific_403'
+        additionalErrors:
+          description: |
+            Array of Error Information Blocks.
+            Might be used if more than one error is to be communicated
+          type: array
+          items: #ErrorInformation
+            description: This is a data element to support the declaration of additional errors in the context of [RFC7807]. 
+            type: object
+            required:
+              - code
+            properties:
+              title:
+                $ref: '#/components/schemas/Max70Text'
+              detail:
+                $ref: '#/components/schemas/Max500Text'
+              code:
+                $ref: '#/components/schemas/MessageCode_ServiceUnspecific_403'
+        _links:
+          $ref: '#/components/schemas/links'
+    clientMessageInformation_403_Administrative:
+      type: object
+      required:
+        - category
+        - code
+      properties:
+        category:
+          description: |
+            Only \"ERROR\" or \"WARNING\" permitted
+          type: string
+        code:
+          $ref: '#/components/schemas/MessageCode_ServiceUnspecific_403'
+        path:
+          type: string
+        text:
+          $ref: '#/components/schemas/Max500Text'
+    error_NG_409_Administrative: 
+      type: object
+      properties:
+        apiClientMessages:
+          type: array
+          items:
+            $ref: '#/components/schemas/clientMessageInformation_409_Administrative'
+        _links:
+          $ref: '#/components/schemas/links'
+  parameters:
+    HEADER_bodySigProfile:
+      name: Body-Sig-Profile 
+      in: header
+      description: |
+         Indicates the signature profile used for signing (parts of) the body. Shall be used if the body is signed.
+      required: false
+      schema:
+        type: string
+        enum:
+          - JAdES_JS
+          - XAdES
+          - EMV_AC
+          - EUDIW
+      example: 'XAdES'
+    HEADER_xJwsSignature:
+      name: x-jws-signature
+      in: header
+      description: |
+        The attribute x-jws-signature contains the JSON Web Signature.
+      schema:
+        type: string
+      required: false # conditional
+      example: 'eyJiNjQiOmZhbHNlLCJ4NXQjUzI1NiI6ImR5dFBwU2tKWXpoVGRQWFNXUDdqaFhnRzRrQ09XSVdHaWVzZHprdk5MelkiLCJjcml0IjpbInNpZ1QiLCJzaWdEIiwiYjY0Il0sInNpZ1QiOiIyMDIwLTEwLTI2VDExOjI2OjU3WiIsInNpZ0QiOnsicGFycyI6WyJ4LXJlcXVlc3QtaWQiLCJkaWdlc3QiXSwibUlkIjoiaHR0cDovL3VyaS5ldHNpLm9yZy8xOTE4Mi9IdHRwSGVhZGVycyJ9LCJhbGciOiJSUzI1NiJ9..NuGglWBtHcXavob2ZmW-PoSpMmhJS9U6z8zPqHFoE97vHI3z8wtaVdbwsj5WzgPjtVWUUnk8cxP4JjLXdwzwhhHB2uJ5FI4ZZGdSQQw-9pXPUx3cCJSzHmrgkJ-di-A4'
+    PATH_onboardingId:
+      name: onboardingId
+      in: path
+      description: 
+        Onboarding ID as returned with the response message to the initiation of the onboarding process.
+      required: true
+      schema:
+        $ref: '#/components/schemas/UUID'
+      example: '3d9a81b3-a47d-4130-8765-a9c0ff861100'
+    HEADER_digest:
+      name: Digest
+      in: header
+      description: |
+        When API Client include a signature according to this signature profile, they also must include a \"Digest\" header as defined in [RFC3230]. 
+        The \"Digest\" Header contains a Hash of the message body. If the message does not contain a body, the \"Digest\" header must contain the hash of an empty byte list.
+        The only hash algorithms that may be used to calculate the Digest within the context of this specification are SHA-256 and SHA-512 as defined in [RFC5843]. 
+      schema:
+        type: string
+      required: false # conditional
+      example: 'SHA-256=hl1/Eps8BEQW58FJhDApwJXjGY4nr1ArGDHIT25vq6A='
+    HEADER_xRequestId:
+      name: X-Request-ID
+      in: header
+      description: |
+        ID of the request, unique to the call, as determined by the initiating party.
+        This is the unique ID of the API Client for the payment initiation regarding PSD2 article 47 and EBA RTS article 29.
+      required: true
+      schema:
+        type: string
+        format: uuid
+      example: '99391c7e-ad88-49ec-a2ad-99ddcb1f7721'
+  requestBodies: {}
+  headers:
+    ASPSP-Notification-Support:
+      description: |
+        true if the ASPSP supports resource status notification services.
+        false if the ASPSP supports resource status notification in general, but not for the current request.
+        Not used, if resource status notification services are generally not supported by the ASPSP.
+        Shall be supported if the ASPSP supports resource status notification services.
+      schema:
+        type: boolean       
+      required: false
+      example: true
+    X-Reference-API-Version:
+      description: ID of the request, unique to the call, as determined by the initiating party.
+      required: true
+      schema:
+        type: string
+      example: '2.1.3'
+    X-Reference-API-Document:
+      description: |
+        The name of the Implementation Guideline document, where the service is based on, e.g. \"Extended Payment Initiation Services\". 
+      required: false
+      schema:
+        type: string
+      example: 'Extended Payment Initiation Services'
+    X-Request-ID:
+      description: |
+        ID of the request, unique to the call, as determined by the initiating party.
+      required: true
+      schema:
+        type: string
+        format: uuid
+      example: '99391c7e-ad88-49ec-a2ad-99ddcb1f7721'
+    X-Reference-API-Name:
+      description: |
+        \"Berlin Group openFinance API\" 
+      required: false
+      schema:
+        type: string
+      example: 'Berlin Group openFinance API'
+    Location:
+      description: |
+        Location of the created resource.
+      schema:
+        type: string
+        format: url
+      required: false
+      example: 'https://testbank.com/xs2a/v2/consents/account-access/123cons456'
+  responses:
+    decline_400_Administrative:
+      headers:
+        X-Reference-API-Name:
+          $ref: '#/components/headers/X-Reference-API-Name'
+        X-Reference-API-Document:
+          $ref: '#/components/headers/X-Reference-API-Document'
+        X-Reference-API-Version:
+          $ref: '#/components/headers/X-Reference-API-Version'
+        Location:
+          $ref: '#/components/headers/Location'
+        X-Request-ID:
+          $ref: '#/components/headers/X-Request-ID'
+        ASPSP-Notification-Support:
+          $ref: '#/components/headers/ASPSP-Notification-Support'
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error_NG_400_Administrative'
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/error_RFC7807_400_Administrative'
+    Ok_200_Administrative_informAboutNewQSeal:
+      headers:
+        X-Request-ID:
+          $ref: '#/components/headers/X-Request-ID'
+      description: NO CONTENT
+    decline_405_Administrative:
+      headers:
+        X-Reference-API-Name:
+          $ref: '#/components/headers/X-Reference-API-Name'
+        X-Reference-API-Document:
+          $ref: '#/components/headers/X-Reference-API-Document'
+        X-Reference-API-Version:
+          $ref: '#/components/headers/X-Reference-API-Version'
+        Location:
+          $ref: '#/components/headers/Location'
+        X-Request-ID:
+          $ref: '#/components/headers/X-Request-ID'
+        ASPSP-Notification-Support:
+          $ref: '#/components/headers/ASPSP-Notification-Support'
+      description: Method not allowed
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error_NG_405_Administrative'
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/error_RFC7807_405_Administrative'
+    decline_403_Administrative:
+      headers:
+        X-Reference-API-Name:
+          $ref: '#/components/headers/X-Reference-API-Name'
+        X-Reference-API-Document:
+          $ref: '#/components/headers/X-Reference-API-Document'
+        X-Reference-API-Version:
+          $ref: '#/components/headers/X-Reference-API-Version'
+        Location:
+          $ref: '#/components/headers/Location'
+        X-Request-ID:
+          $ref: '#/components/headers/X-Request-ID'
+        ASPSP-Notification-Support:
+          $ref: '#/components/headers/ASPSP-Notification-Support'
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error_NG_403_Administrative'
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/error_RFC7807_403_Administrative'
+    Ok_200_Administrative_readOnboardingResource:
+      headers:
+        X-Request-ID:
+          $ref: '#/components/headers/X-Request-ID'
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - onboardingStatus
+              - schemeId
+              - serviceIds
+              - serviceContractId
+            properties:
+              onboardingStatus:
+                description: |
+                  Current status of this onboarding resource.
+                allOf:
+                  - $ref: '#/components/schemas/OnboardingStatus'
+              schemeId:
+                description: |
+                  Identification of the corresponding scheme, in case of no scheme involved use constant BILATERAL
+                  Example: giroAPI-payment
+                allOf: 
+                  - $ref: '#/components/schemas/Max70Text'
+              serviceIds:
+                description: |
+                  Identification of the extended services for which the onboarding will be done.
+                  Possible values to identify a service have to be defined by the service owner (scheme or ASPSP).
+                type: array
+                items: 
+                  $ref: '#/components/schemas/ServiceType'
+              serviceContractId:
+                description: |
+                  Identification of the service contract concluded between the service owner (scheme or ASPSP) and the API Client to use these services.
+                allOf: 
+                  - $ref: '#/components/schemas/Max70Text'
+              apiContractId:
+                description: |
+                  Unique identification of the successful onboarding of the API Client for the list of services contained in serviceIds of the request body. Shall be used by the API Client if accessing the services after the onboarding.
+                  Has to be returned if the apiContractId is set within the onboarding resource.
+                allOf:
+                  - $ref: '#/components/schemas/UUID'
+              validTo:
+                description: |
+                  Date until when the successful onboarding is valid.
+                allOf: 
+                  - $ref: '#/components/schemas/ISODate'
+              validFrom:
+                description: |
+                  Indicates the date after which the API Client can access the services at the openFinance API of the ASPSP using the apiContractId.
+                  Has to be returned if the attribute validFrom is set within the onboarding resource.
+                allOf:
+                  - $ref: '#/components/schemas/ISODate'
+    decline_408_Administrative:
+      headers:
+        X-Reference-API-Name:
+          $ref: '#/components/headers/X-Reference-API-Name'
+        X-Reference-API-Document:
+          $ref: '#/components/headers/X-Reference-API-Document'
+        X-Reference-API-Version:
+          $ref: '#/components/headers/X-Reference-API-Version'
+        Location:
+          $ref: '#/components/headers/Location'
+        X-Request-ID:
+          $ref: '#/components/headers/X-Request-ID'
+        ASPSP-Notification-Support :
+          $ref: '#/components/headers/ASPSP-Notification-Support'
+      description: Request Timeout
+    decline_503:
+      headers:
+        X-Reference-API-Name:
+          $ref: '#/components/headers/X-Reference-API-Name'
+        X-Reference-API-Document:
+          $ref: '#/components/headers/X-Reference-API-Document'
+        X-Reference-API-Version:
+          $ref: '#/components/headers/X-Reference-API-Version'
+        Location:
+          $ref: '#/components/headers/Location'
+        X-Request-ID:
+          $ref: '#/components/headers/X-Request-ID'
+        ASPSP-Notification-Support :
+          $ref: '#/components/headers/ASPSP-Notification-Support'
+      description: Service Unavailable
+    decline_415:
+      headers:
+        X-Reference-API-Name:
+          $ref: '#/components/headers/X-Reference-API-Name'
+        X-Reference-API-Document:
+          $ref: '#/components/headers/X-Reference-API-Document'
+        X-Reference-API-Version:
+          $ref: '#/components/headers/X-Reference-API-Version'
+        Location:
+          $ref: '#/components/headers/Location'
+        X-Request-ID:
+          $ref: '#/components/headers/X-Request-ID'
+        ASPSP-Notification-Support :
+          $ref: '#/components/headers/ASPSP-Notification-Support'
+      description: Unsupported Media Type
+    decline_500:
+      headers:
+        X-Reference-API-Name:
+          $ref: '#/components/headers/X-Reference-API-Name'
+        X-Reference-API-Document:
+          $ref: '#/components/headers/X-Reference-API-Document'
+        X-Reference-API-Version:
+          $ref: '#/components/headers/X-Reference-API-Version'
+        Location:
+          $ref: '#/components/headers/Location'
+        X-Request-ID:
+          $ref: '#/components/headers/X-Request-ID'
+        ASPSP-Notification-Support :
+          $ref: '#/components/headers/ASPSP-Notification-Support'
+      description: Internal Server Error
+    decline_406_Administrative:
+      headers:
+        X-Reference-API-Name:
+          $ref: '#/components/headers/X-Reference-API-Name'
+        X-Reference-API-Document:
+          $ref: '#/components/headers/X-Reference-API-Document'
+        X-Reference-API-Version:
+          $ref: '#/components/headers/X-Reference-API-Version'
+        Location:
+          $ref: '#/components/headers/Location'
+        X-Request-ID:
+          $ref: '#/components/headers/X-Request-ID'
+        ASPSP-Notification-Support :
+          $ref: '#/components/headers/ASPSP-Notification-Support'
+      description: Not Acceptable
+    decline_408:
+      headers:
+        X-Reference-API-Name:
+          $ref: '#/components/headers/X-Reference-API-Name'
+        X-Reference-API-Document:
+          $ref: '#/components/headers/X-Reference-API-Document'
+        X-Reference-API-Version:
+          $ref: '#/components/headers/X-Reference-API-Version'
+        Location:
+          $ref: '#/components/headers/Location'
+        X-Request-ID:
+          $ref: '#/components/headers/X-Request-ID'
+        ASPSP-Notification-Support :
+          $ref: '#/components/headers/ASPSP-Notification-Support'
+      description: Request Timeout
+    decline_401_Administrative:
+      headers:
+        X-Reference-API-Name:
+          $ref: '#/components/headers/X-Reference-API-Name'
+        X-Reference-API-Document:
+          $ref: '#/components/headers/X-Reference-API-Document'
+        X-Reference-API-Version:
+          $ref: '#/components/headers/X-Reference-API-Version'
+        Location:
+          $ref: '#/components/headers/Location'
+        X-Request-ID:
+          $ref: '#/components/headers/X-Request-ID'
+        ASPSP-Notification-Support:
+          $ref: '#/components/headers/ASPSP-Notification-Support'
+      description: Unauthorised
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error_NG_401_Administrative'
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/error_RFC7807_401_Administrative'
+    Ok_200_Administrative_readOnboardingStatus:
+      headers:
+        X-Request-ID:
+          $ref: '#/components/headers/X-Request-ID'
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - onboardingStatus
+            properties:
+              onboardingStatus:
+                description: |
+                  Current status of this onboarding resource.
+                allOf:
+                  - $ref: '#/components/schemas/OnboardingStatus'
+    decline_406:
+      headers:
+        X-Reference-API-Name:
+          $ref: '#/components/headers/X-Reference-API-Name'
+        X-Reference-API-Document:
+          $ref: '#/components/headers/X-Reference-API-Document'
+        X-Reference-API-Version:
+          $ref: '#/components/headers/X-Reference-API-Version'
+        Location:
+          $ref: '#/components/headers/Location'
+        X-Request-ID:
+          $ref: '#/components/headers/X-Request-ID'
+        ASPSP-Notification-Support :
+          $ref: '#/components/headers/ASPSP-Notification-Support'
+      description: Not Acceptable
+    Ok_204_Administrative_cancelOnboarding:
+      headers:
+        X-Request-ID:
+          $ref: '#/components/headers/X-Request-ID'
+      description: NO CONTENT
+    decline_404_Administrative:
+      headers:
+        X-Reference-API-Name:
+          $ref: '#/components/headers/X-Reference-API-Name'
+        X-Reference-API-Document:
+          $ref: '#/components/headers/X-Reference-API-Document'
+        X-Reference-API-Version:
+          $ref: '#/components/headers/X-Reference-API-Version'
+        Location:
+          $ref: '#/components/headers/Location'
+        X-Request-ID:
+          $ref: '#/components/headers/X-Request-ID'
+        ASPSP-Notification-Support:
+          $ref: '#/components/headers/ASPSP-Notification-Support'
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error_NG_404_Administrative'
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/error_RFC7807_404_Administrative'
+    decline_415_Administrative:
+      headers:
+        X-Reference-API-Name:
+          $ref: '#/components/headers/X-Reference-API-Name'
+        X-Reference-API-Document:
+          $ref: '#/components/headers/X-Reference-API-Document'
+        X-Reference-API-Version:
+          $ref: '#/components/headers/X-Reference-API-Version'
+        Location:
+          $ref: '#/components/headers/Location'
+        X-Request-ID:
+          $ref: '#/components/headers/X-Request-ID'
+        ASPSP-Notification-Support :
+          $ref: '#/components/headers/ASPSP-Notification-Support'
+      description: Unsupported Media Type
+    decline_409_Administrative:
+      headers:
+        X-Reference-API-Name:
+          $ref: '#/components/headers/X-Reference-API-Name'
+        X-Reference-API-Document:
+          $ref: '#/components/headers/X-Reference-API-Document'
+        X-Reference-API-Version:
+          $ref: '#/components/headers/X-Reference-API-Version'
+        Location:
+          $ref: '#/components/headers/Location'
+        X-Request-ID:
+          $ref: '#/components/headers/X-Request-ID'
+        ASPSP-Notification-Support:
+          $ref: '#/components/headers/ASPSP-Notification-Support'
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error_NG_409_Administrative'
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/error_RFC7807_409_Administrative'
+    created_201_Admin:
+      headers:
+        X-Reference-API-Name:
+          $ref: '#/components/headers/X-Reference-API-Name'
+        X-Reference-API-Document:
+          $ref: '#/components/headers/X-Reference-API-Document'
+        X-Reference-API-Version:
+          $ref: '#/components/headers/X-Reference-API-Version'
+        X-Request-ID:
+          $ref: '#/components/headers/X-Request-ID'
+      description: CREATED
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - onboardingId
+              - onboardingStatus
+            properties:
+              onboardingId:
+                description: |
+                  Unique identification of the onboarding resource created by this initiation.
+                allOf:
+                  - $ref: '#/components/schemas/Max70Text'
+              onboardingStatus:
+                description: |
+                  Status of the onboarding process.
+                allOf:
+                  - $ref: '#/components/schemas/OnboardingStatus'
+              apiContractId:
+                description: |
+                  Unique identification of the successful onboarding of the API Client for the list of services.
+                  Shall be used by the API Client if accessing the services after the onboarding.
+                  The attribute apiContractId shall only be provided if the onboarding resource has been created and the resource status is set to valid.
+                  Otherwise this attribute shall be missing.
+                allOf:
+                  - $ref: '#/components/schemas/UUID'
+              validTo:
+                description: |
+                  Date until when the successful onboarding is valid.
+                  The attribute validTo shall only be provided if the onboarding resource has been created and the resource status is set to valid.
+                  Otherwise this attribute shall be missing.
+                allOf:
+                  - $ref: '#/components/schemas/ISODate'
+              validFrom:
+                description: |
+                  Indicates the date after which the API Client can access the services at the openFinance API of the ASPSP using the apiContractId returned with this response.
+                allOf:
+                  - $ref: '#/components/schemas/ISODate'
+              _links:
+                description: |
+                  A list of hyperlinks to the next steps to read a price list and to confirm a price list.
+                  The attribute _links shall only be provided if the technical onboarding requires the execution of the two step process according to section 2.2. Otherwise this attribute shall be missing.
+                  If this attribute is provided it shall contain the following link:
+                  • readConditions
+                  • confirmConditions
+                  Remark about future versions: Future versions of the data dictionary [oFA DaD] will contain the definition of these href types.
+                allOf:
+                  - $ref: '#/components/schemas/_links_201_Admin'
+  examples: {}
+

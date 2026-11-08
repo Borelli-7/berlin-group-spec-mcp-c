@@ -82,10 +82,12 @@ get_endpoint_requirements → read_openapi_endpoint → trace_requirement → re
 ## Corpus
 
 `corpus/` contains the **official Berlin Group publications** (NextGenPSD2 1.3.16 and openFinance API
-Framework v2.x PDFs and OpenAPI files, including the Verification of Party extended service; 29 sources), published by the Berlin Group mostly under the
-Creative Commons Attribution-NoDerivatives 4.0 license; they are redistributed unmodified. Authority and
+Framework v2.x PDFs and OpenAPI files, including the Verification of Party extended service, the
+Administrative Services and the v1.3 Securities AIS OpenAPI), published by the Berlin Group mostly under the
+Creative Commons Attribution-NoDerivatives 4.0 license, plus two external normative standards referenced by
+them (ETSI TS 119 495 and IETF RFC 5280); 34 sources in total, redistributed unmodified. Authority and
 precedence are **declared** in `corpus/manifest.yaml`, never inferred from file names.
-`corpus/requirements/requirements.yaml` holds 103 curated requirements, and `corpus/text/v2/errata.md`
+`corpus/requirements/requirements.yaml` holds 105 curated requirements, and `corpus/text/v2/errata.md`
 records project clarifications on discrepancies between the official files (not a Berlin Group publication).
 
 Tests use a separate **synthetic fixture corpus** in `crates/bg-spec-indexer/tests/fixtures/corpus/`
