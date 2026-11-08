@@ -1,4 +1,4 @@
-//! Helpers for OpenAPI paths and HTTP methods.
+//! Helpers for `OpenAPI` paths and HTTP methods.
 
 use crate::{CoreError, Result};
 
@@ -19,7 +19,7 @@ pub fn normalize_method(method: &str) -> Result<String> {
     }
 }
 
-/// Validates an OpenAPI path template (must start with `/`, no traversal, no whitespace).
+/// Validates an `OpenAPI` path template (must start with `/`, no traversal, no whitespace).
 pub fn validate_path(path: &str) -> Result<String> {
     let p = path.trim();
     let ok = p.starts_with('/')
@@ -92,10 +92,8 @@ pub fn template_score(requested: &str, candidate: &str) -> u8 {
         3
     } else if template_params(requested) == template_params(candidate) {
         2
-    } else if param_shape(requested) == param_shape(candidate) {
-        1
     } else {
-        0
+        u8::from(param_shape(requested) == param_shape(candidate))
     }
 }
 

@@ -92,7 +92,11 @@ fn hash_tree(root: &Path) -> Vec<(String, String)> {
             let name = p.file_name().unwrap().to_string_lossy().to_string();
             if p.is_dir() {
                 stack.push(p);
-            } else if !name.ends_with("-shm") && !name.ends_with("-wal") && !name.ends_with(".lock")
+            } else if !name.ends_with("-shm")
+                && !name.ends_with("-wal")
+                && !Path::new(&name)
+                    .extension()
+                    .is_some_and(|e| e.eq_ignore_ascii_case("lock"))
             {
                 out.push((
                     p.display().to_string(),
@@ -126,7 +130,7 @@ async fn list_tools_exposes_exactly_the_read_only_tool_set() {
     let tools = s.client.list_all_tools().await.unwrap();
     let mut names: Vec<_> = tools.iter().map(|t| t.name.to_string()).collect();
     names.sort();
-    let mut expected: Vec<_> = TOOL_NAMES.iter().map(|n| n.to_string()).collect();
+    let mut expected: Vec<_> = TOOL_NAMES.iter().map(ToString::to_string).collect();
     expected.sort();
     assert_eq!(names, expected);
 
@@ -179,7 +183,7 @@ async fn list_tools_exposes_exactly_the_read_only_tool_set() {
         .iter()
         .map(|v| v.as_str().unwrap())
         .collect();
-    req.sort();
+    req.sort_unstable();
     assert_eq!(req, ["locator", "source_id"]);
     assert!(
         read["properties"].get("path").is_none(),

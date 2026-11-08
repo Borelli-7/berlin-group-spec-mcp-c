@@ -1,4 +1,7 @@
-use super::{COMPARISON_NOTICE, CrossSourceReference, MatchedBy, SpecificationService};
+use super::{
+    COMPARISON_NOTICE, CrossSourceReference, MatchedBy, SpecificationService,
+    specification::SchemaClosure,
+};
 use crate::{
     CoreError, Result,
     diff::{CompatibilityFact, derive_facts, diff_operations},
@@ -98,7 +101,7 @@ impl CompatibilityService {
                     )
                     .await?
             }
-            None => Default::default(),
+            None => SchemaClosure::default(),
         };
         let closure_b = match &b {
             Some(l) => {
@@ -110,7 +113,7 @@ impl CompatibilityService {
                     )
                     .await?
             }
-            None => Default::default(),
+            None => SchemaClosure::default(),
         };
         let (set_a, set_b) = (closure_a.schema_set(), closure_b.schema_set());
         let changes = diff_operations(

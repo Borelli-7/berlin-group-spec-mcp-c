@@ -1,6 +1,5 @@
 //! `bg-spec`: indexing, diagnostics and maintenance CLI for the Berlin Group spec MCP.
-
-#![forbid(unsafe_code)]
+#![allow(clippy::print_stdout, reason = "the CLI reports results on stdout")]
 
 mod doctor;
 
@@ -10,6 +9,7 @@ use bg_spec_core::{
 };
 use bg_spec_indexer::{IndexAction, IndexOptions, Indexer};
 use clap::{Parser, Subcommand};
+use std::collections::BTreeMap;
 use std::{path::PathBuf, process::ExitCode, sync::Arc};
 
 #[derive(Parser)]
@@ -103,7 +103,8 @@ async fn index(config: &Config, force: bool, jobs: Option<usize>, json: bool) ->
                 "{:<9} {:<48} {:<8} records={:<4} diagnostics={}",
                 format!("{:?}", d.action).to_lowercase(),
                 d.source_id,
-                d.status.map(|s| s.as_str()).unwrap_or("-"),
+                d.status
+                    .map_or("-", bg_spec_core::domain::DocumentStatus::as_str),
                 d.records,
                 d.diagnostics.len()
             );
@@ -162,10 +163,7 @@ async fn stats(config: &Config, json: bool) -> Result<ExitCode> {
     let meta = catalog.index_meta().await?;
     let search_docs = search.num_docs().await?;
     let docs = Arc::clone(&catalog).list_documents().await?;
-    let mut by_version: std::collections::BTreeMap<
-        String,
-        std::collections::BTreeMap<String, usize>,
-    > = Default::default();
+    let mut by_version: BTreeMap<String, BTreeMap<String, usize>> = BTreeMap::new();
     let mut quality = serde_json::Map::new();
     for key in [
         "removed_margin_lines",
@@ -254,10 +252,7 @@ async fn sources(config: &Config, json: bool) -> Result<ExitCode> {
                 s.authority.to_string(),
                 s.precedence,
                 s.status.to_string(),
-                s.sha256
-                    .as_deref()
-                    .map(|h| &h[..12.min(h.len())])
-                    .unwrap_or("-"),
+                s.sha256.as_deref().map_or("-", |h| &h[..12.min(h.len())]),
                 s.path
             );
         }

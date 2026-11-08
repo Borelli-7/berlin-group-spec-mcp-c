@@ -72,7 +72,7 @@ impl Reloader {
     fn snapshot(&self) -> Loaded {
         self.current
             .read()
-            .unwrap_or_else(|e| e.into_inner())
+            .unwrap_or_else(std::sync::PoisonError::into_inner)
             .clone()
     }
 
@@ -95,7 +95,10 @@ impl Reloader {
                     to = ?next.generation,
                     "switched to newly published index generation"
                 );
-                let mut slot = self.current.write().unwrap_or_else(|e| e.into_inner());
+                let mut slot = self
+                    .current
+                    .write()
+                    .unwrap_or_else(std::sync::PoisonError::into_inner);
                 // A concurrent call may already have loaded an equal or newer generation.
                 if slot.generation < next.generation {
                     *slot = next;

@@ -41,7 +41,7 @@ macro_rules! string_enum {
 pub enum DocumentKind {
     /// PDF specification (Implementation Guidelines, Operational Rules, ...).
     Pdf,
-    /// OpenAPI 3.x contract (YAML or JSON).
+    /// `OpenAPI` 3.x contract (YAML or JSON).
     Openapi,
     /// Plain text or Markdown (clarifications, errata, curated notes).
     Text,
@@ -117,6 +117,7 @@ impl Diagnostic {
         }
     }
 
+    #[must_use]
     pub fn at(mut self, locator: impl Into<String>) -> Self {
         self.locator = Some(locator.into());
         self

@@ -27,7 +27,7 @@ pub struct PageQuality {
 fn is_garbage(c: char) -> bool {
     c == '\u{FFFD}'
         || (c.is_control() && !c.is_whitespace())
-        || matches!(c as u32, 0xE000..=0xF8FF | 0xF0000..=0xFFFFD | 0x100000..=0x10FFFD)
+        || matches!(c as u32, 0xE000..=0xF8FF | 0xF_0000..=0xF_FFFD | 0x10_0000..=0x10_FFFD)
 }
 
 pub fn page_quality(text: &str) -> PageQuality {

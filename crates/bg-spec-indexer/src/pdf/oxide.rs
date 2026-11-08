@@ -5,7 +5,7 @@ use std::{path::Path, sync::Once};
 
 static DISABLE_SHARED_FONT_CACHE: Once = Once::new();
 
-/// pdf_oxide shares parsed fonts across documents through a process-wide cache keyed by a font
+/// `pdf_oxide` shares parsed fonts across documents through a process-wide cache keyed by a font
 /// identity hash. Its hits depend on which documents were extracted before (and, with parallel
 /// indexing, on thread timing), which changed the extracted text of some pages. A capacity of zero
 /// evicts every insert, so each document is extracted on its own (the per-document font cache is

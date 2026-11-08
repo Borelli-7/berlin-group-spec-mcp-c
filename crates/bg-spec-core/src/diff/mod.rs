@@ -1,4 +1,4 @@
-//! Deterministic structural comparison of OpenAPI schemas and operations. No heuristics,
+//! Deterministic structural comparison of `OpenAPI` schemas and operations. No heuristics,
 //! no compatibility verdicts: only concrete differences.
 
 mod facts;

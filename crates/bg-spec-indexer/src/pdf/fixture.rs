@@ -1,7 +1,9 @@
 //! Deterministic minimal PDF writer used to produce synthetic regression fixtures.
 //!
-//! Generates single-font (Helvetica, WinAnsi) text-only PDFs. Not a general PDF writer:
+//! Generates single-font (Helvetica, `WinAnsi`) text-only PDFs. Not a general PDF writer:
 //! it exists so fixtures are reproducible and contain no third-party copyrighted text.
+
+use std::fmt::Write as _;
 
 /// One page of text lines. An empty page simulates a scanned (image-only) page.
 #[derive(Debug, Clone, Default)]
@@ -97,7 +99,7 @@ pub fn render_pdf(title: &str, pages: &[FixturePage]) -> Vec<u8> {
     let xref_at = out.len();
     let mut xref = format!("xref\n0 {}\n0000000000 65535 f \n", objects.len() + 1);
     for off in offsets {
-        xref.push_str(&format!("{off:010} 00000 n \n"));
+        let _ = writeln!(xref, "{off:010} 00000 n ");
     }
     out.extend_from_slice(xref.as_bytes());
     out.extend_from_slice(

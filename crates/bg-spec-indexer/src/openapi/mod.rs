@@ -1,11 +1,11 @@
-//! OpenAPI ingestion.
+//! `OpenAPI` ingestion.
 //!
-//! * OpenAPI 3.0.x documents are parsed strictly with [`openapiv3::OpenAPI`]; the typed
+//! * `OpenAPI` 3.0.x documents are parsed strictly with [`openapiv3::OpenAPI`]; the typed
 //!   model validates the structure and supplies API metadata.
 //! * Normalized records are projected from the raw JSON tree, so schema JSON is exactly
 //!   what the source declares (typed re-serialization would drop keywords such as
 //!   `const` or `examples` and break provenance fidelity).
-//! * OpenAPI 3.1 documents (unsupported by `openapiv3`) and 3.0 documents rejected by the
+//! * `OpenAPI` 3.1 documents (unsupported by `openapiv3`) and 3.0 documents rejected by the
 //!   typed parser use the same projector and receive a diagnostic.
 
 mod normalize;
@@ -19,9 +19,12 @@ pub use text::{
 use bg_spec_core::{CoreError, Result};
 use serde_json::Value;
 
-/// Parses a YAML or JSON OpenAPI document into a JSON tree.
+/// Parses a YAML or JSON `OpenAPI` document into a JSON tree.
 pub fn parse_document(raw: &str, file_name: &str) -> Result<Value> {
-    let value: Value = if file_name.ends_with(".json") {
+    let value: Value = if std::path::Path::new(file_name)
+        .extension()
+        .is_some_and(|e| e.eq_ignore_ascii_case("json"))
+    {
         serde_json::from_str(raw)
             .map_err(|e| CoreError::Integrity(format!("{file_name}: invalid JSON: {e}")))?
     } else {
@@ -36,7 +39,7 @@ pub fn parse_document(raw: &str, file_name: &str) -> Result<Value> {
     Ok(value)
 }
 
-/// OpenAPI dialect detected from the root `openapi` / `swagger` field.
+/// `OpenAPI` dialect detected from the root `openapi` / `swagger` field.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Dialect {
     V30(String),

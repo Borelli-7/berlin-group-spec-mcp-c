@@ -95,7 +95,7 @@ pub fn diff_operations(old: OperationSide<'_>, new: OperationSide<'_>) -> Vec<Co
 
     let norm = |op: &OpenApiOperation| {
         let mut v: Vec<Value> = op.security.iter().map(|s| json!(s)).collect();
-        v.sort_by_key(|x| x.to_string());
+        v.sort_by_key(ToString::to_string);
         v
     };
     let (seca, secb) = (norm(a), norm(b));
@@ -424,10 +424,8 @@ mod tests {
             "provenance": {"source_id": "s", "document_id": "s@1", "version": version, "kind": "openapi",
                 "authority": "technical", "precedence": 90, "locator": "op:GET x", "sha256": "0", "document_sha256": "0"}
         });
-        if let (Some(b), Some(e)) = (base.as_object_mut(), extra.as_object()) {
-            for (k, v) in e {
-                b.insert(k.clone(), v.clone());
-            }
+        if let (Some(b), Value::Object(e)) = (base.as_object_mut(), extra) {
+            b.extend(e);
         }
         serde_json::from_value(base).expect("valid operation fixture")
     }

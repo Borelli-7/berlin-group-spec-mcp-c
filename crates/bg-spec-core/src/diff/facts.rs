@@ -11,7 +11,12 @@ pub struct CompatibilityFact {
 }
 
 fn kind_text(k: SchemaChangeKind) -> &'static str {
-    use SchemaChangeKind::*;
+    use SchemaChangeKind::{
+        AdditionalPropertiesChanged, CompositionChanged, ConstraintChanged, EnumConstraintChanged,
+        EnumValuesAdded, EnumValuesRemoved, FormatChanged, NullableChanged, PropertyAdded,
+        PropertyRemoved, RefChanged, RequiredAdded, RequiredRemoved, SchemaAdded, SchemaRemoved,
+        TypeChanged,
+    };
     match k {
         SchemaAdded => "schema added",
         SchemaRemoved => "schema removed",
@@ -40,7 +45,7 @@ fn side_text(s: ChangeSide) -> &'static str {
     }
 }
 
-fn compact(v: &Option<serde_json::Value>) -> String {
+fn compact(v: Option<&serde_json::Value>) -> String {
     match v {
         Some(v) => {
             let s = v.to_string();
@@ -70,7 +75,7 @@ pub fn derive_facts(
                     .after
                     .as_ref()
                     .and_then(|v| v.get("required"))
-                    .and_then(|v| v.as_bool())
+                    .and_then(serde_json::Value::as_bool)
                     .unwrap_or(false);
                 facts.push(CompatibilityFact {
                     side: c.side,
@@ -107,8 +112,8 @@ pub fn derive_facts(
                         "{:?} '{}' changed from {} ({from}) to {} ({to}).",
                         c.area,
                         c.subject,
-                        compact(&c.before),
-                        compact(&c.after)
+                        compact(c.before.as_ref()),
+                        compact(c.after.as_ref())
                     ),
                 });
             }
@@ -130,8 +135,8 @@ pub fn derive_facts(
                     s.pointer,
                     within,
                     kind_text(s.kind),
-                    compact(&s.before),
-                    compact(&s.after)
+                    compact(s.before.as_ref()),
+                    compact(s.after.as_ref())
                 ),
             });
         }

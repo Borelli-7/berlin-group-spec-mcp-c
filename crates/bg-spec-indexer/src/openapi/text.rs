@@ -1,4 +1,4 @@
-//! Search text for OpenAPI records (indexed in Tantivy alongside PDF chunks).
+//! Search text for `OpenAPI` records (indexed in Tantivy alongside PDF chunks).
 
 use bg_spec_core::domain::{OpenApiOperation, OpenApiSchema};
 use serde_json::Value;

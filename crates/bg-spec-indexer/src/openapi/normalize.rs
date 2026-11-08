@@ -18,7 +18,7 @@ const METHODS: [&str; 8] = [
 ];
 const MAX_REF_DEPTH: usize = 16;
 
-/// Normalized content of one OpenAPI document.
+/// Normalized content of one `OpenAPI` document.
 #[derive(Debug, Clone, Default)]
 pub struct NormalizedApi {
     pub operations: Vec<OpenApiOperation>,
@@ -422,7 +422,7 @@ fn metadata(
     })
 }
 
-/// Normalizes an OpenAPI document tree into semantic operation and schema records.
+/// Normalizes an `OpenAPI` document tree into semantic operation and schema records.
 pub fn normalize(root: &Value, doc: &Document) -> Result<NormalizedApi> {
     let dialect = detect_dialect(root)?;
     let mut diagnostics = Vec::new();
@@ -568,7 +568,7 @@ mod tests {
         }
     }
 
-    const YAML: &str = r##"
+    const YAML: &str = r#"
 openapi: 3.0.3
 info: {title: Test, version: "2.0"}
 security:
@@ -632,7 +632,7 @@ components:
     Transaction: {type: object, required: [amount], properties: {amount: {type: string}}}
     Error: {type: object}
     ScaApproach: {type: string, enum: [REDIRECT, EMBEDDED]}
-"##;
+"#;
 
     #[test]
     fn normalizes_typed_30() {

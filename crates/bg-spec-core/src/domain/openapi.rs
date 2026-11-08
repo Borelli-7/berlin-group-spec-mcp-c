@@ -97,7 +97,7 @@ pub enum SecurityOrigin {
     None,
 }
 
-/// A normalized OpenAPI operation, indexed as a semantic unit.
+/// A normalized `OpenAPI` operation, indexed as a semantic unit.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
 pub struct OpenApiOperation {
     pub version: SpecificationVersion,
@@ -129,7 +129,7 @@ pub struct OpenApiOperation {
     pub provenance: Provenance,
 }
 
-/// A reusable OpenAPI component schema, indexed separately.
+/// A reusable `OpenAPI` component schema, indexed separately.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
 pub struct OpenApiSchema {
     pub version: SpecificationVersion,

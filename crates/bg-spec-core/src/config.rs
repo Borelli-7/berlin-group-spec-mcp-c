@@ -50,8 +50,7 @@ impl IndexConfig {
     pub fn effective_jobs(&self) -> usize {
         match self.jobs {
             0 => std::thread::available_parallelism()
-                .map(|n| n.get())
-                .unwrap_or(1)
+                .map_or(1, std::num::NonZero::get)
                 .min(8),
             n => n.min(MAX_INDEX_JOBS),
         }
@@ -154,7 +153,7 @@ impl Config {
     }
 
     pub fn parse(raw: &str, base_dir: &Path) -> Result<Self> {
-        let mut cfg: Config = toml::from_str(raw).map_err(|e| CoreError::Config(e.to_string()))?;
+        let mut cfg: Self = toml::from_str(raw).map_err(|e| CoreError::Config(e.to_string()))?;
         if cfg.corpus_root.is_relative() {
             cfg.corpus_root = base_dir.join(&cfg.corpus_root);
         }

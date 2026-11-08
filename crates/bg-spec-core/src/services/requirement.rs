@@ -528,11 +528,7 @@ impl RequirementService {
             .await
     }
 
-    fn declared_conflicts(
-        &self,
-        rec: &RequirementRecord,
-        all: &[RequirementRecord],
-    ) -> Vec<Conflict> {
+    fn declared_conflicts(rec: &RequirementRecord, all: &[RequirementRecord]) -> Vec<Conflict> {
         let id = &rec.requirement.id;
         let cite = |ids: [&str; 2]| -> Vec<Citation> {
             let mut c: Vec<Citation> = all
@@ -708,8 +704,7 @@ impl RequirementService {
                                 locator: s.locator.clone(),
                             })
                             .collect(),
-                        related_endpoints: self
-                            .endpoint_refs(r)
+                        related_endpoints: Self::endpoint_refs(r)
                             .into_iter()
                             .map(|(e, _)| e.to_string())
                             .collect(),
@@ -752,7 +747,7 @@ impl RequirementService {
     }
 
     /// Endpoints linked by a requirement: explicit list plus `op:`/`path:` source locators.
-    fn endpoint_refs(&self, r: &Requirement) -> Vec<(EndpointRef, String)> {
+    fn endpoint_refs(r: &Requirement) -> Vec<(EndpointRef, String)> {
         let mut out: Vec<(EndpointRef, String)> = r
             .endpoints
             .iter()
@@ -788,12 +783,12 @@ impl RequirementService {
         let req = &rec.requirement;
         let resolved = self.resolve_sources(&rec).await?;
         let mut conflicts = resolved.conflicts;
-        conflicts.extend(self.declared_conflicts(&rec, &all));
+        conflicts.extend(Self::declared_conflicts(&rec, &all));
 
         // Endpoints.
         let mut endpoints = Vec::new();
         let mut ops: Vec<OpenApiOperation> = Vec::new();
-        for (e, via) in self.endpoint_refs(req) {
+        for (e, via) in Self::endpoint_refs(req) {
             let lookup = if let Some(sid) = via
                 .strip_prefix("source:")
                 .and_then(|v| v.split_whitespace().next())
@@ -809,46 +804,43 @@ impl RequirementService {
                     .await?
                     .map(|l| (l.primary, l.others))
             };
-            match lookup {
-                Some((op, others)) => {
-                    let other_prov: Vec<Provenance> =
-                        others.iter().map(|o| o.provenance.clone()).collect();
-                    conflicts.extend(Self::duplicate_conflict(
-                        &format!("operation {e}"),
-                        &op.provenance,
-                        &other_prov,
-                    ));
-                    endpoints.push(TracedEndpoint {
-                        endpoint: e.to_string(),
-                        via,
-                        found: true,
-                        operation: Some(OperationSummary::from(&op)),
-                        provenance: Some(op.provenance.clone()),
-                    });
-                    ops.push(op);
-                }
-                None => {
-                    // Already reported by resolve_sources for `source:` links.
-                    if via == "endpoints" {
-                        conflicts.push(Conflict {
-                            kind: ConflictKind::DanglingReference,
-                            description: format!(
-                                "{} links endpoint {e} which is not defined in version {}",
-                                req.id, req.version
-                            ),
-                            requirement_ids: vec![req.id.clone()],
-                            citations: vec![],
-                            provenance: vec![],
-                        });
-                    }
-                    endpoints.push(TracedEndpoint {
-                        endpoint: e.to_string(),
-                        via,
-                        found: false,
-                        operation: None,
-                        provenance: None,
+            if let Some((op, others)) = lookup {
+                let other_prov: Vec<Provenance> =
+                    others.iter().map(|o| o.provenance.clone()).collect();
+                conflicts.extend(Self::duplicate_conflict(
+                    &format!("operation {e}"),
+                    &op.provenance,
+                    &other_prov,
+                ));
+                endpoints.push(TracedEndpoint {
+                    endpoint: e.to_string(),
+                    via,
+                    found: true,
+                    operation: Some(OperationSummary::from(&op)),
+                    provenance: Some(op.provenance.clone()),
+                });
+                ops.push(op);
+            } else {
+                // Already reported by resolve_sources for `source:` links.
+                if via == "endpoints" {
+                    conflicts.push(Conflict {
+                        kind: ConflictKind::DanglingReference,
+                        description: format!(
+                            "{} links endpoint {e} which is not defined in version {}",
+                            req.id, req.version
+                        ),
+                        requirement_ids: vec![req.id.clone()],
+                        citations: vec![],
+                        provenance: vec![],
                     });
                 }
+                endpoints.push(TracedEndpoint {
+                    endpoint: e.to_string(),
+                    via,
+                    found: false,
+                    operation: None,
+                    provenance: None,
+                });
             }
         }
         for (path, via) in Self::path_refs(req) {
@@ -918,56 +910,53 @@ impl RequirementService {
                     .into_iter()
                     .next(),
             };
-            match found {
-                Some(s) => {
-                    let closure = self
-                        .spec
-                        .schema_closure(
-                            &s.provenance.source_id,
-                            &req.version,
-                            s.referenced_schemas.iter().cloned(),
-                        )
-                        .await?;
-                    schemas.push(TracedSchema {
-                        name: name.clone(),
-                        via,
-                        found: true,
-                        referenced_schemas: s.referenced_schemas.clone(),
-                        provenance: Some(s.provenance.clone()),
-                    });
-                    for (n, t) in closure.schemas {
-                        if seen.insert(n.clone()) {
-                            schemas.push(TracedSchema {
-                                name: n,
-                                via: format!("transitive:{name}"),
-                                found: true,
-                                referenced_schemas: t.referenced_schemas.clone(),
-                                provenance: Some(t.provenance),
-                            });
-                        }
-                    }
-                }
-                None => {
-                    if via == "explicit" {
-                        conflicts.push(Conflict {
-                            kind: ConflictKind::DanglingReference,
-                            description: format!(
-                                "{} links schema '{name}' which is not defined in version {}",
-                                req.id, req.version
-                            ),
-                            requirement_ids: vec![req.id.clone()],
-                            citations: vec![],
-                            provenance: vec![],
+            if let Some(s) = found {
+                let closure = self
+                    .spec
+                    .schema_closure(
+                        &s.provenance.source_id,
+                        &req.version,
+                        s.referenced_schemas.iter().cloned(),
+                    )
+                    .await?;
+                schemas.push(TracedSchema {
+                    name: name.clone(),
+                    via,
+                    found: true,
+                    referenced_schemas: s.referenced_schemas.clone(),
+                    provenance: Some(s.provenance.clone()),
+                });
+                for (n, t) in closure.schemas {
+                    if seen.insert(n.clone()) {
+                        schemas.push(TracedSchema {
+                            name: n,
+                            via: format!("transitive:{name}"),
+                            found: true,
+                            referenced_schemas: t.referenced_schemas.clone(),
+                            provenance: Some(t.provenance),
                         });
                     }
-                    schemas.push(TracedSchema {
-                        name,
-                        via,
-                        found: false,
-                        referenced_schemas: vec![],
-                        provenance: None,
+                }
+            } else {
+                if via == "explicit" {
+                    conflicts.push(Conflict {
+                        kind: ConflictKind::DanglingReference,
+                        description: format!(
+                            "{} links schema '{name}' which is not defined in version {}",
+                            req.id, req.version
+                        ),
+                        requirement_ids: vec![req.id.clone()],
+                        citations: vec![],
+                        provenance: vec![],
                     });
                 }
+                schemas.push(TracedSchema {
+                    name,
+                    via,
+                    found: false,
+                    referenced_schemas: vec![],
+                    provenance: None,
+                });
             }
         }
 
@@ -1070,8 +1059,7 @@ impl RequirementService {
             if r.version != version {
                 continue;
             }
-            let mut linked_via: Vec<String> = self
-                .endpoint_refs(r)
+            let mut linked_via: Vec<String> = Self::endpoint_refs(r)
                 .into_iter()
                 .filter(|(e, _)| {
                     e.method == method
@@ -1097,7 +1085,7 @@ impl RequirementService {
             let resolved = self.resolve_sources(rec).await?;
             conflicts.extend(resolved.conflicts);
             let partners = self.conflict_partners(rec).await?;
-            conflicts.extend(self.declared_conflicts(rec, &partners));
+            conflicts.extend(Self::declared_conflicts(rec, &partners));
             for s in &resolved.sources {
                 if s.provenance.is_empty() {
                     citations.push(SourceCitation {

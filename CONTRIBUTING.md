@@ -4,12 +4,17 @@
 
 ```bash
 cargo fmt --all --check
-cargo clippy --all-targets --all-features -- -D warnings
-cargo test --workspace
-cargo build --release
+cargo clippy --workspace --all-targets --all-features --locked -- -D warnings
+cargo test --workspace --locked
+cargo build --release --locked
 ```
 
-The MSRV is Rust 1.91 (edition 2024), and `rust-toolchain.toml` tracks stable.
+The MSRV is Rust 1.99 (edition 2024), and `rust-toolchain.toml` tracks stable.
+
+Lints are configured once in the root `Cargo.toml` (`[workspace.lints]`) and inherited by every
+crate via `[lints] workspace = true`: `clippy::pedantic` is on, with a short, commented allow-list.
+Silence an individual finding with `#[expect(lint, reason = "...")]` (or `#[allow(..., reason = ...)]`
+for macro-generated code) rather than a crate-wide allow.
 
 ## Architecture rules
 
@@ -20,7 +25,7 @@ The MSRV is Rust 1.91 (edition 2024), and `rust-toolchain.toml` tracks stable.
   Put logic in a core service and add a thin adapter.
 * Never add an LLM call or network access to any crate.
 * Every returned evidence item must carry `Provenance`.
-* No `unsafe`: every crate declares `#![forbid(unsafe_code)]`.
+* No `unsafe`: `unsafe_code = "forbid"` is set in `[workspace.lints.rust]`.
 * Expected input errors are `CoreError` variants and must never cause a panic.
 
 ## Adding a tool

@@ -35,6 +35,7 @@ use bg_spec_store::{
 use serde::Serialize;
 use serde_json::json;
 use std::{
+    collections::BTreeSet,
     path::{Path, PathBuf},
     sync::Arc,
     time::{Instant, SystemTime, UNIX_EPOCH},
@@ -113,10 +114,10 @@ struct Processed {
 fn now_unix() -> i64 {
     SystemTime::now()
         .duration_since(UNIX_EPOCH)
-        .map(|d| d.as_secs() as i64)
-        .unwrap_or(0)
+        .map_or(0, |d| i64::try_from(d.as_secs()).unwrap_or(i64::MAX))
 }
 
+#[expect(clippy::needless_pass_by_value, reason = "signature matches `map_err`")]
 fn join_err(e: tokio::task::JoinError) -> CoreError {
     CoreError::Integrity(format!("indexing task failed: {e}"))
 }
@@ -429,7 +430,7 @@ impl Indexer {
         let (sha, size) = tokio::task::spawn_blocking(move || -> Result<(String, u64)> {
             let file = std::fs::File::open(&hash_path)
                 .map_err(|e| CoreError::io(hash_path.display().to_string(), e))?;
-            let size = file.metadata().map(|m| m.len()).unwrap_or(0);
+            let size = file.metadata().map_or(0, |m| m.len());
             let sha = sha256_reader(std::io::BufReader::new(file))
                 .map_err(|e| CoreError::io(hash_path.display().to_string(), e))?;
             Ok((sha, size))
@@ -509,7 +510,7 @@ impl Indexer {
                     .split('\u{c}')
                     .enumerate()
                     .map(|(i, text)| ExtractedPage {
-                        number: i as u32 + 1,
+                        number: u32::try_from(i + 1).unwrap_or(u32::MAX),
                         text: text.to_owned(),
                         error: None,
                     })
@@ -661,7 +662,7 @@ fn process_paged(
             source_id: document.source_id.clone(),
             page: page.number,
             status,
-            char_count: text.chars().count() as u32,
+            char_count: u32::try_from(text.chars().count()).unwrap_or(u32::MAX),
             sha256: sha256_hex(text.as_bytes()),
             text,
         });
@@ -681,7 +682,7 @@ fn process_paged(
                 .collect::<Vec<_>>(),
         )
     } else {
-        Default::default()
+        BTreeSet::default()
     };
     let mut removed_margin_lines = 0;
     let mut hyphenation_repairs = 0;
@@ -738,7 +739,7 @@ fn process_paged(
             .at(format!("page:{p}")),
         );
     }
-    document.page_count = Some(total as u32);
+    document.page_count = Some(u32::try_from(total).unwrap_or(u32::MAX));
     document.status = if extracted_count + blank == total && extracted_count > 0 {
         DocumentStatus::Indexed
     } else {

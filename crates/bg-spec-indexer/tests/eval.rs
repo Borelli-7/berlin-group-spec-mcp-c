@@ -1,4 +1,8 @@
 //! Deterministic retrieval gates. Gold locators identify evidence, not normative conclusions.
+#![allow(
+    clippy::print_stdout,
+    reason = "prints retrieval metrics for the gate report"
+)]
 use bg_spec_core::services::{ServiceSettings, Services, SourceResolution};
 use bg_spec_indexer::{IndexOptions, Indexer, testing};
 use serde::Deserialize;
@@ -104,8 +108,7 @@ async fn evaluate(official: bool) {
             let page = (
                 hit.source_id.clone(),
                 hit.page
-                    .map(|p| format!("{p}|{}", hit.title))
-                    .unwrap_or_else(|| hit.locator.clone()),
+                    .map_or_else(|| hit.locator.clone(), |p| format!("{p}|{}", hit.title)),
             );
             let fresh_content = seen.insert(content);
             let fresh_page = seen.insert(page);
@@ -128,9 +131,9 @@ async fn evaluate(official: bool) {
         }
     }
     let n = gold.searches.len() as f64;
-    let recall = found as f64 / n;
+    let recall = f64::from(found) / n;
     // Exactly one judged relevant locator per query; unjudged hits are not treated as relevant.
-    let precision = found as f64 / (n * k as f64);
+    let precision = f64::from(found) / (n * k as f64);
     let mrr = reciprocal_rank / n;
     assert_eq!(recall, 1.0);
     assert!(mrr >= if official { 0.8 } else { 1.0 });

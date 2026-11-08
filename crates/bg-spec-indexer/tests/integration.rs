@@ -121,8 +121,7 @@ async fn removed_manifest_entries_are_dropped_from_both_stores() {
         .expect("errata entry");
     let end = raw[start + 4..]
         .find("\n  - id:")
-        .map(|i| start + 4 + i + 1)
-        .unwrap_or(raw.len());
+        .map_or(raw.len(), |i| start + 4 + i + 1);
     std::fs::write(&manifest, format!("{}{}", &raw[..start], &raw[end..])).unwrap();
 
     let report = Indexer::new(env.config.clone())
@@ -640,13 +639,13 @@ async fn acceptance_scenario_transactions_endpoint() {
         .unwrap();
     let b = stable(&bundle);
     assert_eq!(b["endpoint"]["found"], true);
-    let req_ids: Vec<_> = b["requirements"]
-        .as_array()
-        .unwrap()
-        .iter()
-        .map(|r| r["requirement_id"].as_str().unwrap().to_owned())
-        .collect();
-    assert!(req_ids.contains(&"OFV2-TRANSACTIONS-001".to_owned()));
+    assert!(
+        b["requirements"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|r| r["requirement_id"] == "OFV2-TRANSACTIONS-001")
+    );
     for r in b["requirements"].as_array().unwrap() {
         assert_eq!(r["classification"], "authoritative_requirement");
     }
@@ -798,7 +797,7 @@ async fn schema_closure_reports_cross_source_references_and_cycles() {
     let root = &env.config.corpus_root;
     std::fs::write(
         root.join("openapi/v2/extra.yaml"),
-        r##"openapi: 3.0.3
+        r#"openapi: 3.0.3
 info: {title: Extra, version: "2.0"}
 paths:
   /extras/{extraId}:
@@ -819,7 +818,7 @@ components:
       properties:
         children: {type: array, items: {$ref: '#/components/schemas/Node'}}
         amount: {$ref: '#/components/schemas/Amount'}
-"##,
+"#,
     )
     .unwrap();
     let manifest = root.join("manifest.yaml");

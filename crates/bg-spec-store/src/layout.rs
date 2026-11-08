@@ -91,8 +91,7 @@ pub fn current_layout(data_dir: &Path) -> Result<IndexLayout> {
 pub fn create_staging(data_dir: &Path) -> Result<PathBuf> {
     let nanos = SystemTime::now()
         .duration_since(UNIX_EPOCH)
-        .map(|d| d.as_nanos())
-        .unwrap_or(0);
+        .map_or(0, |d| d.as_nanos());
     let dir =
         generations_dir(data_dir).join(format!("{STAGING_PREFIX}{}-{nanos}", std::process::id()));
     fs::create_dir_all(&dir).map_err(|e| io_err(&dir, e))?;

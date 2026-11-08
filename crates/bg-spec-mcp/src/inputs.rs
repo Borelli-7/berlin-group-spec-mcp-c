@@ -52,7 +52,7 @@ pub struct EndpointInput {
     /// Specification version; defaults to the configured target version.
     #[serde(default)]
     pub version: Option<String>,
-    /// OpenAPI path template, e.g. `/accounts/{accountId}/transactions`.
+    /// `OpenAPI` path template, e.g. `/accounts/{accountId}/transactions`.
     pub path: String,
     /// HTTP method, e.g. `GET`.
     pub method: String,
@@ -64,7 +64,7 @@ pub struct EndpointRequirementsInput {
     /// Specification version; defaults to the configured target version.
     #[serde(default)]
     pub version: Option<String>,
-    /// OpenAPI path template, e.g. `/accounts/{accountId}/transactions`.
+    /// `OpenAPI` path template, e.g. `/accounts/{accountId}/transactions`.
     pub path: String,
     /// HTTP method, e.g. `GET`.
     pub method: String,

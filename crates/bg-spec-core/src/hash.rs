@@ -10,7 +10,7 @@ pub fn sha256_hex(bytes: impl AsRef<[u8]>) -> String {
 /// Streams a reader through SHA-256 without loading it fully into memory.
 pub fn sha256_reader<R: Read>(mut reader: R) -> std::io::Result<String> {
     let mut hasher = Sha256::new();
-    let mut buf = [0u8; 64 * 1024];
+    let mut buf = vec![0u8; 64 * 1024];
     loop {
         let n = reader.read(&mut buf)?;
         if n == 0 {

@@ -16,7 +16,7 @@ fn from_json<T: DeserializeOwned>(s: &str) -> Result<T> {
     serde_json::from_str(s).map_err(storage)
 }
 
-fn decode_all<T: DeserializeOwned>(rows: Vec<String>) -> Result<Vec<T>> {
+fn decode_all<T: DeserializeOwned>(rows: &[String]) -> Result<Vec<T>> {
     rows.iter().map(|s| from_json(s)).collect()
 }
 
@@ -34,7 +34,7 @@ impl SqliteCatalog {
             .fetch_one(self.pool())
             .await
             .map_err(storage)?;
-        Ok(n.max(0) as u64)
+        Ok(u64::try_from(n).unwrap_or(0))
     }
 
     /// Raw `index_meta` value.
@@ -65,7 +65,7 @@ impl CatalogRepository for SqliteCatalog {
                 &[],
             )
             .await?;
-        decode_all(rows)
+        decode_all(&rows)
     }
 
     async fn get_document(&self, source_id: &str) -> Result<Option<Document>> {
@@ -90,7 +90,7 @@ impl CatalogRepository for SqliteCatalog {
                 &[&ids],
             )
             .await?;
-        decode_all(rows)
+        decode_all(&rows)
     }
 
     async fn get_pages(&self, source_id: &str, from: u32, to: u32) -> Result<Vec<PageRecord>> {
@@ -107,10 +107,10 @@ impl CatalogRepository for SqliteCatalog {
             .map(|(page, status, text, char_count, sha256)| {
                 Ok(PageRecord {
                     source_id: source_id.to_owned(),
-                    page: page as u32,
+                    page: u32::try_from(page).map_err(storage)?,
                     status: status.parse().map_err(storage)?,
                     text,
-                    char_count: char_count as u32,
+                    char_count: u32::try_from(char_count).map_err(storage)?,
                     sha256,
                 })
             })
@@ -133,7 +133,7 @@ impl CatalogRepository for SqliteCatalog {
         .fetch_all(self.pool())
         .await
         .map_err(storage)?;
-        decode_all(rows)
+        decode_all(&rows)
     }
 
     async fn chunks_for_section(
@@ -181,7 +181,7 @@ impl CatalogRepository for SqliteCatalog {
                 &[version.as_str(), method, path_key],
             )
             .await?;
-        decode_all(rows)
+        decode_all(&rows)
     }
 
     async fn get_source_operation(
@@ -210,7 +210,7 @@ impl CatalogRepository for SqliteCatalog {
                 &[source_id, path],
             )
             .await?;
-        decode_all(rows)
+        decode_all(&rows)
     }
 
     async fn find_schemas(
@@ -225,7 +225,7 @@ impl CatalogRepository for SqliteCatalog {
                 &[version.as_str(), name],
             )
             .await?;
-        decode_all(rows)
+        decode_all(&rows)
     }
 
     async fn get_source_schema(
@@ -258,7 +258,7 @@ impl CatalogRepository for SqliteCatalog {
                 &[source_id, &names],
             )
             .await?;
-        decode_all(rows)
+        decode_all(&rows)
     }
 
     async fn find_schemas_by_names(
@@ -278,14 +278,14 @@ impl CatalogRepository for SqliteCatalog {
                 &[version.as_str(), &names],
             )
             .await?;
-        decode_all(rows)
+        decode_all(&rows)
     }
 
     async fn list_requirements(&self) -> Result<Vec<RequirementRecord>> {
         let rows = self
             .json_rows("SELECT json FROM requirements ORDER BY id", &[])
             .await?;
-        decode_all(rows)
+        decode_all(&rows)
     }
 
     async fn get_requirement(&self, id: &str) -> Result<Option<RequirementRecord>> {
@@ -310,7 +310,7 @@ impl CatalogRepository for SqliteCatalog {
                 &[&ids, target],
             )
             .await?;
-        decode_all(rows)
+        decode_all(&rows)
     }
 
     async fn requirements_by_version(
@@ -323,7 +323,7 @@ impl CatalogRepository for SqliteCatalog {
                 &[version.as_str()],
             )
             .await?;
-        decode_all(rows)
+        decode_all(&rows)
     }
 
     async fn requirements_for_method(
@@ -341,7 +341,7 @@ impl CatalogRepository for SqliteCatalog {
                 &[version.as_str(), method],
             )
             .await?;
-        decode_all(rows)
+        decode_all(&rows)
     }
 
     async fn stats(&self) -> Result<CatalogStats> {

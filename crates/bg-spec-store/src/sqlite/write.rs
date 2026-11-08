@@ -57,7 +57,7 @@ impl SqliteCatalog {
         .bind(&document.title)
         .bind(&document.path)
         .bind(document.sha256.as_deref())
-        .bind(document.size_bytes.map(|s| s as i64))
+        .bind(document.size_bytes.map(|s| i64::try_from(s).unwrap_or(i64::MAX)))
         .bind(document.status.as_str())
         .bind(&document.fingerprint)
         .bind(document.extractor.as_deref())
@@ -215,7 +215,7 @@ impl SqliteCatalog {
                     "INSERT INTO requirement_sources (requirement_id, ordinal, source_id, locator, sha256_pin) VALUES (?1,?2,?3,?4,?5)",
                 )
                 .bind(&req.id)
-                .bind(i as i64)
+                .bind(i64::try_from(i).map_err(storage)?)
                 .bind(&src.source_id)
                 .bind(&src.locator)
                 .bind(src.sha256.as_deref())

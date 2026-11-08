@@ -27,7 +27,7 @@ impl Drop for Timer {
         tracing::debug!(
             target: TARGET,
             op = self.op,
-            elapsed_us = self.started.elapsed().as_micros() as u64,
+            elapsed_us = u64::try_from(self.started.elapsed().as_micros()).unwrap_or(u64::MAX),
             "timing"
         );
     }

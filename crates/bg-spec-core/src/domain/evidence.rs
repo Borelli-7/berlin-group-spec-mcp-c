@@ -70,7 +70,7 @@ pub struct SearchQuery {
 /// One full-text search hit. Always `discovered_evidence`.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
 pub struct SearchResult {
-    /// Chunk id, or record id for OpenAPI operations/schemas. Use with `read_source`.
+    /// Chunk id, or record id for `OpenAPI` operations/schemas. Use with `read_source`.
     pub record_id: String,
     pub record_type: RecordType,
     pub source_id: String,
@@ -104,7 +104,7 @@ pub enum DuplicateReason {
     IdenticalContent,
     /// Another chunk of the same page and section (title) of the same source.
     SamePage,
-    /// A schema of the same name and version in another OpenAPI file (e.g. a service file
+    /// A schema of the same name and version in another `OpenAPI` file (e.g. a service file
     /// embedding a copy of a data-dictionary schema with cosmetic differences).
     SameSchema,
 }

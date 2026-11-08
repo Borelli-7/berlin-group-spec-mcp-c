@@ -75,7 +75,7 @@ pub fn validate_relative_path(path: &str) -> Result<()> {
 
 impl Manifest {
     pub fn parse(yaml: &str) -> Result<Self> {
-        let manifest: Manifest =
+        let manifest: Self =
             serde_saphyr::from_str(yaml).map_err(|e| CoreError::Manifest(e.to_string()))?;
         manifest.validate()?;
         Ok(manifest)
@@ -144,7 +144,7 @@ impl Manifest {
 mod tests {
     use super::*;
 
-    const YAML: &str = r#"
+    const YAML: &str = r"
 sources:
   - id: bg-openfinance-v2-implementation-guidelines
     kind: pdf
@@ -159,7 +159,7 @@ sources:
     precedence: 90
     path: openapi/v2/openfinance.yaml
     title: Open Finance V2 OpenAPI
-"#;
+";
 
     #[test]
     fn parses_valid_manifest() {

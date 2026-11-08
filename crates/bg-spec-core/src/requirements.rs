@@ -35,7 +35,7 @@ impl RequirementsFile {
     /// References to unknown sources/endpoints are *not* rejected here: they are surfaced
     /// at query time as `dangling_reference` conflicts so that curators can see them.
     pub fn parse(yaml: &str) -> Result<Self> {
-        let file: RequirementsFile =
+        let file: Self =
             serde_saphyr::from_str(yaml).map_err(|e| CoreError::Requirements(e.to_string()))?;
         file.validate()?;
         Ok(file)
@@ -148,13 +148,13 @@ requirements:
     fn rejects_invalid() {
         assert!(RequirementsFile::parse(&YAML.replace("page:3", "page:zero")).is_err());
         assert!(RequirementsFile::parse(&YAML.replace("OFV2-TRANSACTIONS-001", "bad id")).is_err());
-        let no_sources = r#"
+        let no_sources = r"
 requirements:
   - id: X-1
     version: openfinance-v2
     title: t
     sources: []
-"#;
+";
         assert!(RequirementsFile::parse(no_sources).is_err());
         assert!(RequirementsFile::parse(&YAML.replace("dateFrom", "x\"\n    bogus: [")).is_err());
     }

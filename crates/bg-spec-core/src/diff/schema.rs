@@ -67,15 +67,12 @@ fn resolve<'v>(set: &'v SchemaSet, mut v: &'v Value) -> (Option<&'v str>, &'v Va
         else {
             break;
         };
-        match set.get_key_value(n) {
-            Some((k, target)) => {
-                name = Some(k.as_str());
-                v = target;
-            }
-            None => {
-                name = Some(n);
-                break;
-            }
+        if let Some((k, target)) = set.get_key_value(n) {
+            name = Some(k.as_str());
+            v = target;
+        } else {
+            name = Some(n);
+            break;
         }
     }
     (name, v)
@@ -94,7 +91,7 @@ fn type_set(v: &Value) -> BTreeSet<String> {
     }
 }
 
-/// OpenAPI 3.0 `nullable: true` or 3.1 `type: [..., "null"]`.
+/// `OpenAPI` 3.0 `nullable: true` or 3.1 `type: [..., "null"]`.
 fn is_nullable(v: &Value) -> bool {
     v.get("nullable").and_then(Value::as_bool).unwrap_or(false)
         || matches!(v.get("type"), Some(Value::Array(ts)) if ts.iter().any(|t| t == "null"))

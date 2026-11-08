@@ -4,8 +4,6 @@
 //! This crate is free of storage, parsing and transport concerns. Storage adapters live
 //! in `bg-spec-store`, ingestion in `bg-spec-indexer` and the MCP adapter in `bg-spec-mcp`.
 
-#![forbid(unsafe_code)]
-
 pub mod config;
 pub mod diff;
 pub mod domain;

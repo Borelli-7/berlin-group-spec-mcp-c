@@ -4,8 +4,6 @@
 //! documents or rebuilds indexes. When `bg-spec index` publishes a new generation, the next tool
 //! call switches to it. All logs go to stderr so stdout carries only MCP frames.
 
-#![forbid(unsafe_code)]
-
 use anyhow::{Context, Result};
 use bg_spec_core::config::Config;
 use bg_spec_mcp::{BgSpecServer, ServiceSource};

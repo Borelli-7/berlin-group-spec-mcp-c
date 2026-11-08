@@ -1,4 +1,4 @@
-//! Tantivy full-text index (BM25) over chunks, OpenAPI operations and schemas.
+//! Tantivy full-text index (BM25) over chunks, `OpenAPI` operations and schemas.
 
 use async_trait::async_trait;
 use bg_spec_core::{
@@ -165,7 +165,7 @@ pub struct SearchDocument {
     pub sha256: String,
     /// Code-like identifiers matched exactly (see `bg_spec_core::identifiers`).
     pub identifiers: Vec<String>,
-    /// Enclosing headings of a chunk, outermost first (empty for OpenAPI records).
+    /// Enclosing headings of a chunk, outermost first (empty for `OpenAPI` records).
     pub section_path: Vec<String>,
 }
 
@@ -311,7 +311,7 @@ impl TantivySearch {
         &self.dir
     }
 
-    fn build_query(&self, q: &SearchQuery) -> Result<Box<dyn Query>> {
+    fn build_query(&self, q: &SearchQuery) -> Box<dyn Query> {
         let f = &self.fields;
         let mut parser =
             QueryParser::for_index(&self.index, vec![f.title, f.section_context, f.content]);
@@ -348,14 +348,14 @@ impl TantivySearch {
                 .collect();
             clauses.push((Occur::Must, Box::new(BooleanQuery::new(kinds))));
         }
-        Ok(Box::new(BooleanQuery::new(clauses)))
+        Box::new(BooleanQuery::new(clauses))
     }
 
     fn search_blocking(&self, q: &SearchQuery) -> Result<Vec<SearchResult>> {
         if q.limit == 0 || q.text.trim().is_empty() {
             return Ok(Vec::new());
         }
-        let query = self.build_query(q)?;
+        let query = self.build_query(q);
         let searcher = self.reader.searcher();
         // Over-fetch so ties at the cut-off are resolved deterministically by record id.
         let fetch = q.limit.saturating_add(16);
@@ -399,7 +399,7 @@ impl TantivySearch {
                 page: doc
                     .get_first(f.page)
                     .and_then(|v| v.as_u64())
-                    .map(|p| p as u32),
+                    .and_then(|p| u32::try_from(p).ok()),
                 evidence,
                 relevance: (score * 1000.0).round() / 1000.0,
                 sha256: text(f.sha256),

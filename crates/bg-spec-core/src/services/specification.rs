@@ -380,7 +380,7 @@ pub struct HealthReport {
     pub published_generation: Option<u64>,
 }
 
-/// Source retrieval, OpenAPI lookup and full-text search.
+/// Source retrieval, `OpenAPI` lookup and full-text search.
 #[derive(Clone)]
 pub struct SpecificationService {
     catalog: Arc<dyn CatalogRepository>,
@@ -467,13 +467,13 @@ impl SpecificationService {
     }
 
     async fn known_versions(&self) -> Result<Arc<BTreeSet<String>>> {
-        if let Some(known) = self
+        let cached = self
             .caches
             .known_versions
             .lock()
-            .unwrap_or_else(|e| e.into_inner())
-            .clone()
-        {
+            .unwrap_or_else(std::sync::PoisonError::into_inner)
+            .clone();
+        if let Some(known) = cached {
             return Ok(known);
         }
         let known: Arc<BTreeSet<String>> = Arc::new(
@@ -488,7 +488,7 @@ impl SpecificationService {
             .caches
             .known_versions
             .lock()
-            .unwrap_or_else(|e| e.into_inner()) = Some(known.clone());
+            .unwrap_or_else(std::sync::PoisonError::into_inner) = Some(known.clone());
         Ok(known)
     }
 
@@ -553,7 +553,7 @@ impl SpecificationService {
             query: text.to_owned(),
             filters: SearchFilters {
                 version: version.map(|v| v.to_string()),
-                kind: kinds.first().map(|k| k.to_string()),
+                kind: kinds.first().map(ToString::to_string),
                 source_id: source_id.map(str::to_owned),
             },
             notice: EVIDENCE_NOTICE.to_owned(),

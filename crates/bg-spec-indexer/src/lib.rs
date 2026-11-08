@@ -1,7 +1,5 @@
-//! Ingestion pipeline: discovery, hashing, PDF extraction, OpenAPI normalization,
+//! Ingestion pipeline: discovery, hashing, PDF extraction, `OpenAPI` normalization,
 //! chunking and indexing into the SQLite catalog and Tantivy index.
-
-#![forbid(unsafe_code)]
 
 pub mod chunk;
 pub mod discover;

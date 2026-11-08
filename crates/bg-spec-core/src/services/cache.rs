@@ -44,22 +44,25 @@ impl<K: Eq + Hash + Clone, V: Clone> BoundedCache<K, V> {
     }
 
     pub(crate) fn get(&self, key: &K) -> Option<V> {
-        let mut entries = self.entries.lock().unwrap_or_else(|e| e.into_inner());
-        match entries.get_mut(key) {
-            Some((value, used)) => {
-                *used = self.tick();
-                self.hits.fetch_add(1, Ordering::Relaxed);
-                Some(value.clone())
-            }
-            None => {
-                self.misses.fetch_add(1, Ordering::Relaxed);
-                None
-            }
+        let mut entries = self
+            .entries
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner);
+        if let Some((value, used)) = entries.get_mut(key) {
+            *used = self.tick();
+            self.hits.fetch_add(1, Ordering::Relaxed);
+            Some(value.clone())
+        } else {
+            self.misses.fetch_add(1, Ordering::Relaxed);
+            None
         }
     }
 
     pub(crate) fn insert(&self, key: K, value: V) {
-        let mut entries = self.entries.lock().unwrap_or_else(|e| e.into_inner());
+        let mut entries = self
+            .entries
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner);
         if !entries.contains_key(&key) && entries.len() >= self.capacity {
             let oldest = entries
                 .iter()
@@ -74,7 +77,11 @@ impl<K: Eq + Hash + Clone, V: Clone> BoundedCache<K, V> {
 
     pub(crate) fn stats(&self) -> CacheStats {
         CacheStats {
-            entries: self.entries.lock().unwrap_or_else(|e| e.into_inner()).len(),
+            entries: self
+                .entries
+                .lock()
+                .unwrap_or_else(std::sync::PoisonError::into_inner)
+                .len(),
             hits: self.hits.load(Ordering::Relaxed),
             misses: self.misses.load(Ordering::Relaxed),
         }
